@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>[TEST] ILM Statistics</title>
+</head>
+<body>
+
+    <h1>ILM Statistics</h1>
+    </br>
+    <h2>Users</h2>
+    <p>{{.Users}} users, {{.Accounts}} accounts - average of {{.AverageAccountsPerUser}} accounts/user</p>
+    </br></br>
+    <h2>Number of tests started in each hour</h2>
+    <p>0:00 – 0:59: {{.NrProj0}} </p>
+    <p>1:00 – 1:59: {{.NrProj1}} </p>
+    <p>2:00 – 2:59: {{.NrProj2}} </p>
+    <p>3:00 – 3:59: {{.NrProj3}} </p>
+    <p>4:00 – 4:59: {{.NrProj4}} </p>
+    <p>5:00 – 5:59: {{.NrProj5}} </p>
+    <p>6:00 – 6:59: {{.NrProj6}} </p>
+    <p>7:00 – 7:59: {{.NrProj7}} </p>
+    <p>8:00 – 8:59: {{.NrProj8}} </p>
+    <p>9:00 – 9:59: {{.NrProj9}} </p>
+    <p>10:00 – 10:59: {{.NrProj10}} </p>
+    <p>11:00 – 11:59: {{.NrProj11}} </p>
+    <p>12:00 – 12:59: {{.NrProj12}} </p>
+    <p>13:00 – 13:59: {{.NrProj13}} </p>
+    <p>14:00 – 14:59: {{.NrProj14}} </p>
+    <p>15:00 – 15:59: {{.NrProj15}} </p>
+    <p>16:00 – 16:59: {{.NrProj16}} </p>
+    <p>17:00 – 17:59: {{.NrProj17}} </p>
+    <p>18:00 – 18:59: {{.NrProj18}} </p>
+    <p>19:00 – 19:59: {{.NrProj19}} </p>
+    <p>20:00 – 20:59: {{.NrProj20}} </p>
+    <p>21:00 – 21:59: {{.NrProj21}} </p>
+    <p>22:00 – 22:59: {{.NrProj22}} </p>
+    <p>23:00 – 23:59: {{.NrProj23}} </p>
+
+    <h2>Busiest time of the day:</h2>
+    <p>{{.BusiestHour}}</p>
+
+    <h2>Other stats</h2>
+    <p>{{.Tests}} tests, {{.Projects}} projects - average of {{.AverageTestsPerProject}} tests/project</p>
+    <p>Overall {{.Images}} images, {{.Projects}} projects - average of {{.AverageImagesPerProject}} images/project</p>
+    <p>Overall success rate of projects in ILM: {{.SuccessRate}}%</p>
+    <p>Overall failure rate of projects in ILM: {{.FailureRate}}%</p>
+
+</body>
+</html>
