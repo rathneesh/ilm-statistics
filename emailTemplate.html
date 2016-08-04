@@ -25,8 +25,8 @@
         {{ end }}
 
     <h2>Most executed project(s)</h2>
-    The most executed project was ran {{ .MaxProjectPopularity }} times
-    <br>
+    The most executed project(s) was (were) ran {{ .MaxProjectPopularity }} times
+    <br><br>
     {{ range $projectId, $project := .MostPopularProjects }}
        Project:
         <li> Id: {{ $projectId }}</li>
@@ -39,7 +39,23 @@
     {{ end }}
 
     <h2>Images in projects</h2>
-
+    <ol>
+    {{ range $image, $projectList := .ImagesInProjects }}
+        <li> {{ $image }}</li>
+        <ul>
+        {{ range $project := $projectList }}
+            Project:
+            <li> Id: {{ $project.Id }}</li>
+            <li> Name: {{ $project.Name }}</li>
+            <li> Author: {{ $project.Author }}</li>
+            <li> Creation time: {{ $project.CreationTime }}</li>
+            <li> Last run: {{ $project.LastRunTime }}</li>
+            <li> Status: {{ $project.Status }}</li>
+            <br><br>
+        {{ end }}
+        </ul>
+    {{ end }}
+    </ol>
     <h2>Projects: success and failure rate</h2>
 
     <h2>Most used tags</h2>

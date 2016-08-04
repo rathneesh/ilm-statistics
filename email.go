@@ -26,6 +26,7 @@ func SendEmailTemplate(stat Statistic) {
 		FailureRate string
 		MostPopularProjects map[string]ScriptProjects
 		MaxProjectPopularity int
+		ImagesInProjects map[string][]ScriptProjects
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,
@@ -42,6 +43,7 @@ func SendEmailTemplate(stat Statistic) {
 		FailureRate: strconv.FormatFloat(stat.Projects.FailureRate, 'f', 2, 64),
 		MostPopularProjects: stat.MostPopularProjects,
 		MaxProjectPopularity: stat.MaxProjectPopularity,
+		ImagesInProjects: stat.ImagesInProjects,
 	}
 
 	if len(templateData.Hours) != 0 {
@@ -49,17 +51,17 @@ func SendEmailTemplate(stat Statistic) {
 	}
 
 	log.Println("Creating new e-mail request")
-	r := NewRequest([]string{"lilla.vass@hpe.com","lenuta.toderean@hpe.com"}, "[TEST] ILM Statistics", "Hello, World!")
+	r := NewRequest([]string{"lilla.vass@hpe.com"}, "[TEST] ILM Statistics", "Hello, World!")
 	err := r.ParseTemplate("emailTemplate.html", templateData)
 	if err != nil {
 		log.Println(err)
 		log.Println("Template could not be parsed")
 	} else {
 		log.Println("Sending the e-mail")
-		_, e := r.SendEmail()
-		if e != nil {
-			log.Println(e)
-		}
+		//_, e := r.SendEmail()
+		//if e != nil {
+		//	log.Println(e)
+		//}
 	}
 }
 

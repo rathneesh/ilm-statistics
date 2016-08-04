@@ -58,9 +58,9 @@ type ScriptAccounts struct {
 
 type ScriptImageDetails struct {
 	ProjectId      string
-	Id             string
-	Name           string
-	ImageId        string
+	Id             string   // ---|
+ 	Name           string   //    | One of these is enough - sorry Denisa
+	ImageId        string   // ---|
 	Description    string
 	Status         string
 	RegistryId     string
@@ -139,6 +139,7 @@ type Statistic struct {
 	MostPopularProjects		     map[string]ScriptProjects
 	MaxProjectPopularity		     int
 	ImagesInProjects		     map[string][]ScriptProjects
+	ProjectsSuccessRate		     map[string]int
 
 }
 
@@ -157,11 +158,14 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	s.MaxProjectPopularity = 0
 	var projectId map[string]bool
 	s.ImagesInProjects = map[string][]ScriptProjects{}
-	//var imageIdToName map[string]string
+	/*/imageIdToName := map[string]string{}
 
-	//for i := 0; i < len(stat); i++ {
-	//	for
-	//}
+	//map the image id to imagename:imagetag
+	for i := 0; i < len(stat); i++ {
+		for j := 0; j < len(stat[i].Images); j++ {
+			imageIdToName[stat[i].Images[j].Id] = strings.Join([]string{stat[i].Images[j].Name, ":", stat[i].Images[j].Tag},"")
+		}
+	}*/
 
 	for i:=0; i<len(stat); i++ {
 		s.Accounts += len(stat[i].Accounts)
@@ -171,6 +175,11 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 				s.Projects.Passed += 1
 			} else if stat[i].Projects[j].Status == "finished_failed" {
 				s.Projects.Failed += 1
+			}
+
+			//Images in projects
+			for k := 0; k < len(stat[i].Projects[j].Images); k++ {
+				s.ImagesInProjects[strings.Join([]string{stat[i].Projects[j].Images[k].Name, ":", stat[i].Projects[j].Images[k].Tag},"")] = append(s.ImagesInProjects[strings.Join([]string{stat[i].Projects[j].Images[k].Name, ":", stat[i].Projects[j].Images[k].Tag},"")], stat[i].Projects[j])
 			}
 		}
 
@@ -212,6 +221,8 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 	}
 
+	log.Println(s.ImagesInProjects)
+
 	//Most popular projects
 	s.MostPopularProjects = make(map[string]ScriptProjects)
 	for j := 0; j < len(stat); j++ {
@@ -237,7 +248,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 	}
 
-	//Projects by images
+
 
 
 
