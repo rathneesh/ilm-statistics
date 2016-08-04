@@ -4,7 +4,6 @@ import (
 	"time"
 	"encoding/json"
 	"io/ioutil"
-	"net/smtp"
 	"strings"
 	"strconv"
 	"os"
@@ -94,7 +93,6 @@ func SendStatistics() {
 	s.Day = time.Now()
 
 	// Email the statistics
-	//EmailStatistics(s)
 	SendEmailTemplate(s)
 
 	// Save today's averages to the file

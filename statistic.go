@@ -1,18 +1,23 @@
 package main
 
-import "time"
-
+import (
+	"time"
+	"strings"
+	"strconv"
+	"log"
+)
 
 type SenderStatistics struct {
-	Username   string
-	Images     []ScriptImageDetails
-	Accounts   []ScriptAccounts
-	Projects   []ScriptProjects
-	Builds     []ScriptBuilds
-	Registries []ScriptRegistries
-	Tests      []ScriptTests
-	Results    []ScriptBuildResults
-	Day 	   time.Time
+	Username     string
+	Images       []ScriptImageDetails
+	Accounts     []ScriptAccounts
+	Projects     []ScriptProjects
+	Builds       []ScriptBuilds
+	Registries   []ScriptRegistries
+	Tests        []ScriptTests
+	Results      []ScriptBuildResults
+	Repositories []ScriptRepository
+	Day 	     time.Time
 }
 
 type ScriptBuilds struct {
@@ -22,50 +27,80 @@ type ScriptBuilds struct {
 	StartTime string
 	Status    Status
 }
+
 type Status struct {
 	Status string
 }
+
 type Results struct {
 	ResultEntries []string
 }
+
 type ScriptProjects struct {
+	Id           string
 	Name         string
 	Author       string
 	CreationTime string
 	LastRunTime  string
 	Status       string
+	Images       []ScriptImageDetails
+	Tests        []ScriptTests
 }
 
 type ScriptAccounts struct {
-	Id        string   `json:"id"`
-	FirstName string   `json:"first_name"`
-	LastName  string   `json:"last_name"`
-	Username  string   `json:"username"`
-	Password  string   `json:"password"`
-	Roles     []string `json:"roles"`
+	Id        string
+	FirstName string
+	LastName  string
+	Username  string
+	Password  string
+	Roles     []string
 }
 
 type ScriptImageDetails struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	ImageId     string `json:"imageId"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	RegistryId  string `json:"registryId"`
-
-	Location       string `json:"location"`
-	SkipImageBuild string `json:"skipImageBuild"`
-
-	ProjectId string `json:"projectId"`
+	ProjectId      string
+	Id             string
+	Name           string
+	ImageId        string
+	Description    string
+	Status         string
+	RegistryId     string
+	Tag            string
+	IlmTags        []string
+	Location       string
+	SkipImageBuild string
 }
 
+type ScriptRepository struct {
+	Name         string
+	Tag          string
+	FsLayers     []FsLayer
+	Signatures   []Signature
+	HasProblems  bool
+	Message      string
+	RegistryUrl  string
+	RegistryName string
+}
+
+type FsLayer struct {
+	BlobSum string
+}
+type Signature struct {
+	Header    Header
+	Signature string
+	Protected string
+}
+
+type Header struct {
+	Algorithm string
+}
 type ScriptRegistries struct {
+	Id   string
 	Name string
 	Addr string
 }
 type ScriptTests struct {
-	Id        string `json:"id"`
-	ProjectId string `json:"projectId"`
+	Id        string
+	ProjectId string
 	Provider  Provider
 }
 type Provider struct {
@@ -78,80 +113,33 @@ type ScriptBuildResults struct {
 }
 
 type Statistic struct {
-	Users 		                    int `json:"users"`
-	Accounts 	                    int `json:"accounts"`
-	AvgAccountPerUser                   float64 `json:"avgaccountperuser"`
+	Day 				     time.Time
+	Users 		                     int `json:"users"`
+	Accounts 	                     int `json:"accounts"`
+	AvgAccountPerUser                    float64 `json:"avgaccountperuser"`
 	Projects struct {
-		Total		            int `json:"total"`
-		ImagesInProjects            int `json:"imagesinprojects"`
-		AvgTestsInProjects          float64 `json:"avgtestsinprojects"`
-		AvgImagesInProjects         float64 `json:"avgimagesinprojects"`
-		Passed			    int `json:"passed"`
-		Failed			    int `json:"failed"`
-		SuccessRate		    float64 `json:"successrate"`
-		FailureRate		    float64 `json:"failurerate"`
-		NrProj0 int
-		NrProj1 int
-		NrProj2 int
-		NrProj3 int
-		NrProj4 int
-		NrProj5 int
-		NrProj6 int
-		NrProj7 int
-		NrProj8 int
-		NrProj9 int
-		NrProj10 int
-		NrProj11 int
-		NrProj12 int
-		NrProj13 int
-		NrProj14 int
-		NrProj15 int
-		NrProj16 int
-		NrProj17 int
-		NrProj18 int
-		NrProj19 int
-		NrProj20 int
-		NrProj21 int
-		NrProj22 int
-		NrProj23 int
-		BusiestHour string
-	} 					`json:"projects"`
-	Registries 	                    int `json:"registries"`
+			 Total               int `json:"total"`
+			 ImagesInProjects    int `json:"imagesinprojects"`
+			 AvgTestsInProjects  float64 `json:"avgtestsinprojects"`
+			 AvgImagesInProjects float64 `json:"avgimagesinprojects"`
+			 Passed              int `json:"passed"`
+			 Failed              int `json:"failed"`
+			 SuccessRate         float64 `json:"successrate"`
+			 FailureRate         float64 `json:"failurerate"`
+		 } 					`json:"projects"`
 	Tests struct {
-		Total                       int `json:"total"`
-		Passed 	                    int `json:"passed"`
-		Failed	                    int `json:"failed"`
-//		SuccessRate                 float64 `json:"successrate"`
-//		FailureRate                 float64 `json:"failurerate"`
-	}					`json:"tests"`
-	Difference struct {
-		Users 		            int `json:"users"`
-		Accounts 	            int `json:"accounts"`
-		AvgAccountPerUser           float64 `json:"avgaccountperuser"`
-		Projects struct {
-			Total		    int `json:"total"`
-			ImagesInProjects    int `json:"imagesinprojects"`
-			AvgTestsInProjects  float64 `json:"avgtestsinprojects"`
-			AvgImagesInProjects float64 `json:"avgimagesinprojects"`
-//			Passed		    int `json:passed`
-//			Failed		    int `json:failed`
-		} 				`json:"projects"`
-		Registries 	            int `json:"registries"`
-		Tests struct {
-			Total               int `json:"total"`
-			Passed 	            int `json:"passed"`
-			Failed	            int `json:"failed"`
-			SuccessRate         float64 `json:"successrate"`
-			FailureRate         float64 `json:"failurerate"`
-		}				`json:"tests"`
-	} 					`json:"difference"`
-	Day time.Time
-}
+		Total                        int `json:"total"`
+		Passed 	                     int `json:"passed"`
+		Failed	                     int `json:"failed"`
+	}					 `json:"tests"`
 
-func StatisticCalculateDifference(yesterdayStat Statistic, statToday Statistic) Statistic {
-	//TODO: calculate difference based on the final model
+	HourlyActivities 		     map[int]int
+	BusiestHours 			     []int
+	Registries 	                     int `json:"registries"`
+	MostPopularProjects		     map[string]ScriptProjects
+	MaxProjectPopularity		     int
+	ImagesInProjects		     map[string][]ScriptProjects
 
-	return Statistic{}
 }
 
 func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
@@ -164,6 +152,16 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	s.Projects.Failed = 0
 	s.Registries = 0
 	s.Tests.Total = 0
+	s.HourlyActivities = map[int]int{}
+	projectsPopularity := map[string]int{}
+	s.MaxProjectPopularity = 0
+	var projectId map[string]bool
+	s.ImagesInProjects = map[string][]ScriptProjects{}
+	//var imageIdToName map[string]string
+
+	//for i := 0; i < len(stat); i++ {
+	//	for
+	//}
 
 	for i:=0; i<len(stat); i++ {
 		s.Accounts += len(stat[i].Accounts)
@@ -175,11 +173,73 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 				s.Projects.Failed += 1
 			}
 		}
+
+
+		for j := 0; j < len(stat[i].Builds); j++ {
+			datetime := strings.Split(stat[i].Builds[j].StartTime,"T")
+			time := strings.Split(datetime[1],":")
+			hour := time[0]
+			hr, err := strconv.Atoi(hour);
+			if err != nil {
+				log.Println(err)
+				log.Println("Invalid input data")
+			} else {
+				for k := 0; k < len(stat[i].Tests); k++ {
+					if (stat[i].Builds[j].ProjectId == stat[i].Tests[k].ProjectId) {
+						s.HourlyActivities[hr]++
+					}
+				}
+			}
+
+			//Most popular projects
+			projectsPopularity[stat[i].Builds[j].ProjectId]++
+		}
+
 		s.Projects.ImagesInProjects += len(stat[i].Images)
 		//TODO find unique registries
 		s.Registries += len(stat[i].Registries)
 		s.Tests.Total += len(stat[i].Tests)
+
+		//Most popular projects
+		for projid, occurence := range projectsPopularity {
+			if occurence > s.MaxProjectPopularity {
+				projectId = make(map[string]bool)
+				projectId[projid] = true
+				s.MaxProjectPopularity = occurence
+			} else if occurence == s.MaxProjectPopularity {
+				projectId[projid] = true
+			}
+		}
 	}
+
+	//Most popular projects
+	s.MostPopularProjects = make(map[string]ScriptProjects)
+	for j := 0; j < len(stat); j++ {
+		for k := 0; k < len(stat[j].Projects); k++ {
+			for id, _ := range projectId {
+				if stat[j].Projects[k].Id == id {
+					s.MostPopularProjects[id] = stat[j].Projects[k]
+				}
+			}
+		}
+	}
+
+
+	//Tests/hour
+	s.BusiestHours = []int{}
+	max := s.HourlyActivities[0]
+	for i := 1; i < 24; i++ {
+		if s.HourlyActivities[i] > max {
+			s.BusiestHours = []int{i}
+			max = s.HourlyActivities[i]
+		} else if s.HourlyActivities[i] == max {
+			s.BusiestHours = append(s.BusiestHours, i)
+		}
+	}
+
+	//Projects by images
+
+
 
 	s.AvgAccountPerUser = float64(s.Accounts)/float64(s.Users)
 	s.Projects.AvgTestsInProjects = float64(s.Tests.Total)/float64(s.Projects.Total)

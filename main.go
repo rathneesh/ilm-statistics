@@ -17,7 +17,6 @@ func main() {
 	log.Println("Cronometer started")
 
 	SendStatistics()
-	log.Println("Statistics sent")
 
 	// Listen on port 8080 for incoming REST calls
 	log.Println("Listening on port 8080")
