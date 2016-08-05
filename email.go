@@ -31,9 +31,14 @@ func SendEmailTemplate(stat Statistic) {
 		ProjectsSuccess map[string]string
 		ProjectsFailure map[string]string
 		MostUsedImages []string
-		MostUsedImageOccurence int
+		MostUsedImageOccurrence int
 		LeastUsedImages []string
-		LeastUsedImageOccurence int
+		LeastUsedImageOccurrence int
+		NumberOfImages int
+		MostExecutedTests []ScriptTests
+		MostExecutedTestsNr int
+		LeastExecutedTests []ScriptTests
+		LeastExecutedTestsNr int
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,
@@ -53,9 +58,14 @@ func SendEmailTemplate(stat Statistic) {
 		ImagesInProjects: stat.ImagesInProjects,
 		ProjectsList: stat.ScriptProjects,
 		MostUsedImages: stat.MostUsedImages,
-		MostUsedImageOccurence: stat.MostUsedImageOccurence,
+		MostUsedImageOccurrence: stat.MostUsedImageOccurrence,
 		LeastUsedImages: stat.LeastUsedImages,
-		LeastUsedImageOccurence: stat.LeastUsedImageOccurence,
+		LeastUsedImageOccurrence: stat.LeastUsedImageOccurrence,
+		NumberOfImages: stat.NumberOfImages,
+		MostExecutedTests: stat.MostExecutedTests,
+		MostExecutedTestsNr: stat.MostExecutedTestsNr,
+		LeastExecutedTests: stat.LeastExecutedTests,
+		LeastExecutedTestsNr: stat.LeastExecutedTestsNr,
 
 	}
 

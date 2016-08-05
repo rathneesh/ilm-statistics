@@ -5,6 +5,7 @@ import (
 	"strings"
 	"strconv"
 	"log"
+	"math"
 )
 
 type SenderStatistics struct {
@@ -143,9 +144,14 @@ type Statistic struct {
 	ProjectsFailure			     map[string]float64
 	ScriptProjects			     []ScriptProjects
 	MostUsedImages			     []string
-	MostUsedImageOccurence		     int
+	MostUsedImageOccurrence		     int
 	LeastUsedImages			     []string
-	LeastUsedImageOccurence		     int
+	LeastUsedImageOccurrence		     int
+	NumberOfImages			     int
+	MostExecutedTests		     []ScriptTests
+	MostExecutedTestsNr		     int
+	LeastExecutedTests		     []ScriptTests
+	LeastExecutedTestsNr		     int
 }
 
 func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
@@ -166,6 +172,10 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	s.ProjectsFailure = map[string]float64{}
 	s.ProjectsSuccess = map[string]float64{}
 	projectsOtherOutcome := map[string]float64{}
+	s.MostExecutedTestsNr = 0
+	s.LeastExecutedTestsNr = math.MaxInt32
+	buildsToTest := map[string][]ScriptBuilds{}
+
 
 	for i:=0; i<len(stat); i++ {
 		s.Accounts += len(stat[i].Accounts)
@@ -211,6 +221,9 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 			} else {
 				projectsOtherOutcome[stat[i].Builds[j].ProjectId]++
 			}
+
+			// Most/Least executed tests
+			buildsToTest[stat[i].Builds[j].TestId] = append(buildsToTest[stat[i].Builds[j].TestId], stat[i].Builds[j])
 		}
 
 		s.Projects.ImagesInProjects += len(stat[i].Images)
@@ -219,12 +232,12 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		s.Tests.Total += len(stat[i].Tests)
 
 		//Most popular projects
-		for projid, occurence := range projectsPopularity {
-			if occurence > s.MaxProjectPopularity {
+		for projid, occurrence := range projectsPopularity {
+			if occurrence > s.MaxProjectPopularity {
 				projectId = make(map[string]bool)
 				projectId[projid] = true
-				s.MaxProjectPopularity = occurence
-			} else if occurence == s.MaxProjectPopularity {
+				s.MaxProjectPopularity = occurrence
+			} else if occurrence == s.MaxProjectPopularity {
 				projectId[projid] = true
 			}
 		}
@@ -252,6 +265,23 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 				s.ProjectsFailure[stat[j].Projects[k].Id] = 0
 			}
 		}
+
+		for _, test := range stat[j].Tests {
+			buildListLength := len(buildsToTest[test.Id])
+			if s.MostExecutedTestsNr < buildListLength {
+				s.MostExecutedTestsNr = buildListLength
+				s.MostExecutedTests = []ScriptTests{test}
+			} else if s.MostExecutedTestsNr == buildListLength {
+				s.MostExecutedTests = append(s.MostExecutedTests, test)
+			}
+
+			if s.LeastExecutedTestsNr > buildListLength {
+				s.LeastExecutedTestsNr = buildListLength
+				s.LeastExecutedTests = []ScriptTests{test}
+			} else if s.LeastExecutedTestsNr == buildListLength {
+				s.LeastExecutedTests = append(s.LeastExecutedTests, test)
+			}
+		}
 	}
 
 
@@ -267,25 +297,26 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 	}
 
-	s.MostUsedImageOccurence = 0
-	s.LeastUsedImageOccurence = 10000000
+	s.MostUsedImageOccurrence = 0
+	s.LeastUsedImageOccurrence = math.MaxInt32
 	for imageName, projectList := range s.ImagesInProjects {
-		if s.MostUsedImageOccurence < len(projectList){
-			s.MostUsedImageOccurence = len(projectList)
+		if s.MostUsedImageOccurrence < len(projectList){
+			s.MostUsedImageOccurrence = len(projectList)
 			s.MostUsedImages = []string{imageName}
-		} else if s.MostUsedImageOccurence == len(projectList) {
+		} else if s.MostUsedImageOccurrence == len(projectList) {
 			s.MostUsedImages = append(s.MostUsedImages, imageName)
 		}
 
-		if s.LeastUsedImageOccurence > len(projectList) {
-			s.LeastUsedImageOccurence = len(projectList)
+		if s.LeastUsedImageOccurrence > len(projectList) {
+			s.LeastUsedImageOccurrence = len(projectList)
 			s.LeastUsedImages = []string{imageName}
-		} else if s.LeastUsedImageOccurence == len(projectList) {
+		} else if s.LeastUsedImageOccurrence == len(projectList) {
 			s.LeastUsedImages = append(s.LeastUsedImages, imageName)
 		}
 	}
 
 
+	s.NumberOfImages = len(s.ImagesInProjects)
 	s.AvgAccountPerUser = float64(s.Accounts)/float64(s.Users)
 	s.Projects.AvgTestsInProjects = float64(s.Tests.Total)/float64(s.Projects.Total)
 	s.Projects.AvgImagesInProjects = float64(s.Projects.ImagesInProjects)/float64(s.Projects.Total)

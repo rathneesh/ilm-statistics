@@ -68,14 +68,35 @@
     <br><br>
     {{ end }}
 
+    <h2>Overall number of tags applied</h2>
+    {{ .NumberOfImages }}
+
     <h2>Most used tag(s)</h2>
     {{ range $image := .MostUsedImages}}
-    <li>{{ $image }} - {{ $.MostUsedImageOccurence }}</li>
+    <li>{{ $image }} - {{ $.MostUsedImageOccurrence }} occurrence(s)</li>
     {{ end }}
 
     <h2>Least used tag(s)</h2>
     {{ range $image := .LeastUsedImages}}
-    <li>{{ $image }} - {{ $.LeastUsedImageOccurence }}</li>
+    <li>{{ $image }} - {{ $.LeastUsedImageOccurrence }} occurrence(s)</li>
+    {{ end }}
+
+    <h2>Most executed test(s)</h2>
+    {{ range $test := .MostExecutedTests }}
+        Test:
+        <li>Id: {{ .Id }}</li>
+        <li>Project id: {{ .ProjectId }}</li>
+        <li>Executed: {{ $.MostExecutedTestsNr }} time(s)</li>
+        <br><br>
+    {{ end }}
+
+    <h2>Least executed test(s)</h2>
+    {{ range $test := .LeastExecutedTests }}
+        Test:
+        <li>Id: {{ .Id }}</li>
+        <li>Project id: {{ .ProjectId }}</li>
+        <li>Executed: {{ $.LeastExecutedTestsNr }} time(s)</li>
+        <br><br>
     {{ end }}
 
     <h2>Other stats</h2>
