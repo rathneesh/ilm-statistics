@@ -58,9 +58,25 @@
     </ol>
     <h2>Projects: success and failure rate</h2>
 
-    <h2>Most used tags</h2>
+    {{ range $project := .ProjectsList }}
+    Project:
+    <li>Id: {{ .Id }}</li>
+    <li>Name: {{ .Name }}</li>
+    <li>Success rate: {{ (index $.ProjectsSuccess .Id) }}%</li>
+    <li>Failure rate: {{ index $.ProjectsFailure .Id }}%</li>
 
-    <h2>Least used tags</h2>
+    <br><br>
+    {{ end }}
+
+    <h2>Most used tag(s)</h2>
+    {{ range $image := .MostUsedImages}}
+    <li>{{ $image }} - {{ $.MostUsedImageOccurence }}</li>
+    {{ end }}
+
+    <h2>Least used tag(s)</h2>
+    {{ range $image := .LeastUsedImages}}
+    <li>{{ $image }} - {{ $.LeastUsedImageOccurence }}</li>
+    {{ end }}
 
     <h2>Other stats</h2>
     <p>Overall {{.Tests}} tests, {{.Projects}} projects - average of {{.AverageTestsPerProject}} tests/project</p>

@@ -139,8 +139,13 @@ type Statistic struct {
 	MostPopularProjects		     map[string]ScriptProjects
 	MaxProjectPopularity		     int
 	ImagesInProjects		     map[string][]ScriptProjects
-	ProjectsSuccessRate		     map[string]int
-
+	ProjectsSuccess 		     map[string]float64
+	ProjectsFailure			     map[string]float64
+	ScriptProjects			     []ScriptProjects
+	MostUsedImages			     []string
+	MostUsedImageOccurence		     int
+	LeastUsedImages			     []string
+	LeastUsedImageOccurence		     int
 }
 
 func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
@@ -158,23 +163,18 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	s.MaxProjectPopularity = 0
 	var projectId map[string]bool
 	s.ImagesInProjects = map[string][]ScriptProjects{}
-	/*/imageIdToName := map[string]string{}
-
-	//map the image id to imagename:imagetag
-	for i := 0; i < len(stat); i++ {
-		for j := 0; j < len(stat[i].Images); j++ {
-			imageIdToName[stat[i].Images[j].Id] = strings.Join([]string{stat[i].Images[j].Name, ":", stat[i].Images[j].Tag},"")
-		}
-	}*/
+	s.ProjectsFailure = map[string]float64{}
+	s.ProjectsSuccess = map[string]float64{}
+	projectsOtherOutcome := map[string]float64{}
 
 	for i:=0; i<len(stat); i++ {
 		s.Accounts += len(stat[i].Accounts)
 		s.Projects.Total += len(stat[i].Projects)
 		for j := 0; j < len(stat[i].Projects); j++ {
 			if stat[i].Projects[j].Status == "finished_success" {
-				s.Projects.Passed += 1
+				s.Projects.Passed++
 			} else if stat[i].Projects[j].Status == "finished_failed" {
-				s.Projects.Failed += 1
+				s.Projects.Failed++
 			}
 
 			//Images in projects
@@ -200,8 +200,17 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 				}
 			}
 
-			//Most popular projects
+			// Most popular projects
 			projectsPopularity[stat[i].Builds[j].ProjectId]++
+
+			// Project success/failure rate
+			if stat[i].Builds[j].Status.Status == "finished_success" {
+				s.ProjectsSuccess[stat[i].Builds[j].ProjectId]++
+			} else if stat[i].Builds[j].Status.Status == "finished_failed" {
+				s.ProjectsFailure[stat[i].Builds[j].ProjectId]++
+			} else {
+				projectsOtherOutcome[stat[i].Builds[j].ProjectId]++
+			}
 		}
 
 		s.Projects.ImagesInProjects += len(stat[i].Images)
@@ -221,16 +230,26 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 	}
 
-	log.Println(s.ImagesInProjects)
-
 	//Most popular projects
 	s.MostPopularProjects = make(map[string]ScriptProjects)
 	for j := 0; j < len(stat); j++ {
 		for k := 0; k < len(stat[j].Projects); k++ {
+			s.ScriptProjects = append(s.ScriptProjects, stat[j].Projects[k])
+
 			for id, _ := range projectId {
 				if stat[j].Projects[k].Id == id {
 					s.MostPopularProjects[id] = stat[j].Projects[k]
 				}
+			}
+
+			//Project success/failure rate
+			totalNoOfBuilds := s.ProjectsSuccess[stat[j].Projects[k].Id] + s.ProjectsFailure[stat[j].Projects[k].Id] + projectsOtherOutcome[stat[j].Projects[k].Id]
+			if totalNoOfBuilds != 0 {
+				s.ProjectsSuccess[stat[j].Projects[k].Id] = (s.ProjectsSuccess[stat[j].Projects[k].Id] * 100) / totalNoOfBuilds
+				s.ProjectsFailure[stat[j].Projects[k].Id] = (s.ProjectsFailure[stat[j].Projects[k].Id] * 100) / totalNoOfBuilds
+			} else {
+				s.ProjectsSuccess[stat[j].Projects[k].Id] = 0
+				s.ProjectsFailure[stat[j].Projects[k].Id] = 0
 			}
 		}
 	}
@@ -248,8 +267,23 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 	}
 
+	s.MostUsedImageOccurence = 0
+	s.LeastUsedImageOccurence = 10000000
+	for imageName, projectList := range s.ImagesInProjects {
+		if s.MostUsedImageOccurence < len(projectList){
+			s.MostUsedImageOccurence = len(projectList)
+			s.MostUsedImages = []string{imageName}
+		} else if s.MostUsedImageOccurence == len(projectList) {
+			s.MostUsedImages = append(s.MostUsedImages, imageName)
+		}
 
-
+		if s.LeastUsedImageOccurence > len(projectList) {
+			s.LeastUsedImageOccurence = len(projectList)
+			s.LeastUsedImages = []string{imageName}
+		} else if s.LeastUsedImageOccurence == len(projectList) {
+			s.LeastUsedImages = append(s.LeastUsedImages, imageName)
+		}
+	}
 
 
 	s.AvgAccountPerUser = float64(s.Accounts)/float64(s.Users)

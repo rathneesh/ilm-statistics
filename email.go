@@ -27,6 +27,13 @@ func SendEmailTemplate(stat Statistic) {
 		MostPopularProjects map[string]ScriptProjects
 		MaxProjectPopularity int
 		ImagesInProjects map[string][]ScriptProjects
+		ProjectsList []ScriptProjects
+		ProjectsSuccess map[string]string
+		ProjectsFailure map[string]string
+		MostUsedImages []string
+		MostUsedImageOccurence int
+		LeastUsedImages []string
+		LeastUsedImageOccurence int
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,
@@ -44,10 +51,26 @@ func SendEmailTemplate(stat Statistic) {
 		MostPopularProjects: stat.MostPopularProjects,
 		MaxProjectPopularity: stat.MaxProjectPopularity,
 		ImagesInProjects: stat.ImagesInProjects,
+		ProjectsList: stat.ScriptProjects,
+		MostUsedImages: stat.MostUsedImages,
+		MostUsedImageOccurence: stat.MostUsedImageOccurence,
+		LeastUsedImages: stat.LeastUsedImages,
+		LeastUsedImageOccurence: stat.LeastUsedImageOccurence,
+
 	}
 
 	if len(templateData.Hours) != 0 {
 		templateData.IsActivity = true
+	}
+
+
+	templateData.ProjectsSuccess = map[string]string{}
+	templateData.ProjectsFailure = map[string]string{}
+	for projectId, success := range stat.ProjectsSuccess {
+		templateData.ProjectsSuccess[projectId] = strconv.FormatFloat(success, 'f', 2, 64)
+	}
+	for projectId, failure := range stat.ProjectsFailure {
+		templateData.ProjectsFailure[projectId] = strconv.FormatFloat(failure, 'f', 2, 64)
 	}
 
 	log.Println("Creating new e-mail request")
@@ -58,11 +81,12 @@ func SendEmailTemplate(stat Statistic) {
 		log.Println("Template could not be parsed")
 	} else {
 		log.Println("Sending the e-mail")
-		//_, e := r.SendEmail()
-		//if e != nil {
-		//	log.Println(e)
-		//}
+		_, e := r.SendEmail()
+		if e != nil {
+			log.Println(e)
+		}
 	}
+
 }
 
 //Request struct
