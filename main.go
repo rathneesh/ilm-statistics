@@ -3,15 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
-	"github.com/roylee0704/gron"
-	"github.com/roylee0704/gron/xtime"
+	"github.com/robfig/cron"
 )
 
 func main() {
 	log.Println("Adding cronometer")
 	// Set timer to calculate and send statistics
-	c := gron.New()
-	c.AddFunc(gron.Every(1 * xtime.Day).At("00:00"), SendStatistics)
+	c := cron.New()
+	c.AddFunc("@midnight", SendStatistics)
 	c.Start()
 
 	log.Println("Cronometer started")

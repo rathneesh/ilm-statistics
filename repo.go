@@ -8,11 +8,13 @@ import (
 	"strconv"
 	"os"
 	"log"
+	"sync"
 )
 
 const FILENAME = "data/statistics.json"
 var tmpfilename string
 var statistics []SenderStatistics
+var fileMutex sync.Mutex
 
 func init() {
 	log.Println("Initializing repository")
@@ -29,7 +31,10 @@ func CreateStatistic(s SenderStatistics) SenderStatistics {
 		log.Println(err)
 		return SenderStatistics{}
 	}
+
+	fileMutex.Lock()
 	err = ioutil.WriteFile(tmpfilename, data, 0666)
+	defer fileMutex.Unlock()
 	if err != nil {
 		log.Println(err)
 		return SenderStatistics{}

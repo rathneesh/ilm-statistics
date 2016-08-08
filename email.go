@@ -9,7 +9,7 @@ import (
 )
 
 func SendEmailTemplate(stat Statistic) {
-	log.Println("Start initializing e-mail template")
+	log.Println("Start initializing the e-mail")
 	templateData := struct {
 		Users int
 		Accounts int
@@ -142,7 +142,6 @@ func (r *Request) ParseTemplate(templateFileName string, data interface{}) error
 		return err
 	}
 	r.body = buf.String()
-	log.Println(buf.String())
 	log.Println("End parsing the e-mail template")
 	return nil
 }

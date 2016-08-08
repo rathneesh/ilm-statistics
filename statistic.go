@@ -155,6 +155,8 @@ type Statistic struct {
 }
 
 func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
+
+	//Initializing the required values
 	var s Statistic
 	s.Users = len(stat);
 	s.Accounts = 0
@@ -177,9 +179,14 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	buildsToTest := map[string][]ScriptBuilds{}
 
 
+	//iterate through the statistics
 	for i:=0; i<len(stat); i++ {
+
+		//Number all the accounts and projects
 		s.Accounts += len(stat[i].Accounts)
 		s.Projects.Total += len(stat[i].Projects)
+
+		//Overall project success/failure rate
 		for j := 0; j < len(stat[i].Projects); j++ {
 			if stat[i].Projects[j].Status == "finished_success" {
 				s.Projects.Passed++
@@ -194,18 +201,46 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 
 
+		//Iterate through the builds
 		for j := 0; j < len(stat[i].Builds); j++ {
+
+			//Get the build's date and today's date in different variables - for the comparision below
 			datetime := strings.Split(stat[i].Builds[j].StartTime,"T")
-			time := strings.Split(datetime[1],":")
-			hour := time[0]
+			date := strings.Split(datetime[0],"-")
+			now := time.Now()
+
+
+			year, err := strconv.Atoi(date[0])
+			if err != nil {
+				log.Println(err)
+			}
+
+			month, err := strconv.Atoi(date[1])
+			if err != nil {
+				log.Println(err)
+			}
+
+			day, err := strconv.Atoi(date[2])
+			if err != nil {
+				log.Println(err)
+			}
+
+			//It is triggered at midnight, has to calculate for the day before
+			day += 1
+
+
+			t := strings.Split(datetime[1],":")
+			hour := t[0]
 			hr, err := strconv.Atoi(hour);
 			if err != nil {
 				log.Println(err)
-				log.Println("Invalid input data")
 			} else {
-				for k := 0; k < len(stat[i].Tests); k++ {
-					if (stat[i].Builds[j].ProjectId == stat[i].Tests[k].ProjectId) {
-						s.HourlyActivities[hr]++
+				//Number today's hourly activities
+				if (year == now.Year() && time.Month(month) == now.Month() && day == now.Day()){
+					for k := 0; k < len(stat[i].Tests); k++ {
+						if (stat[i].Builds[j].ProjectId == stat[i].Tests[k].ProjectId) {
+							s.HourlyActivities[hr]++
+						}
 					}
 				}
 			}
@@ -213,7 +248,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 			// Most popular projects
 			projectsPopularity[stat[i].Builds[j].ProjectId]++
 
-			// Project success/failure rate
+			//Per project success/failure rate
 			if stat[i].Builds[j].Status.Status == "finished_success" {
 				s.ProjectsSuccess[stat[i].Builds[j].ProjectId]++
 			} else if stat[i].Builds[j].Status.Status == "finished_failed" {
@@ -227,7 +262,8 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 
 		s.Projects.ImagesInProjects += len(stat[i].Images)
-		//TODO find unique registries
+
+		//TODO find unique registries - when statistics regarding registries will be needed
 		s.Registries += len(stat[i].Registries)
 		s.Tests.Total += len(stat[i].Tests)
 
@@ -255,7 +291,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 				}
 			}
 
-			//Project success/failure rate
+			//Project success/failure rate - calculate in percents
 			totalNoOfBuilds := s.ProjectsSuccess[stat[j].Projects[k].Id] + s.ProjectsFailure[stat[j].Projects[k].Id] + projectsOtherOutcome[stat[j].Projects[k].Id]
 			if totalNoOfBuilds != 0 {
 				s.ProjectsSuccess[stat[j].Projects[k].Id] = (s.ProjectsSuccess[stat[j].Projects[k].Id] * 100) / totalNoOfBuilds
@@ -266,6 +302,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 			}
 		}
 
+		// Most/least executed tests
 		for _, test := range stat[j].Tests {
 			buildListLength := len(buildsToTest[test.Id])
 			if s.MostExecutedTestsNr < buildListLength {
@@ -285,7 +322,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	}
 
 
-	//Tests/hour
+	//Tests/hour - busiest hours
 	s.BusiestHours = []int{}
 	max := s.HourlyActivities[0]
 	for i := 1; i < 24; i++ {
@@ -297,6 +334,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 		}
 	}
 
+	// Most/least used images and their occurences
 	s.MostUsedImageOccurrence = 0
 	s.LeastUsedImageOccurrence = math.MaxInt32
 	for imageName, projectList := range s.ImagesInProjects {
@@ -323,5 +361,6 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	s.Projects.SuccessRate = float64(s.Projects.Passed*100)/float64(s.Projects.Total)
 	s.Projects.FailureRate = float64(s.Projects.Failed*100)/float64(s.Projects.Total)
 
+	// Return all in a statistics object
 	return s
 }
