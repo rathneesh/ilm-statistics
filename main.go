@@ -14,9 +14,7 @@ func main() {
 	c.AddFunc("@midnight", resource.SendStatistics)
 	c.Start()
 	log.Println("Cronometer started")
-
-	// resource.SendStatistics()
-
+	
 	// Listen on port 8080 for incoming REST calls
 	log.Println("Listening on port 8080")
 	router := resource.NewRouter()

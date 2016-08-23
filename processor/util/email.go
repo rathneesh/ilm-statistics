@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"strings"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 	FROM = "from@email.io"
 )
 
-var to = []string{"to@email.io"} // go does not allow to create constant arrays
+var to = []string{"to@email.io"}
 
 func SendEmailTemplate(stat model.Statistic) {
 	log.Println("Start initializing the e-mail")
@@ -129,7 +130,8 @@ func NewRequest(to []string, subject, body string) *Request {
 func (r *Request) SendEmail() (bool, error) {
 	mime := MIME
 	subject := "Subject: " + r.subject + "\n"
-	msg := []byte(subject + mime + "\n" + r.body)
+	to := "To: " + strings.TrimSuffix(strings.Join(to, ","), ",")
+	msg := []byte(subject + "From: " + FROM + "\n" + to + "\n;" + mime + "\n\r" + r.body)
 	addr := SMTPSERVER
 
 	err := smtp.SendMail(addr, nil, FROM, r.to, msg)
