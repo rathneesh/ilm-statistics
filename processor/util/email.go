@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"bytes"
@@ -6,9 +6,20 @@ import (
 	"net/smtp"
 	"log"
 	"strconv"
+	"github.com/ilm-statistics/ilm-statistics/model"
 )
 
-func SendEmailTemplate(stat Statistic) {
+const (
+	SUBJECT = "ILM Statistics"
+	TEMPLATE = "./processor/util/emailTemplate.html"
+	MIME = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	SMTPSERVER = "acme.smtp"
+	FROM = "from@email.io"
+)
+
+var to = []string{"to@email.io"} // go does not allow to create constant arrays
+
+func SendEmailTemplate(stat model.Statistic) {
 	log.Println("Start initializing the e-mail")
 	templateData := struct {
 		Users int
@@ -24,10 +35,10 @@ func SendEmailTemplate(stat Statistic) {
 		AverageImagesPerProject string
 		SuccessRate string
 		FailureRate string
-		MostPopularProjects map[string]ScriptProjects
+		MostPopularProjects map[string]model.Project
 		MaxProjectPopularity int
-		ImagesInProjects map[string][]ScriptProjects
-		ProjectsList []ScriptProjects
+		ImagesInProjects map[string][]model.Project
+		ProjectsList []model.Project
 		ProjectsSuccess map[string]string
 		ProjectsFailure map[string]string
 		MostUsedImages []string
@@ -35,9 +46,9 @@ func SendEmailTemplate(stat Statistic) {
 		LeastUsedImages []string
 		LeastUsedImageOccurrence int
 		NumberOfImages int
-		MostExecutedTests []ScriptTests
+		MostExecutedTests []model.Test
 		MostExecutedTestsNr int
-		LeastExecutedTests []ScriptTests
+		LeastExecutedTests []model.Test
 		LeastExecutedTestsNr int
 	}{
 		Users: stat.Users,
@@ -84,8 +95,8 @@ func SendEmailTemplate(stat Statistic) {
 	}
 
 	log.Println("Creating new e-mail request")
-	r := NewRequest([]string{"lilla.vass@hpe.com"}, "[TEST] ILM Statistics", "Hello, World!")
-	err := r.ParseTemplate("emailTemplate.html", templateData)
+	r := NewRequest(to, SUBJECT, "")
+	err := r.ParseTemplate(TEMPLATE, templateData)
 	if err != nil {
 		log.Println(err)
 		log.Println("Template could not be parsed")
@@ -116,12 +127,12 @@ func NewRequest(to []string, subject, body string) *Request {
 }
 
 func (r *Request) SendEmail() (bool, error) {
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	subject := "Subject: " + r.subject + "!\n"
+	mime := MIME
+	subject := "Subject: " + r.subject + "\n"
 	msg := []byte(subject + mime + "\n" + r.body)
-	addr := "smtp3.hpe.com:25"
+	addr := SMTPSERVER
 
-	err := smtp.SendMail(addr, nil, "ilm.stats@hpe.com", r.to, msg)
+	err := smtp.SendMail(addr, nil, FROM, r.to, msg)
 	if err != nil {
 		log.Println(err)
 		return false, err

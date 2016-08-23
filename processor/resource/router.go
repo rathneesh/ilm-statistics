@@ -1,4 +1,4 @@
-package main
+package resource
 
 import (
 	"net/http"
@@ -26,6 +26,12 @@ var routes = Routes{
 		"GET",
 		"/statistics",
 		GetStatistics,
+	},
+	Route{
+		"IPSend",
+		"POST",
+		"/usage",
+		GetIp,
 	},
 }
 

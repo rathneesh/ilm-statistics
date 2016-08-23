@@ -5,6 +5,7 @@ import (
 )
 
 type CollectedData struct {
+	MAC 	     string
 	Username     string
 	Images       []Image
 	Accounts     []Account
@@ -148,4 +149,26 @@ type Statistic struct {
 	MostExecutedTestsNr		     int
 	LeastExecutedTests		     []Test
 	LeastExecutedTestsNr		     int
+}
+
+type CollectedDataDiff struct {
+	MAC 		    string
+	NewUserName 	    string
+	AddedImages         []Image
+	DeletedImages       []Image
+	AddedAccounts 	    []Account
+	DeletedAccounts     []Account
+	AddedProjects 	    []Project
+	DeletedProjects     []Project
+	AddedBuilds 	    []Build
+	DeletedBuilds 	    []Build
+	AddedRegistries     []Registry
+	DeletedRegistries   []Registry
+	AddedTests 	    []Test
+	DeletedTests 	    []Test
+	AddedResults	    []BuildResult
+	DeletedResults 	    []BuildResult
+	AddedRepositories   []Repository
+	DeletedRepositories []Repository
+	NewDay 		    time.Time
 }

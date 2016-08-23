@@ -1,163 +1,23 @@
-package main
+package util
 
 import (
-	"time"
+	"math"
 	"strings"
+	"time"
 	"strconv"
 	"log"
-	"math"
+	"github.com/ilm-statistics/ilm-statistics/model"
 )
 
-type SenderStatistics struct {
-	Username     string
-	Images       []ScriptImageDetails
-	Accounts     []ScriptAccounts
-	Projects     []ScriptProjects
-	Builds       []ScriptBuilds
-	Registries   []ScriptRegistries
-	Tests        []ScriptTests
-	Results      []ScriptBuildResults
-	Repositories []ScriptRepository
-	Day 	     time.Time
-}
+const (
+	SUCCESS = "finished_success"
+	FAILURE = "finished_failed"
+)
 
-type ScriptBuilds struct {
-	Id        string
-	ProjectId string
-	TestId    string
-	StartTime string
-	Status    Status
-}
-
-type Status struct {
-	Status string
-}
-
-type Results struct {
-	ResultEntries []string
-}
-
-type ScriptProjects struct {
-	Id           string
-	Name         string
-	Author       string
-	CreationTime string
-	LastRunTime  string
-	Status       string
-	Images       []ScriptImageDetails
-	Tests        []ScriptTests
-}
-
-type ScriptAccounts struct {
-	Id        string
-	FirstName string
-	LastName  string
-	Username  string
-	Password  string
-	Roles     []string
-}
-
-type ScriptImageDetails struct {
-	ProjectId      string
-	Id             string   // ---|
- 	Name           string   //    | One of these is enough - sorry Denisa
-	ImageId        string   // ---|
-	Description    string
-	Status         string
-	RegistryId     string
-	Tag            string
-	IlmTags        []string
-	Location       string
-	SkipImageBuild string
-}
-
-type ScriptRepository struct {
-	Name         string
-	Tag          string
-	FsLayers     []FsLayer
-	Signatures   []Signature
-	HasProblems  bool
-	Message      string
-	RegistryUrl  string
-	RegistryName string
-}
-
-type FsLayer struct {
-	BlobSum string
-}
-type Signature struct {
-	Header    Header
-	Signature string
-	Protected string
-}
-
-type Header struct {
-	Algorithm string
-}
-type ScriptRegistries struct {
-	Id   string
-	Name string
-	Addr string
-}
-type ScriptTests struct {
-	Id        string
-	ProjectId string
-	Provider  Provider
-}
-type Provider struct {
-	providerType string
-}
-type ScriptBuildResults struct {
-	ID            string
-	BuildId       string
-	ResultEntries []string
-}
-
-type Statistic struct {
-	Day 				     time.Time
-	Users 		                     int `json:"users"`
-	Accounts 	                     int `json:"accounts"`
-	AvgAccountPerUser                    float64 `json:"avgaccountperuser"`
-	Projects struct {
-			 Total               int `json:"total"`
-			 ImagesInProjects    int `json:"imagesinprojects"`
-			 AvgTestsInProjects  float64 `json:"avgtestsinprojects"`
-			 AvgImagesInProjects float64 `json:"avgimagesinprojects"`
-			 Passed              int `json:"passed"`
-			 Failed              int `json:"failed"`
-			 SuccessRate         float64 `json:"successrate"`
-			 FailureRate         float64 `json:"failurerate"`
-		 } 					`json:"projects"`
-	Tests struct {
-		Total                        int `json:"total"`
-		Passed 	                     int `json:"passed"`
-		Failed	                     int `json:"failed"`
-	}					 `json:"tests"`
-
-	HourlyActivities 		     map[int]int
-	BusiestHours 			     []int
-	Registries 	                     int `json:"registries"`
-	MostPopularProjects		     map[string]ScriptProjects
-	MaxProjectPopularity		     int
-	ImagesInProjects		     map[string][]ScriptProjects
-	ProjectsSuccess 		     map[string]float64
-	ProjectsFailure			     map[string]float64
-	ScriptProjects			     []ScriptProjects
-	MostUsedImages			     []string
-	MostUsedImageOccurrence		     int
-	LeastUsedImages			     []string
-	LeastUsedImageOccurrence		     int
-	NumberOfImages			     int
-	MostExecutedTests		     []ScriptTests
-	MostExecutedTestsNr		     int
-	LeastExecutedTests		     []ScriptTests
-	LeastExecutedTestsNr		     int
-}
-
-func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
+func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
 
 	//Initializing the required values
-	var s Statistic
+	var s model.Statistic
 	s.Users = len(stat);
 	s.Accounts = 0
 	s.Projects.Total = 0
@@ -170,13 +30,13 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	projectsPopularity := map[string]int{}
 	s.MaxProjectPopularity = 0
 	var projectId map[string]bool
-	s.ImagesInProjects = map[string][]ScriptProjects{}
+	s.ImagesInProjects = map[string][]model.Project{}
 	s.ProjectsFailure = map[string]float64{}
 	s.ProjectsSuccess = map[string]float64{}
 	projectsOtherOutcome := map[string]float64{}
 	s.MostExecutedTestsNr = 0
 	s.LeastExecutedTestsNr = math.MaxInt32
-	buildsToTest := map[string][]ScriptBuilds{}
+	buildsToTest := map[string][]model.Build{}
 
 
 	//iterate through the statistics
@@ -188,9 +48,9 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 
 		//Overall project success/failure rate
 		for j := 0; j < len(stat[i].Projects); j++ {
-			if stat[i].Projects[j].Status == "finished_success" {
+			if stat[i].Projects[j].Status == SUCCESS {
 				s.Projects.Passed++
-			} else if stat[i].Projects[j].Status == "finished_failed" {
+			} else if stat[i].Projects[j].Status == FAILURE {
 				s.Projects.Failed++
 			}
 
@@ -249,9 +109,9 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 			projectsPopularity[stat[i].Builds[j].ProjectId]++
 
 			//Per project success/failure rate
-			if stat[i].Builds[j].Status.Status == "finished_success" {
+			if stat[i].Builds[j].Status.Status == SUCCESS {
 				s.ProjectsSuccess[stat[i].Builds[j].ProjectId]++
-			} else if stat[i].Builds[j].Status.Status == "finished_failed" {
+			} else if stat[i].Builds[j].Status.Status == FAILURE {
 				s.ProjectsFailure[stat[i].Builds[j].ProjectId]++
 			} else {
 				projectsOtherOutcome[stat[i].Builds[j].ProjectId]++
@@ -280,7 +140,7 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 	}
 
 	//Most popular projects
-	s.MostPopularProjects = make(map[string]ScriptProjects)
+	s.MostPopularProjects = make(map[string]model.Project)
 	for j := 0; j < len(stat); j++ {
 		for k := 0; k < len(stat[j].Projects); k++ {
 			s.ScriptProjects = append(s.ScriptProjects, stat[j].Projects[k])
@@ -294,8 +154,8 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 			//Project success/failure rate - calculate in percents
 			totalNoOfBuilds := s.ProjectsSuccess[stat[j].Projects[k].Id] + s.ProjectsFailure[stat[j].Projects[k].Id] + projectsOtherOutcome[stat[j].Projects[k].Id]
 			if totalNoOfBuilds != 0 {
-				s.ProjectsSuccess[stat[j].Projects[k].Id] = (s.ProjectsSuccess[stat[j].Projects[k].Id] * 100) / totalNoOfBuilds
-				s.ProjectsFailure[stat[j].Projects[k].Id] = (s.ProjectsFailure[stat[j].Projects[k].Id] * 100) / totalNoOfBuilds
+				s.ProjectsSuccess[stat[j].Projects[k].Id] = float64(s.ProjectsSuccess[stat[j].Projects[k].Id] * 100) / float64(totalNoOfBuilds)
+				s.ProjectsFailure[stat[j].Projects[k].Id] = float64(s.ProjectsFailure[stat[j].Projects[k].Id] * 100) / float64(totalNoOfBuilds)
 			} else {
 				s.ProjectsSuccess[stat[j].Projects[k].Id] = 0
 				s.ProjectsFailure[stat[j].Projects[k].Id] = 0
@@ -307,14 +167,14 @@ func StatisticsCalculateAverages(stat []SenderStatistics) Statistic{
 			buildListLength := len(buildsToTest[test.Id])
 			if s.MostExecutedTestsNr < buildListLength {
 				s.MostExecutedTestsNr = buildListLength
-				s.MostExecutedTests = []ScriptTests{test}
+				s.MostExecutedTests = []model.Test{test}
 			} else if s.MostExecutedTestsNr == buildListLength {
 				s.MostExecutedTests = append(s.MostExecutedTests, test)
 			}
 
 			if s.LeastExecutedTestsNr > buildListLength {
 				s.LeastExecutedTestsNr = buildListLength
-				s.LeastExecutedTests = []ScriptTests{test}
+				s.LeastExecutedTests = []model.Test{test}
 			} else if s.LeastExecutedTestsNr == buildListLength {
 				s.LeastExecutedTests = append(s.LeastExecutedTests, test)
 			}

@@ -8,8 +8,8 @@
 
     <h1>ILM Statistics</h1>
 
-    {{ if .IsActivity }}
 
+    {{ if .IsActivity }}
         <h2>Number of tests started in each hour</h2>
 
         {{ range $key, $value := .Hours }}
@@ -20,6 +20,7 @@
         {{ range $hr := .BusiestHours }}
             <li>{{ $hr }}:00 - {{ $hr }}:59</li>
         {{ end }}
+    {{ end }}
 
     <h2>Most executed project(s)</h2>
     The most executed project(s) was (were) ran {{ .MaxProjectPopularity }} times
@@ -97,7 +98,6 @@
     {{ end }}
 
     <h2>Other stats</h2>
-    {{ end }}
     <p>Overall {{.Tests}} tests, {{.Projects}} projects - average of {{.AverageTestsPerProject}} tests/project</p>
     <p>Overall {{.Images}} images, {{.Projects}} projects - average of {{.AverageImagesPerProject}} images/project</p>
     <p>Overall success rate of projects in ILM: {{.SuccessRate}}%</p>
