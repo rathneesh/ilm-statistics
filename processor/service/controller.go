@@ -16,7 +16,7 @@ func SendStatistics() {
 	}
 
 	// Read statistics
-	stats := repository.GetTodaysStatistic()
+	stats := repository.GetTodaysData()
 
 	// Calculate the average
 	s := util.StatisticsCalculateAverages(stats)
@@ -33,4 +33,8 @@ func SendStatistics() {
 
 func CreateStatistic(stat model.CollectedData) model.CollectedData{
 	return repository.CreateStatistic(stat)
+}
+
+func GetTodaysData() []model.CollectedData {
+	return repository.GetTodaysData()
 }

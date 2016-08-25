@@ -1,0 +1,5 @@
+subject: ILM Statistics
+smptserver: smtp3.hpe.com:25
+from: ilm.stats@hpe.com
+to:
+  - lilla.vass@hpe.com

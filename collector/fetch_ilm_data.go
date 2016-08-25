@@ -521,6 +521,6 @@ func postResponse() {
 	io.Copy(os.Stdout, result.Body)
 }
 
-func main() {
+/*func main() {
 	postResponse()
-}
+}*/

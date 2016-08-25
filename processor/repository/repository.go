@@ -11,6 +11,7 @@ import (
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"github.com/ilm-statistics/ilm-statistics/processor/util"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -27,8 +28,7 @@ var fileMutex sync.Mutex
 func init() {
 	log.Println("Initializing repository")
 	UpdateTmpFileName()
-	statistics = map[string]model.CollectedData{}
-	diffData = []model.CollectedDataDiff{}
+	InitFromFile()
 }
 
 // Save the incoming data into a file
@@ -60,7 +60,7 @@ func CreateStatistic(s model.CollectedData) model.CollectedData {
 	return s
 }
 
-func GetTodaysStatistic() []model.CollectedData {
+func GetTodaysData() []model.CollectedData {
 	log.Println("Getting today's statistics")
 
 	data, err := ioutil.ReadFile(tmpfilename)
@@ -76,11 +76,17 @@ func GetTodaysStatistic() []model.CollectedData {
 	}
 
 	statisticsMap := map[string]model.CollectedData{}
+
 	stats := []model.CollectedData{}
 
 	// Suppose the data was saved ordered
+	// TODO check the order of the data
 
 	for _, collData := range statsDiff {
+		if statisticsMap[collData.MAC].MAC == ""{
+			statisticsMap[collData.MAC] = model.CollectedData{MAC:collData.MAC}
+		}
+
 		stats = append(stats, util.MergeDiff(statisticsMap[collData.MAC], collData))
 		statisticsMap[collData.MAC] = util.MergeDiff(statisticsMap[collData.MAC], collData)
 	}
@@ -116,4 +122,31 @@ func SaveStatisticsToFile(s model.Statistic){
 	}
 
 	UpdateTmpFileName()
+}
+
+func InitFromFile(){
+	log.Println("Loading past data into memory from", tmpfilename)
+	os.Mkdir("." + string(filepath.Separator) + "data", 0777)
+
+	statistics = map[string]model.CollectedData{}
+	diffData = []model.CollectedDataDiff{}
+
+	data, err := ioutil.ReadFile(tmpfilename)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = json.Unmarshal(data, &diffData)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, collData := range diffData {
+		if statistics[collData.MAC].MAC == ""{
+			statistics[collData.MAC] = model.CollectedData{MAC:collData.MAC}
+		}
+
+		statistics[collData.MAC] = util.MergeDiff(statistics[collData.MAC], collData)
+	}
 }

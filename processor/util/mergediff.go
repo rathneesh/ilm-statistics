@@ -13,7 +13,11 @@ func MergeDiff(oldData model.CollectedData, newData model.CollectedDataDiff) mod
 		return model.CollectedData{}
 	}
 	data.MAC = newData.MAC
-	data.Username = newData.NewUserName
+	if newData.NewUserName != "" {
+		data.Username = newData.NewUserName
+	} else {
+		data.Username = oldData.Username
+	}
 	data.Images = MergeImageLists(oldData.Images, newData.AddedImages, newData.DeletedImages)
 	data.Accounts = MergeAccountLists(oldData.Accounts, newData.AddedAccounts, newData.DeletedAccounts)
 	data.Projects = MergeProjectLists(oldData.Projects, newData.AddedProjects, newData.DeletedProjects)

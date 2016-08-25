@@ -8,20 +8,31 @@ import (
 	"strconv"
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"strings"
+	"path/filepath"
+	"io/ioutil"
+	"gopkg.in/yaml.v2"
 )
 
 const (
-	SUBJECT = "ILM Statistics"
-	TEMPLATE = "./processor/util/emailTemplate.html"
 	MIME = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	SMTPSERVER = "acme.smtp"
-	FROM = "from@email.io"
+	EMAILCONFIGFILE = "./emailConfig.yml"
+	TEMPLATEPATH = "./processor/util/emailTemplate.html"
 )
 
-var to = []string{"to@email.io"}
+type EmailConfig struct {
+	Subject string
+	SmptServer string
+	From string
+	To []string
+}
+
+var emailConfig EmailConfig
 
 func SendEmailTemplate(stat model.Statistic) {
 	log.Println("Start initializing the e-mail")
+
+	log.Println("Loading e-mail configurations from file")
+	ParseEmailConfigFile()
 	templateData := struct {
 		Users int
 		Accounts int
@@ -96,8 +107,8 @@ func SendEmailTemplate(stat model.Statistic) {
 	}
 
 	log.Println("Creating new e-mail request")
-	r := NewRequest(to, SUBJECT, "")
-	err := r.ParseTemplate(TEMPLATE, templateData)
+	r := NewRequest(emailConfig.To, emailConfig.Subject, "")
+	err := r.ParseTemplate(TEMPLATEPATH, templateData)
 	if err != nil {
 		log.Println(err)
 		log.Println("Template could not be parsed")
@@ -130,11 +141,11 @@ func NewRequest(to []string, subject, body string) *Request {
 func (r *Request) SendEmail() (bool, error) {
 	mime := MIME
 	subject := "Subject: " + r.subject + "\n"
-	to := "To: " + strings.TrimSuffix(strings.Join(to, ","), ",")
-	msg := []byte(subject + "From: " + FROM + "\n" + to + "\n;" + mime + "\n\r" + r.body)
-	addr := SMTPSERVER
+	to := "To: " + strings.TrimSuffix(strings.Join(emailConfig.To, ","), ",")
+	msg := []byte(subject + "From: " + emailConfig.From + "\n" + to + "\n;" + mime + "\n\r" + r.body)
+	addr := emailConfig.SmptServer
 
-	err := smtp.SendMail(addr, nil, FROM, r.to, msg)
+	err := smtp.SendMail(addr, nil, emailConfig.From, r.to, msg)
 	if err != nil {
 		log.Println(err)
 		return false, err
@@ -157,4 +168,23 @@ func (r *Request) ParseTemplate(templateFileName string, data interface{}) error
 	r.body = buf.String()
 	log.Println("End parsing the e-mail template")
 	return nil
+}
+
+func ParseEmailConfigFile() {
+	log.Println("Parsing the config file")
+	filename, _ := filepath.Abs(EMAILCONFIGFILE)
+
+	yamlFile, err := ioutil.ReadFile(filename)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	err = yaml.Unmarshal(yamlFile, &emailConfig)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }

@@ -8,7 +8,6 @@ import (
 	"time"
 	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
-	"github.com/ilm-statistics/ilm-statistics/processor/repository"
 	"github.com/ilm-statistics/ilm-statistics/processor/service"
 )
 
@@ -52,7 +51,7 @@ func GetStatistics(w http.ResponseWriter, r *http.Request) {
 		time.Since(start),
 	)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if err := json.NewEncoder(w).Encode(repository.GetTodaysStatistic()); err != nil {
+	if err := json.NewEncoder(w).Encode(service.GetTodaysData()); err != nil {
 		panic(err)
 	}
 }
