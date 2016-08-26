@@ -110,6 +110,15 @@ type BuildResult struct {
 	ResultEntries []string
 }
 
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type Authentication struct {
+	AuthToken string `json:"auth_token"`
+}
+
 type Statistic struct {
 	Day 				     time.Time
 	Users 		                     int

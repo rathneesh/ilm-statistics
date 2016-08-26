@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/ilm-statistics/ilm-statistics/model"
 	"io"
 	"io/ioutil"
 	"log"
@@ -26,130 +27,18 @@ const (
 	PASSWORD      = "shipyard"
 )
 
+var token string
+var credentials model.Credentials
+
 func setUrl() string {
 	url := PROTOCOL + CLIENTADDRESS + ":" + PORT_NAME
 	return url
 }
 
-type Credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type Authentication struct {
-	AuthToken string `json:"auth_token"`
-}
-type ScriptId struct {
-	Id string `json:"id"`
-}
-type SenderStatistics struct {
-	Username     string
-	Images       []ScriptImageDetails
-	Accounts     []ScriptAccounts
-	Projects     []ScriptProjects
-	Builds       []ScriptBuilds
-	Registries   []ScriptRegistries
-	Tests        []ScriptTests
-	Results      []ScriptBuildResults
-	Repositories []ScriptRepository
-}
-
-type ScriptBuilds struct {
-	Id        string
-	ProjectId string
-	TestId    string
-	StartTime string
-	Status    Status
-}
-type Status struct {
-	Status string
-}
-type Results struct {
-	ResultEntries []string
-}
-type ScriptProjects struct {
-	Id           string
-	Name         string
-	Author       string
-	CreationTime string
-	LastRunTime  string
-	Status       string
-	Images       []ScriptImageDetails
-	Tests        []ScriptTests
-}
-
-type ScriptAccounts struct {
-	Id        string
-	FirstName string
-	LastName  string
-	Username  string
-	Password  string
-	Roles     []string
-}
-
-type ScriptImageDetails struct {
-	ProjectId      string
-	Id             string
-	Name           string
-	ImageId        string
-	Description    string
-	Status         string
-	RegistryId     string
-	Tag            string
-	IlmTags        []string
-	Location       string
-	SkipImageBuild string
-}
-
-type ScriptRepository struct {
-	Name         string
-	Tag          string
-	FsLayers     []FsLayer
-	Signatures   []Signature
-	HasProblems  bool
-	Message      string
-	RegistryUrl  string
-	RegistryName string
-}
-
-type FsLayer struct {
-	BlobSum string
-}
-type Signature struct {
-	Header    Header
-	Signature string
-	Protected string
-}
-
-type Header struct {
-	Algorithm string
-}
-type ScriptRegistries struct {
-	Id   string
-	Name string
-	Addr string
-}
-type ScriptTests struct {
-	Id        string
-	ProjectId string
-	Provider  Provider
-}
-type Provider struct {
-	providerType string
-}
-type ScriptBuildResults struct {
-	ID            string
-	BuildId       string
-	ResultEntries []string
-}
-
-var token string
-var credentials Credentials
-
-func setCredentials(u Credentials) Credentials {
-	u.Username = USERNAME
-	u.Password = PASSWORD
-	return u
+func setCredentials(user model.Credentials) model.Credentials {
+	user.Username = USERNAME
+	user.Password = PASSWORD
+	return user
 }
 
 func postAuthentication() []byte {
@@ -167,7 +56,7 @@ func postAuthentication() []byte {
 }
 
 func parseAuthResponse(body []byte) (string, error) {
-	var auth Authentication
+	var auth model.Authentication
 
 	err := json.Unmarshal(body, &auth)
 	if err != nil {
@@ -190,9 +79,9 @@ func getAuthToken() string {
 	x := string(s)
 	return x
 }
-func getAccountsfromApi() []ScriptAccounts {
+func getAccountsfromApi() []model.Account {
 	var body []byte
-	var accounts []ScriptAccounts
+	var accounts []model.Account
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + ACCOUNTPATH
 	client := &http.Client{}
@@ -212,9 +101,9 @@ func getAccountsfromApi() []ScriptAccounts {
 	return accounts
 }
 
-func getProjectsfromApi() []ScriptProjects {
+func getProjectsfromApi() []model.Project {
 	var body []byte
-	projects := []ScriptProjects{}
+	projects := []model.Project{}
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH
 	client := &http.Client{}
@@ -235,8 +124,8 @@ func getProjectsfromApi() []ScriptProjects {
 	return projects
 }
 
-func getImagesfromApi() []ScriptImageDetails {
-	var result []ScriptImageDetails
+func getImagesfromApi() []model.Image {
+	var result []model.Image
 	var body2 []byte
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -253,7 +142,7 @@ func getImagesfromApi() []ScriptImageDetails {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			myResult := []ScriptImageDetails{}
+			myResult := []model.Image{}
 			defer response.Body.Close()
 			body2, err = ioutil.ReadAll(response.Body)
 
@@ -268,8 +157,8 @@ func getImagesfromApi() []ScriptImageDetails {
 	return result
 }
 
-func getImagesFromAProject(project ScriptProjects) []ScriptImageDetails {
-	var result []ScriptImageDetails
+func getImagesFromAProject(project model.Project) []model.Image {
+	var result []model.Image
 	var body2 []byte
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -283,7 +172,7 @@ func getImagesFromAProject(project ScriptProjects) []ScriptImageDetails {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		myResult := []ScriptImageDetails{}
+		myResult := []model.Image{}
 		defer response.Body.Close()
 		body2, err = ioutil.ReadAll(response.Body)
 
@@ -297,8 +186,8 @@ func getImagesFromAProject(project ScriptProjects) []ScriptImageDetails {
 	return result
 }
 
-func getTestsFromAProject(project ScriptProjects) []ScriptTests {
-	var result []ScriptTests
+func getTestsFromAProject(project model.Project) []model.Test {
+	var result []model.Test
 	var body2 []byte
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -311,7 +200,7 @@ func getTestsFromAProject(project ScriptProjects) []ScriptTests {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		myResult := []ScriptTests{}
+		myResult := []model.Test{}
 		defer response.Body.Close()
 		body2, err = ioutil.ReadAll(response.Body)
 
@@ -324,9 +213,9 @@ func getTestsFromAProject(project ScriptProjects) []ScriptTests {
 	}
 	return result
 }
-func getTestsFromApi() []ScriptTests {
+func getTestsFromApi() []model.Test {
 	var body2 []byte
-	var result []ScriptTests
+	var result []model.Test
 
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -341,7 +230,7 @@ func getTestsFromApi() []ScriptTests {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			myResult := []ScriptTests{}
+			myResult := []model.Test{}
 
 			defer response.Body.Close()
 			body2, err = ioutil.ReadAll(response.Body)
@@ -355,9 +244,9 @@ func getTestsFromApi() []ScriptTests {
 	return result
 }
 
-func getBuildsFromApi() []ScriptBuilds {
+func getBuildsFromApi() []model.Build {
 	var body2 []byte
-	var result []ScriptBuilds
+	var result []model.Build
 
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -376,7 +265,7 @@ func getBuildsFromApi() []ScriptBuilds {
 			log.Fatal(err)
 		} else {
 
-			myResult := []ScriptBuilds{}
+			myResult := []model.Build{}
 
 			defer response.Body.Close()
 			body2, err = ioutil.ReadAll(response.Body)
@@ -390,10 +279,10 @@ func getBuildsFromApi() []ScriptBuilds {
 	return result
 }
 
-func getResultsFromApi() []ScriptBuildResults {
+func getResultsFromApi() []model.BuildResult {
 	var body2 []byte
-	var result []ScriptBuildResults
-	myResult := []ScriptBuildResults{}
+	var result []model.BuildResult
+	myResult := []model.BuildResult{}
 
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -423,7 +312,7 @@ func getResultsFromApi() []ScriptBuildResults {
 	return result
 
 }
-func getRegistriesFromAPi() []ScriptRegistries {
+func getRegistriesFromAPi() []model.Registry {
 	var body2 []byte
 
 	token = USERNAME + ":" + getAuthToken()
@@ -442,15 +331,15 @@ func getRegistriesFromAPi() []ScriptRegistries {
 			log.Fatal(err)
 		}
 	}
-	myResult := []ScriptRegistries{}
+	myResult := []model.Registry{}
 	json.Unmarshal(body2, &myResult)
 
 	return myResult
 }
 
-func getImagesFromRegistriesApi() []ScriptRepository {
+func getImagesFromRegistriesApi() []model.Repository {
 
-	var result []ScriptRepository
+	var result []model.Repository
 	var body2 []byte
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + "/api/registries/"
@@ -465,7 +354,7 @@ func getImagesFromRegistriesApi() []ScriptRepository {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			myResult := []ScriptRepository{}
+			myResult := []model.Repository{}
 
 			defer response.Body.Close()
 			body2, err = ioutil.ReadAll(response.Body)
@@ -480,9 +369,9 @@ func getImagesFromRegistriesApi() []ScriptRepository {
 	return result
 }
 
-func setStatistics(stats SenderStatistics) SenderStatistics {
+func setStatistics(stats model.CollectedData) model.CollectedData {
 	uname := "admin"
-	var result []ScriptProjects
+	var result []model.Project
 	projects := getProjectsfromApi()
 	for _, proj := range projects {
 		img := getImagesFromAProject(proj)
@@ -493,8 +382,8 @@ func setStatistics(stats SenderStatistics) SenderStatistics {
 	}
 	stats.Projects = result
 
-	imgs := getImagesfromApi()
 	acc := getAccountsfromApi()
+	imgs := getImagesfromApi()
 	tsts := getTestsFromApi()
 	reg := getRegistriesFromAPi()
 	bld := getBuildsFromApi()
@@ -512,7 +401,7 @@ func setStatistics(stats SenderStatistics) SenderStatistics {
 }
 
 func postResponse() {
-	var stats SenderStatistics
+	var stats model.CollectedData
 	s := setStatistics(stats)
 	b := new(bytes.Buffer)
 
