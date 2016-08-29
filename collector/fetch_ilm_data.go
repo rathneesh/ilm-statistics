@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	CLIENTADDRESS = "ec2-52-37-174-113.us-west-2.compute.amazonaws.com"
-	SERVERADDRESS = "http://16.51.182.155:8080/statistics"
+	CLIENTADDRESS = "CLIENTADDRESS"
+	SERVERADDRESS = "SERVERADDRESS"
 	PROTOCOL      = "http://"
 	LOCALHOST     = "localhost"
 	PORT_NAME     = "8082"
@@ -247,6 +247,7 @@ func getTestsFromApi() []model.Test {
 func getBuildsFromApi() []model.Build {
 	var body2 []byte
 	var result []model.Build
+	myResult := []model.Build{}
 
 	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
@@ -264,9 +265,6 @@ func getBuildsFromApi() []model.Build {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-
-			myResult := []model.Build{}
-
 			defer response.Body.Close()
 			body2, err = ioutil.ReadAll(response.Body)
 			if err != nil {
@@ -308,6 +306,7 @@ func getResultsFromApi() []model.BuildResult {
 			}
 			json.Unmarshal(body2, &myResult)
 		}
+			result = append(result, myResult...)
 	}
 	return result
 
