@@ -27,8 +27,8 @@ const (
 	PASSWORD      = "shipyard"
 )
 
-var token string
 var credentials model.Credentials
+var token = USERNAME + ":" + getAuthToken()
 
 func setUrl() string {
 	url := PROTOCOL + CLIENTADDRESS + ":" + PORT_NAME
@@ -62,14 +62,14 @@ func parseAuthResponse(body []byte) (string, error) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	y := marshalOb(auth)
+	y := marshalObject(auth)
 	split := strings.Split(y, ":")
 	authToken := split[1]
 	result := authToken[1 : len(authToken)-2]
 	return result, err
 }
 
-func marshalOb(v interface{}) string {
+func marshalObject(v interface{}) string {
 	vBytes, _ := json.Marshal(v)
 	return string(vBytes)
 }
@@ -82,8 +82,8 @@ func getAuthToken() string {
 func getAccountsfromApi() []model.Account {
 	var body []byte
 	var accounts []model.Account
-	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + ACCOUNTPATH
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("X-Access-Token", token)
@@ -98,15 +98,14 @@ func getAccountsfromApi() []model.Account {
 		}
 	}
 	json.Unmarshal(body, &accounts)
-	log.Printf("%v\n", accounts)
 	return accounts
 }
 
 func getProjectsfromApi() []model.Project {
 	var body []byte
-	projects := []model.Project{}
-	token = USERNAME + ":" + getAuthToken()
+	var projects []model.Project
 	url := setUrl() + PROJECTPATH
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("X-Access-Token", token)
@@ -126,11 +125,10 @@ func getProjectsfromApi() []model.Project {
 }
 
 func getImagesfromApi() []model.Image {
-	var result []model.Image
-	var body2 []byte
-	token = USERNAME + ":" + getAuthToken()
+	var images []model.Image
+	var body []byte
+	var projectImages []model.Image
 	url := setUrl() + PROJECTPATH + "/"
-
 	projects := getProjectsfromApi()
 
 	for _, project := range projects {
@@ -143,27 +141,26 @@ func getImagesfromApi() []model.Image {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			myResult := []model.Image{}
 			defer response.Body.Close()
-			body2, err = ioutil.ReadAll(response.Body)
+			body, err = ioutil.ReadAll(response.Body)
 
-			json.Unmarshal(body2, &myResult)
-			result = append(result, myResult...)
+			json.Unmarshal(body, &projectImages)
+			images = append(images, projectImages...)
 
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
-	return result
+	return images
 }
 
 func getImagesFromAProject(project model.Project) []model.Image {
-	var result []model.Image
-	var body2 []byte
-	token = USERNAME + ":" + getAuthToken()
-	url := setUrl() + PROJECTPATH + "/"
+	var images []model.Image
+	var projectImages []model.Image
+	var body []byte
 
+	url := setUrl() + PROJECTPATH + "/"
 	path := url + project.Id + "/images"
 
 	client := &http.Client{}
@@ -173,24 +170,24 @@ func getImagesFromAProject(project model.Project) []model.Image {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		myResult := []model.Image{}
 		defer response.Body.Close()
-		body2, err = ioutil.ReadAll(response.Body)
+		body, err = ioutil.ReadAll(response.Body)
 
-		json.Unmarshal(body2, &myResult)
-		result = append(result, myResult...)
+		json.Unmarshal(body, &projectImages)
+		images = append(images, projectImages...)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	return result
+	return images
 }
 
 func getTestsFromAProject(project model.Project) []model.Test {
-	var result []model.Test
-	var body2 []byte
-	token = USERNAME + ":" + getAuthToken()
+	var tests []model.Test
+	var projectTests []model.Test
+	var body []byte
+
 	url := setUrl() + PROJECTPATH + "/"
 	path := url + project.Id + "/tests"
 
@@ -201,64 +198,60 @@ func getTestsFromAProject(project model.Project) []model.Test {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		myResult := []model.Test{}
 		defer response.Body.Close()
-		body2, err = ioutil.ReadAll(response.Body)
-
-		json.Unmarshal(body2, &myResult)
-		result = append(result, myResult...)
+		body, err = ioutil.ReadAll(response.Body)
+		json.Unmarshal(body, &projectTests)
+		tests = append(tests, projectTests...)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	return result
+	return tests
 }
 func getTestsFromApi() []model.Test {
-	var body2 []byte
-	var result []model.Test
+	var tests []model.Test
+	var projectTests []model.Test
+	var body []byte
 
-	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
-	body := getProjectsfromApi()
+	projects := getProjectsfromApi()
 
-	for _, data := range body {
-		projId := url + data.Id + "/tests"
+	for _, project := range projects {
+		id := url + project.Id + "/tests"
 		client := &http.Client{}
-		req, err := http.NewRequest("GET", projId, nil)
+		req, err := http.NewRequest("GET", id, nil)
 		req.Header.Add("X-Access-Token", token)
 		response, err := client.Do(req)
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			myResult := []model.Test{}
-
 			defer response.Body.Close()
-			body2, err = ioutil.ReadAll(response.Body)
-			json.Unmarshal(body2, &myResult)
-			result = append(result, myResult...)
+			body, err = ioutil.ReadAll(response.Body)
+			json.Unmarshal(body, &projectTests)
+			tests = append(tests, projectTests...)
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
-	return result
+	return tests
 }
 
 func getBuildsFromApi() []model.Build {
-	var body2 []byte
-	var result []model.Build
-	myResult := []model.Build{}
+	var builds []model.Build
+	var projectBuilds []model.Build
+	var body []byte
 
-	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
-	testsBody := getProjectsfromApi()
+	projects := getProjectsfromApi()
 
-	for _, data := range testsBody {
-		testIds := data.TestIds
-		projId := data.Id
-		for i := 0; i < len(testIds); i++ {
-			id := url + projId + "/tests/" + testIds[i] + "/builds"
+	for _, project := range projects {
+		testIds := project.TestIds
+		projId := project.Id
+
+		for _, testId := range testIds {
+			id := url + projId + "/tests/" + testId + "/builds"
 
 			client := &http.Client{}
 			req, err := http.NewRequest("GET", id, nil)
@@ -268,31 +261,30 @@ func getBuildsFromApi() []model.Build {
 				log.Fatal(err)
 			} else {
 				defer response.Body.Close()
-				body2, err = ioutil.ReadAll(response.Body)
+				body, err = ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
-
-				json.Unmarshal(body2, &myResult)
-				result = append(result, myResult...)
+				json.Unmarshal(body, &projectBuilds)
+				builds = append(builds, projectBuilds...)
 			}
 		}
 	}
-	return result
+	return builds
 }
 
 func getResultsFromApi() []model.BuildResult {
-	var body2 []byte
-	var result []model.BuildResult
-	myResult := []model.BuildResult{}
+	var buildResults []model.BuildResult
+	var projectBuildResults []model.BuildResult
+	var body []byte
 
-	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + PROJECTPATH + "/"
-	buildsBody := getBuildsFromApi()
-	for _, data := range buildsBody {
-		testId := data.TestId
-		projId := data.ProjectId
-		buildId := data.Id
+	builds := getBuildsFromApi()
+
+	for _, build := range builds {
+		testId := build.TestId
+		projId := build.ProjectId
+		buildId := build.Id
 		id := url + projId + "/tests/" + testId + "/builds/" + buildId + "/results"
 
 		client := &http.Client{}
@@ -302,23 +294,22 @@ func getResultsFromApi() []model.BuildResult {
 		if err != nil {
 			log.Fatal(err)
 		} else {
-
 			defer response.Body.Close()
-			body2, err = ioutil.ReadAll(response.Body)
+			body, err = ioutil.ReadAll(response.Body)
 			if err != nil {
 				log.Fatal(err)
 			}
-			json.Unmarshal(body2, &myResult)
+			json.Unmarshal(body, &projectBuildResults)
 		}
-			result = append(result, myResult...)
+		buildResults = append(buildResults, projectBuildResults...)
 	}
-	return result
 
+	return buildResults
 }
 func getRegistriesFromAPi() []model.Registry {
-	var body2 []byte
+	var body []byte
+	var registries []model.Registry
 
-	token = USERNAME + ":" + getAuthToken()
 	url := setUrl() + REGISTRYPATH
 
 	client := &http.Client{}
@@ -329,47 +320,45 @@ func getRegistriesFromAPi() []model.Registry {
 		log.Fatal(err)
 	} else {
 		defer response.Body.Close()
-		body2, err = ioutil.ReadAll(response.Body)
+		body, err = ioutil.ReadAll(response.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	myResult := []model.Registry{}
-	json.Unmarshal(body2, &myResult)
+	json.Unmarshal(body, &registries)
 
-	return myResult
+	return registries
 }
 
 func getImagesFromRegistriesApi() []model.Repository {
 
-	var result []model.Repository
-	var body2 []byte
-	token = USERNAME + ":" + getAuthToken()
-	url := setUrl() + "/api/registries/"
-	body := getRegistriesFromAPi()
+	var images []model.Repository
+	var repoImages []model.Repository
+	var body []byte
 
-	for _, data := range body {
-		projId := url + data.Id + "/repositories"
+	url := setUrl() + "/api/registries/"
+	registries := getRegistriesFromAPi()
+
+	for _, registry := range registries {
+		id := url + registry.Id + "/repositories"
 		client := &http.Client{}
-		req, err := http.NewRequest("GET", projId, nil)
+		req, err := http.NewRequest("GET", id, nil)
 		req.Header.Add("X-Access-Token", token)
 		response, err := client.Do(req)
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			myResult := []model.Repository{}
-
 			defer response.Body.Close()
-			body2, err = ioutil.ReadAll(response.Body)
-			json.Unmarshal(body2, &myResult)
-			result = append(result, myResult...)
+			body, err = ioutil.ReadAll(response.Body)
+			json.Unmarshal(body, &repoImages)
+			images = append(images, repoImages...)
 
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
 	}
-	return result
+	return images
 }
 
 func setStatistics(stats model.CollectedData) model.CollectedData {
@@ -415,4 +404,4 @@ func postResponse() {
 
 /*func main() {
 	postResponse()
-}
+}*/

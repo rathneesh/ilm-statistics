@@ -37,9 +37,7 @@ type Results struct {
 type Project struct {
 	Id           string
 	Name         string
-	Author       string
 	CreationTime string
-	LastRunTime  string
 	Status       string
 	ImageIds     []string
 	TestIds      []string
@@ -99,6 +97,7 @@ type Registry struct {
 }
 type Test struct {
 	Id       string
+	Name     string
 	Provider Provider
 }
 type Provider struct {
