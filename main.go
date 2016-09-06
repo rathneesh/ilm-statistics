@@ -15,8 +15,8 @@ func main() {
 	c.Start()
 	log.Println("Cronometer started")
 
-	// Listen on port 8080 for incoming REST calls
-	log.Println("Listening on port 8080")
+	// Listen on port 8084 for incoming REST calls
+	log.Println("Listening on port 8084")
 	router := resource.NewRouter()
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8084", router))
 }

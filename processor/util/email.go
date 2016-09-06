@@ -62,6 +62,7 @@ func SendEmailTemplate(stat model.Statistic) {
 		MostExecutedTestsNr int
 		LeastExecutedTests []model.Test
 		LeastExecutedTestsNr int
+		StatisticsPerUsers map[string][]model.StatPerUser
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,
@@ -89,6 +90,7 @@ func SendEmailTemplate(stat model.Statistic) {
 		MostExecutedTestsNr: stat.MostExecutedTestsNr,
 		LeastExecutedTests: stat.LeastExecutedTests,
 		LeastExecutedTestsNr: stat.LeastExecutedTestsNr,
+		StatisticsPerUsers: stat.StatisticsPerUsers,
 
 	}
 

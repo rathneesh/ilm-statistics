@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"regexp"
 )
 
 const (
@@ -37,6 +38,7 @@ func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
 	s.MostExecutedTestsNr = 0
 	s.LeastExecutedTestsNr = math.MaxInt32
 	buildsToTest := map[string][]model.Build{}
+	s.StatisticsPerUsers = map[string][]model.StatPerUser{}
 
 
 	//iterate through the statistics
@@ -213,6 +215,35 @@ func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
 		}
 	}
 
+
+	//Statistics per user - days, nr of images, nr of vulnerabilities
+	for _, st := range stat {
+		auxStatPerUser := model.StatPerUser{}
+		auxStatPerUser.Day = st.Day
+		auxStatPerUser.Username = st.Username
+		auxStatPerUser.NoOfVulnerabilities = 0
+		auxStatPerUser.NoOfImages = 0
+		auxStatPerUser.Vulnerabilities = map[string]int{}
+		for _, results := range st.Results {
+			for _, entry := range results.ResultEntries {
+				if strings.Contains(entry, "SUCCESS:") || strings.Contains(entry, "FAILURE:") {
+					re := regexp.MustCompile("[0-9]+")
+					vulnerabilities := re.FindAllString(entry, -1)
+					noOfVulnerabilities, err := strconv.Atoi(vulnerabilities[0])
+					reImage := regexp.MustCompile("[^ ]+:[^ ]+")
+					registryAndImage := reImage.FindAllString(entry, -1)
+					if err != nil {
+						log.Println(err)
+					} else {
+						auxStatPerUser.Vulnerabilities[strings.Join(registryAndImage, " ")] = noOfVulnerabilities
+						auxStatPerUser.NoOfImages ++
+						auxStatPerUser.NoOfVulnerabilities += noOfVulnerabilities
+					}
+				}
+			}
+		}
+		s.StatisticsPerUsers[st.MAC] = append(s.StatisticsPerUsers[st.MAC], auxStatPerUser)
+	}
 
 	s.NumberOfImages = len(s.ImagesInProjects)
 	s.AvgAccountPerUser = float64(s.Accounts)/float64(s.Users)

@@ -149,6 +149,7 @@ type Statistic struct {
 	MostExecutedTestsNr		     int
 	LeastExecutedTests		     []Test
 	LeastExecutedTestsNr		     int
+	StatisticsPerUsers		     map[string][]StatPerUser
 }
 
 type CollectedDataDiff struct {
@@ -171,4 +172,12 @@ type CollectedDataDiff struct {
 	AddedRepositories   []Repository
 	DeletedRepositories []Repository
 	NewDay 		    time.Time
+}
+
+type StatPerUser struct {
+	Username string
+	Day time.Time
+	Vulnerabilities map[string]int
+	NoOfVulnerabilities int
+	NoOfImages int
 }

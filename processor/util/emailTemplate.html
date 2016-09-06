@@ -8,53 +8,22 @@
 
     <h1>ILM Statistics</h1>
 
+    <h2>Overview</h2>
+    Projects
+    <ul>
+        <li>Success rate: {{.SuccessRate}}%</li>
+        <li>Failure rate: {{.FailureRate}}%</li>
+    </ul>
+    {{.Images}} images, {{.Tests}} tests, {{.Projects}} projects
+    <ul>
+        <li>In average {{.AverageImagesPerProject}} images/project</li>
+        <li>In average {{.AverageTestsPerProject}} tests/project</li>
+    </ul>
 
-    {{ if .IsActivity }}
-        <h2>Number of tests started in each hour</h2>
+    <hr>
 
-        {{ range $key, $value := .Hours }}
-                <li>{{ $key }}:00 - {{ $key }}:59 : {{ $value }}</li>
-        {{ end }}
-
-        <h2>Busiest time(s) of the day:</h2>
-        {{ range $hr := .BusiestHours }}
-            <li>{{ $hr }}:00 - {{ $hr }}:59</li>
-        {{ end }}
-    {{ end }}
-
-    <h2>Most executed project(s)</h2>
-    The most executed project(s) was (were) ran {{ .MaxProjectPopularity }} times
-    <br><br>
-    {{ range $projectId, $project := .MostPopularProjects }}
-       Project:
-        <li> Id: {{ $projectId }}</li>
-        <li> Name: {{ $project.Name }}</li>
-        <li> Author: {{ $project.Author }}</li>
-        <li> Creation time: {{ $project.CreationTime }}</li>
-        <li> Last run: {{ $project.LastRunTime }}</li>
-        <li> Status: {{ $project.Status }}</li>
-        <br><br>
-    {{ end }}
-
-    <h2>Images in projects</h2>
-    <ol>
-    {{ range $image, $projectList := .ImagesInProjects }}
-        <li> {{ $image }}</li>
-        <ul>
-        {{ range $project := $projectList }}
-            Project:
-            <li> Id: {{ $project.Id }}</li>
-            <li> Name: {{ $project.Name }}</li>
-            <li> Author: {{ $project.Author }}</li>
-            <li> Creation time: {{ $project.CreationTime }}</li>
-            <li> Last run: {{ $project.LastRunTime }}</li>
-            <li> Status: {{ $project.Status }}</li>
-            <br><br>
-        {{ end }}
-        </ul>
-    {{ end }}
-    </ol>
-    <h2>Projects: success and failure rate</h2>
+    <h2>Projects</h2>
+    <h3>Projects: success and failure rate</h3>
 
     {{ range $project := .ProjectsList }}
     Project:
@@ -62,48 +31,103 @@
     <li>Name: {{ .Name }}</li>
     <li>Success rate: {{ (index $.ProjectsSuccess .Id) }}%</li>
     <li>Failure rate: {{ index $.ProjectsFailure .Id }}%</li>
-
     <br><br>
     {{ end }}
 
-    <h2>Overall number of tags applied</h2>
-    {{ .NumberOfImages }}
+    <h3>Most executed projects</h3>
+    The most executed projects were ran {{ .MaxProjectPopularity }} times
+    <br><br>
+    {{ range $projectId, $project := .MostPopularProjects }}
+    Project:
+    <li> Id: {{ $projectId }}</li>
+    <li> Name: {{ $project.Name }}</li>
+    <li> Creation time: {{ $project.CreationTime }}</li>
+    <li> Status: {{ $project.Status }}</li>
+    <br><br>
+    {{ end }}
 
-    <h2>Most used tag(s)</h2>
+    <hr>
+
+    <h2>Images</h2>
+    <h3>Overall number of tags applied: {{ .NumberOfImages }}</h3>
+    <h3>Most used tags</h3>
     {{ range $image := .MostUsedImages}}
     <li>{{ $image }} - {{ $.MostUsedImageOccurrence }} occurrence(s)</li>
     {{ end }}
 
-    <h2>Least used tag(s)</h2>
+    <h3>Least used tags</h3>
     {{ range $image := .LeastUsedImages}}
     <li>{{ $image }} - {{ $.LeastUsedImageOccurrence }} occurrence(s)</li>
     {{ end }}
 
-    <h2>Most executed test(s)</h2>
+    <h3>Images in projects</h3>
+    <ol>
+        {{ range $image, $projectList := .ImagesInProjects }}
+        <li> {{ $image }}</li>
+        <ul>
+            {{ range $project := $projectList }}
+            Project:
+            <li> Id: {{ $project.Id }}</li>
+            <li> Name: {{ $project.Name }}</li>
+            <li> Creation time: {{ $project.CreationTime }}</li>
+            <li> Status: {{ $project.Status }}</li>
+            <br><br>
+            {{ end }}
+        </ul>
+        {{ end }}
+    </ol>
+
+    <hr>
+
+    <h2>Tests</h2>
+    <h2>Most executed tests</h2>
     {{ range $test := .MostExecutedTests }}
-        Test:
-        <li>Id: {{ .Id }}</li>
-        <li>Project id: {{ .ProjectId }}</li>
-        <li>Executed: {{ $.MostExecutedTestsNr }} time(s)</li>
-        <br><br>
+    Test:
+    <li>Id: {{ .Id }}</li>
+    <li>Project id: {{ .ProjectId }}</li>
+    <li>Executed: {{ $.MostExecutedTestsNr }} time(s)</li>
+    <br><br>
     {{ end }}
 
-    <h2>Least executed test(s)</h2>
+    <h2>Least executed tests</h2>
     {{ range $test := .LeastExecutedTests }}
-        Test:
-        <li>Id: {{ .Id }}</li>
-        <li>Project id: {{ .ProjectId }}</li>
-        <li>Executed: {{ $.LeastExecutedTestsNr }} time(s)</li>
-        <br><br>
+    Test:
+    <li>Id: {{ .Id }}</li>
+    <li>Project id: {{ .ProjectId }}</li>
+    <li>Executed: {{ $.LeastExecutedTestsNr }} time(s)</li>
+    <br><br>
     {{ end }}
 
-    <h2>Other stats</h2>
-    <p>Overall {{.Tests}} tests, {{.Projects}} projects - average of {{.AverageTestsPerProject}} tests/project</p>
-    <p>Overall {{.Images}} images, {{.Projects}} projects - average of {{.AverageImagesPerProject}} images/project</p>
-    <p>Overall success rate of projects in ILM: {{.SuccessRate}}%</p>
-    <p>Overall failure rate of projects in ILM: {{.FailureRate}}%</p>
+    <hr>
 
 
+    {{ if .IsActivity }}
+    <h2>Today's user activity</h2>
+    <h3>Number of tests started in each hour</h3>
+
+    {{ range $key, $value := .Hours }}
+    <li>{{ $key }}:00 - {{ $key }}:59 : {{ $value }}</li>
+    {{ end }}
+
+    <br>
+    <b>Busiest times of the day:</b>
+    {{ range $hr := .BusiestHours }}
+    <li>{{ $hr }}:00 - {{ $hr }}:59</li>
+    {{ end }}
+
+    <hr>
+    {{ end }}
+
+    <h2>Per user views </h2>
+    {{ range $mac, $statsPerUserList := .StatisticsPerUsers }}
+    <h3>User MAC: <b>{{ $mac }}</b></h3>
+    {{ range $stat := $statsPerUserList }}
+    <h4><p>User {{ .Username }} at time: {{ .Day }} had {{ .NoOfImages }} images with a total of {{ .NoOfVulnerabilities }} vulnerabilities for the tested images</p></h4>
+    {{ range $image, $noOfVulnerabilities := .Vulnerabilities }}
+    <p> Image <b>{{ $image }}</b> has <b>{{ $noOfVulnerabilities }}</b> vulnerabilities</p>
+    {{ end }}
+    {{ end }}
+    {{ end }}
 
 </body>
 </html>

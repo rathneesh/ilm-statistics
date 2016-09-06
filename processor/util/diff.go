@@ -279,6 +279,8 @@ func DiffRepositoryList(oldRepositories, newRepositories []model.Repository) ([]
 }
 
 func DiffCollectedData(oldData, newData model.CollectedData) model.CollectedDataDiff {
+	log.Println(newData)
+
 	difference := model.CollectedDataDiff{}
 	difference.MAC = newData.MAC
 

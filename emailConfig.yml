@@ -1,5 +1,6 @@
 subject: ILM Statistics
-smptserver: smtp3.hpe.com:25
-from: ilm.stats@hpe.com
+smptserver: server:25
+from: from@domain
 to:
-  - lilla.vass@hpe.com
+  - recipient1@domain
+  - recipient2@domain

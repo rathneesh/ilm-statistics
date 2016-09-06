@@ -9,6 +9,7 @@ import (
 	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"github.com/ilm-statistics/ilm-statistics/processor/service"
+	"math"
 )
 
 func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +22,7 @@ func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
 	)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	var stat model.CollectedData
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, math.MaxInt64))
 	if err != nil {
 		panic(err)
 	}
