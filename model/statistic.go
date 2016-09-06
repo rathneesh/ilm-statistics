@@ -104,11 +104,19 @@ type Provider struct {
 	ProviderType string
 }
 type BuildResult struct {
-	ID            string
-	BuildId       string
-	ResultEntries []string
+	ID             string
+	BuildId        string
+	ResultEntries  []string
+	TargetArtifact TargetArtifact
+}
+type TargetArtifact struct {
+	Artifact Artifact
 }
 
+type Artifact struct {
+	ImageId string
+	Link    string
+}
 type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
