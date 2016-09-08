@@ -20,7 +20,7 @@ func TestMergeImageLists(t *testing.T) {
 
 	// Merge 1 added image
 
-	addedImages = []model.Image{{ProjectId: "1", Id: "1", Name: "image1"}}
+	addedImages = []model.Image{{Id: "1", Name: "image1"}}
 	add, del := DiffImageList(MergeImageLists(initList, addedImages, deletedImages), addedImages)
 	if len(MergeImageLists(initList, addedImages, deletedImages)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error("Adding a one-elemented list to the initial list gave an unexpected result")
@@ -31,7 +31,7 @@ func TestMergeImageLists(t *testing.T) {
 
 	initList = MergeImageLists(initList, addedImages, deletedImages)
 	addedImages = []model.Image{}
-	deletedImages = []model.Image{{ProjectId: "1", Id: "1", Name: "image1"}}
+	deletedImages = []model.Image{{Id: "1", Name: "image1"}}
 
 	add, del = DiffImageList(MergeImageLists(initList, addedImages, deletedImages), []model.Image{})
 	if len(MergeImageLists(initList, addedImages, deletedImages)) != 0 || len(add) != 0 || len(del) != 0 {
@@ -40,10 +40,10 @@ func TestMergeImageLists(t *testing.T) {
 
 	// Delete 1 image, add another 1
 
-	initList = []model.Image{{ProjectId: "1", Id: "1", Name: "image1"}}
-	deletedImages = []model.Image{{ProjectId: "1", Id: "1", Name: "image1"}}
-	addedImages = []model.Image{{ProjectId: "1", Id: "1", Name: "image1"}}
-	add, del = DiffImageList(MergeImageLists(initList, addedImages, deletedImages), []model.Image{{ProjectId: "1", Id: "1", Name: "image1"}})
+	initList = []model.Image{{Id: "1", Name: "image1"}}
+	deletedImages = []model.Image{{Id: "1", Name: "image1"}}
+	addedImages = []model.Image{{Id: "1", Name: "image1"}}
+	add, del = DiffImageList(MergeImageLists(initList, addedImages, deletedImages), []model.Image{{Id: "1", Name: "image1"}})
 
 	if len(MergeImageLists(initList, addedImages, deletedImages)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error("Adding and deleting a one-elemented list to the initial list gave an unexpected result")
@@ -413,7 +413,6 @@ func TestMergeDiff(t *testing.T) {
 		MAC: "co:mp:ut:er",
 		Username: "uname",
 		Images: []model.Image{{
-			ProjectId: "1",
 			Id: "1",
 			Name: "Image1",
 			ImageId: "1",
@@ -425,7 +424,6 @@ func TestMergeDiff(t *testing.T) {
 			Location: "public registry",
 			SkipImageBuild: "false",
 		}, {
-			ProjectId: "2",
 			Id: "2",
 			Name: "Image2",
 			ImageId: "2",
@@ -455,9 +453,7 @@ func TestMergeDiff(t *testing.T) {
 		Projects: []model.Project{{
 			Id: "1",
 			Name: "Project1",
-			Author: "Author1",
 			CreationTime: "2002",
-			LastRunTime: "2002",
 			Status: "new",
 			Images: []model.Image{},
 			Tests: []model.Test{},
@@ -465,9 +461,7 @@ func TestMergeDiff(t *testing.T) {
 			{
 				Id: "2",
 				Name: "Project2",
-				Author: "Author2",
 				CreationTime: "2002",
-				LastRunTime: "2002",
 				Status: "new",
 				Images: []model.Image{},
 				Tests: []model.Test{},
@@ -498,14 +492,12 @@ func TestMergeDiff(t *testing.T) {
 			}},
 		Tests: []model.Test{{
 			Id: "1",
-			ProjectId: "1",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
 		},
 			{
 				Id: "2",
-				ProjectId: "2",
 				Provider: model.Provider{
 					ProviderType: "clair",
 				},
@@ -548,7 +540,6 @@ func TestMergeDiff(t *testing.T) {
 		NewUserName: "uname",
 		AddedImages: []model.Image{},
 		DeletedImages: []model.Image{{
-			ProjectId: "1",
 			Id: "1",
 			Name: "Image1",
 			ImageId: "1",
@@ -560,7 +551,6 @@ func TestMergeDiff(t *testing.T) {
 			Location: "public registry",
 			SkipImageBuild: "false",
 		}, {
-			ProjectId: "2",
 			Id: "2",
 			Name: "Image2",
 			ImageId: "2",
@@ -592,9 +582,7 @@ func TestMergeDiff(t *testing.T) {
 		DeletedProjects: []model.Project{{
 			Id: "1",
 			Name: "Project1",
-			Author: "Author1",
 			CreationTime: "2002",
-			LastRunTime: "2002",
 			Status: "new",
 			Images: []model.Image{},
 			Tests: []model.Test{},
@@ -602,9 +590,7 @@ func TestMergeDiff(t *testing.T) {
 			{
 				Id: "2",
 				Name: "Project2",
-				Author: "Author2",
 				CreationTime: "2002",
-				LastRunTime: "2002",
 				Status: "new",
 				Images: []model.Image{},
 				Tests: []model.Test{},
@@ -638,14 +624,12 @@ func TestMergeDiff(t *testing.T) {
 		AddedTests: []model.Test{},
 		DeletedTests: []model.Test{{
 			Id: "1",
-			ProjectId: "1",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
 		},
 			{
 				Id: "2",
-				ProjectId: "2",
 				Provider: model.Provider{
 					ProviderType: "clair",
 				},

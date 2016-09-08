@@ -100,7 +100,7 @@ func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
 				//Number today's hourly activities
 				if (year == now.Year() && time.Month(month) == now.Month() && day == now.Day()){
 					for k := 0; k < len(stat[i].Tests); k++ {
-						if (stat[i].Builds[j].ProjectId == stat[i].Tests[k].ProjectId) {
+						if (stat[i].Builds[j].TestId == stat[i].Tests[k].Id) {
 							s.HourlyActivities[hr]++
 						}
 					}

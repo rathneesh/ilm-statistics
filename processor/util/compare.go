@@ -6,9 +6,6 @@ import (
 
 // Compare two images
 func CmpImages(img1, img2 model.Image) bool {
-	if img1.ProjectId != img2.ProjectId {
-		return false
-	}
 	if img1.Name != img2.Name {
 		return false
 	}
@@ -107,13 +104,7 @@ func CmpProjects(proj1, proj2 model.Project) bool {
 	if proj1.Name != proj2.Name {
 		return false
 	}
-	if proj1.Author != proj2.Author {
-		return false
-	}
 	if proj1.CreationTime != proj2.CreationTime {
-		return false
-	}
-	if proj1.LastRunTime != proj2.LastRunTime {
 		return false
 	}
 	if proj1.Status != proj2.Status {

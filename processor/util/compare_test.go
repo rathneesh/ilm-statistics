@@ -9,7 +9,6 @@ import (
 func TestCmpImages(t *testing.T){
 	// Two equal images
 	img1 := model.Image{
-		ProjectId: "1",
 		Id: "1",
 		Name: "Image1",
 		ImageId: "1",
@@ -22,7 +21,6 @@ func TestCmpImages(t *testing.T){
 		SkipImageBuild: "false",
 	}
 	img2 := model.Image{
-		ProjectId: "1",
 		Id: "1",
 		Name: "Image1",
 		ImageId: "1",
@@ -39,15 +37,7 @@ func TestCmpImages(t *testing.T){
 		t.Error("Two equal images evaluated as non-equal")
 	}
 
-	// One image is different from the other in one field (ProjectId)
-	img2.ProjectId = "3"
-
-	if CmpImages(img1,img2) {
-		t.Error("Two non-equal images evaluated as equal (different ProjectId)")
-	}
-
 	// One image is different from the other in one field (Name)
-	img2.ProjectId = "1"
 	img2.Name = "Image2"
 
 	if CmpImages(img1,img2) {
@@ -225,14 +215,12 @@ func TestCmpTests(t *testing.T) {
 	//Two equal tests
 	test1 := model.Test{
 		Id: "1",
-		ProjectId: "1",
 		Provider: model.Provider{
 			ProviderType: "clair",
 		},
 	}
 	test2 := model.Test{
 		Id: "1",
-		ProjectId: "1",
 		Provider: model.Provider{
 			ProviderType: "clair",
 		},
@@ -249,16 +237,10 @@ func TestCmpTests(t *testing.T) {
 		t.Error("Two non-equal tests evaluated as equal (different Id)")
 	}
 
-	// One test is different from the other in one field (ProjectId)
-	test2.Id = "1"
-	test2.ProjectId = "2"
 
-	if CmpTests(test1,test2){
-		t.Error("Two non-equal tests evaluated as equal (different ProjectId)")
-	}
+	test2.Id = "1"
 
 	// One test is different from the other in one field (Provider)
-	test2.ProjectId = "1"
 	test2.Provider.ProviderType = "not clair"
 
 	if CmpTests(test1,test2){
@@ -272,9 +254,7 @@ func TestCmpProjects(t *testing.T) {
 	proj1 := model.Project{
 		Id: "1",
 		Name: "Project1",
-		Author: "Author1",
 		CreationTime: "2002",
-		LastRunTime: "2002",
 		Status: "new",
 		Images: []model.Image{},
 		Tests: []model.Test{},
@@ -282,9 +262,7 @@ func TestCmpProjects(t *testing.T) {
 	proj2 := model.Project{
 		Id: "1",
 		Name: "Project1",
-		Author: "Author1",
 		CreationTime: "2002",
-		LastRunTime: "2002",
 		Status: "new",
 		Images: []model.Image{},
 		Tests: []model.Test{},
@@ -308,33 +286,18 @@ func TestCmpProjects(t *testing.T) {
 	if CmpProjects(proj1,proj2){
 		t.Error("Two non-equal projects evaluated as equal (different Name)")
 	}
-
-	// One project is different from the other in one field (Author)
 	proj2.Name = "Project1"
-	proj2.Author = "Author2"
-
-	if CmpProjects(proj1, proj2){
-		t.Error("Two non-equal projects evaluated as equal (different Author)")
-	}
 
 	// One project is different from the other in one field (CreationTime)
-	proj2.Author = "Author1"
 	proj2.CreationTime = "2003"
 
 	if CmpProjects(proj1, proj2){
 		t.Error("Two non-equal projects evaluated as equal (different CreationTime)")
 	}
 
-	// One project is different from the other in one field (LastRunTime)
 	proj2.CreationTime = "2002"
-	proj2.LastRunTime = "2016"
-
-	if CmpProjects(proj1, proj2){
-		t.Error("Two non-equal projects evaluated as equal (different LastRunTime)")
-	}
 
 	// One project is different from the other in one field (Status)
-	proj2.LastRunTime = "2002"
 	proj2.Status = "old"
 
 	if CmpProjects(proj1, proj2){
@@ -345,7 +308,6 @@ func TestCmpProjects(t *testing.T) {
 	proj2.Status = "new"
 	proj2.Images = []model.Image{
 		{
-			ProjectId: "1",
 			Id: "1",
 			Name: "Image1",
 			ImageId: "1",
@@ -358,7 +320,6 @@ func TestCmpProjects(t *testing.T) {
 			SkipImageBuild: "false",
 		},
 		{
-			ProjectId: "1",
 			Id: "12",
 			Name: "Image1",
 			ImageId: "12",
@@ -379,7 +340,6 @@ func TestCmpProjects(t *testing.T) {
 	// One project is different from the other in one field (different order in Images) -> they should evaluate as equal
 	proj1.Images = []model.Image{
 		{
-			ProjectId: "1",
 			Id: "12",
 			Name: "Image1",
 			ImageId: "12",
@@ -392,7 +352,6 @@ func TestCmpProjects(t *testing.T) {
 			SkipImageBuild: "false",
 		},
 		{
-			ProjectId: "1",
 			Id: "1",
 			Name: "Image1",
 			ImageId: "1",
@@ -414,14 +373,12 @@ func TestCmpProjects(t *testing.T) {
 	proj2.Tests = []model.Test{
 		{
 			Id: "1",
-			ProjectId: "1",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
 		},
 		{
 			Id: "2",
-			ProjectId: "1",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
@@ -701,13 +658,6 @@ func TestCmpCollectedData(t *testing.T) {
 
 	if !CmpCollectedData(data1, data2) {
 		t.Error("Two equal structs evaluated as non-equal (username set)")
-	}
-
-	data1.Images = append(data1.Images, model.Image{ProjectId: "1", Id: "1", Name: "image1"})
-	data2.Images = append(data2.Images, model.Image{ProjectId: "1", Id: "1", Name: "image1"})
-
-	if !CmpCollectedData(data1, data2) {
-		t.Error("Two equal structs evaluated as non-equal (images set)")
 	}
 
 	data1.Accounts = append(data1.Accounts, model.Account{Id: "1"})

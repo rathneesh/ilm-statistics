@@ -10,7 +10,6 @@ func TestDiffImageList(t *testing.T) {
 
 	// Test if two lists of images are equal
 	imgs1 := []model.Image{{
-		ProjectId: "1",
 		Id: "1",
 		Name: "Image1",
 		ImageId: "1",
@@ -22,7 +21,6 @@ func TestDiffImageList(t *testing.T) {
 		Location: "public registry",
 		SkipImageBuild: "false",
 	}, {
-		ProjectId: "2",
 		Id: "2",
 		Name: "Image2",
 		ImageId: "2",
@@ -36,7 +34,6 @@ func TestDiffImageList(t *testing.T) {
 	}}
 
 	imgs2 := []model.Image{{
-		ProjectId: "1",
 		Id: "1",
 		Name: "Image1",
 		ImageId: "1",
@@ -48,7 +45,6 @@ func TestDiffImageList(t *testing.T) {
 		Location: "public registry",
 		SkipImageBuild: "false",
 	}, {
-		ProjectId: "2",
 		Id: "2",
 		Name: "Image2",
 		ImageId: "2",
@@ -67,7 +63,7 @@ func TestDiffImageList(t *testing.T) {
 	}
 
 	// Test for adding image
-	img := model.Image{ProjectId: "3",
+	img := model.Image{
 		Id: "3",
 		Name: "Image3",
 		ImageId: "3",
@@ -90,7 +86,7 @@ func TestDiffImageList(t *testing.T) {
 	// Test for deleting image
 	imgs1 = append(imgs1, img)
 
-	img = model.Image{ProjectId: "4",
+	img = model.Image{
 		Id: "4",
 		Name: "Image4",
 		ImageId: "4",
@@ -201,9 +197,7 @@ func TestDiffProjectList(t *testing.T) {
 		{
 			Id: "1",
 			Name: "Project1",
-			Author: "Author1",
 			CreationTime: "2002",
-			LastRunTime: "2002",
 			Status: "new",
 			Images: []model.Image{},
 			Tests: []model.Test{},
@@ -211,9 +205,7 @@ func TestDiffProjectList(t *testing.T) {
 		{
 			Id: "2",
 			Name: "Project2",
-			Author: "Author2",
 			CreationTime: "2002",
-			LastRunTime: "2002",
 			Status: "new",
 			Images: []model.Image{},
 			Tests: []model.Test{},
@@ -223,9 +215,7 @@ func TestDiffProjectList(t *testing.T) {
 		{
 			Id: "1",
 			Name: "Project1",
-			Author: "Author1",
 			CreationTime: "2002",
-			LastRunTime: "2002",
 			Status: "new",
 			Images: []model.Image{},
 			Tests: []model.Test{},
@@ -233,9 +223,7 @@ func TestDiffProjectList(t *testing.T) {
 		{
 			Id: "2",
 			Name: "Project2",
-			Author: "Author2",
 			CreationTime: "2002",
-			LastRunTime: "2002",
 			Status: "new",
 			Images: []model.Image{},
 			Tests: []model.Test{},
@@ -252,9 +240,7 @@ func TestDiffProjectList(t *testing.T) {
 
 	proj := model.Project{Id: "3",
 		Name: "Project3",
-		Author: "Author3",
 		CreationTime: "2002",
-		LastRunTime: "2002",
 		Status: "new",
 		Images: []model.Image{},
 		Tests: []model.Test{},
@@ -274,9 +260,7 @@ func TestDiffProjectList(t *testing.T) {
 
 	proj = model.Project{Id: "4",
 		Name: "Project4",
-		Author: "Author4",
 		CreationTime: "2002",
-		LastRunTime: "2002",
 		Status: "new",
 		Images: []model.Image{},
 		Tests: []model.Test{},
@@ -447,14 +431,12 @@ func TestDiffTestList(t *testing.T) {
 	tests1 := []model.Test{
 		{
 			Id: "1",
-			ProjectId: "1",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
 		},
 		{
 			Id: "2",
-			ProjectId: "2",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
@@ -464,14 +446,12 @@ func TestDiffTestList(t *testing.T) {
 	tests2 := []model.Test{
 		{
 			Id: "1",
-			ProjectId: "1",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
 		},
 		{
 			Id: "2",
-			ProjectId: "2",
 			Provider: model.Provider{
 				ProviderType: "clair",
 			},
@@ -488,7 +468,6 @@ func TestDiffTestList(t *testing.T) {
 
 	test := model.Test{
 		Id: "3",
-		ProjectId: "3",
 		Provider: model.Provider{
 			ProviderType: "clair",
 		},
@@ -507,7 +486,6 @@ func TestDiffTestList(t *testing.T) {
 
 	test = model.Test{
 		Id: "4",
-		ProjectId: "4",
 		Provider: model.Provider{
 			ProviderType: "clair",
 		},
@@ -773,8 +751,8 @@ func TestDiffCollectedData(t *testing.T) {
 
 
 	newData.Username = "uname"
-	newData.Images = append(newData.Images, model.Image{ProjectId: "1", Id: "1", Name: "image1"})
-	oldData.Images = append(oldData.Images, model.Image{ProjectId: "2", Id: "2", Name: "image2"})
+	newData.Images = append(newData.Images, model.Image{Id: "1", Name: "image1"})
+	oldData.Images = append(oldData.Images, model.Image{Id: "2", Name: "image2"})
 	newData.Accounts = append(newData.Accounts, model.Account{Id: "1"})
 	oldData.Accounts = append(oldData.Accounts, model.Account{Id: "2"})
 	newData.Projects = append(newData.Projects, model.Project{Id: "1"})

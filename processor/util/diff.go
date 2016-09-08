@@ -2,7 +2,6 @@ package util
 
 import (
 	"github.com/ilm-statistics/ilm-statistics/model"
-	"log"
 )
 
 func DiffImageList(oldImgs, newImgs []model.Image) ([]model.Image, []model.Image) {
@@ -257,7 +256,6 @@ func DiffRepositoryList(oldRepositories, newRepositories []model.Repository) ([]
 			}
 		}
 		if !found {
-			log.Println(repo1)
 			addedRepositories = append(addedRepositories, repo1)
 		}
 	}
@@ -279,8 +277,6 @@ func DiffRepositoryList(oldRepositories, newRepositories []model.Repository) ([]
 }
 
 func DiffCollectedData(oldData, newData model.CollectedData) model.CollectedDataDiff {
-	log.Println(newData)
-
 	difference := model.CollectedDataDiff{}
 	difference.MAC = newData.MAC
 
