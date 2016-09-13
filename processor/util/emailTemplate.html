@@ -26,9 +26,7 @@
     <h3>Projects: success and failure rate</h3>
 
     {{ range $project := .ProjectsList }}
-    Project:
-    <li>Id: {{ .Id }}</li>
-    <li>Name: {{ .Name }}</li>
+    Project {{ .Name }} [{{ .Id }}]:
     <li>Success rate: {{ (index $.ProjectsSuccess .Id) }}%</li>
     <li>Failure rate: {{ index $.ProjectsFailure .Id }}%</li>
     <br><br>
@@ -38,9 +36,7 @@
     The most executed projects were ran {{ .MaxProjectPopularity }} times
     <br><br>
     {{ range $projectId, $project := .MostPopularProjects }}
-    Project:
-    <li> Id: {{ $projectId }}</li>
-    <li> Name: {{ $project.Name }}</li>
+    Project {{ $project.Name }} [{{ $projectId }}]:
     <li> Creation time: {{ $project.CreationTime }}</li>
     <li> Status: {{ $project.Status }}</li>
     <br><br>
@@ -60,15 +56,13 @@
     <li>{{ $image }} - {{ $.LeastUsedImageOccurrence }} occurrence(s)</li>
     {{ end }}
 
-    <h3>Images in projects</h3>
+    <h3>Occurrences of images in projects</h3>
     <ol>
         {{ range $image, $projectList := .ImagesInProjects }}
         <li> {{ $image }}</li>
         <ul>
             {{ range $project := $projectList }}
-            Project:
-            <li> Id: {{ $project.Id }}</li>
-            <li> Name: {{ $project.Name }}</li>
+            <li> Project: {{ $project.Name }} [{{ $project.Id }}]</li>
             <li> Creation time: {{ $project.CreationTime }}</li>
             <li> Status: {{ $project.Status }}</li>
             <br><br>
@@ -82,19 +76,13 @@
     <h2>Tests</h2>
     <h2>Most executed tests</h2>
     {{ range $test := .MostExecutedTests }}
-    Test:
-    <li>Id: {{ .Id }}</li>
-    <li>Project id: {{ .ProjectId }}</li>
-    <li>Executed: {{ $.MostExecutedTestsNr }} time(s)</li>
+    Test {{ .Name }} [{{ .Id }}]: executed: {{ $.MostExecutedTestsNr }} time(s)</li>
     <br><br>
     {{ end }}
 
     <h2>Least executed tests</h2>
     {{ range $test := .LeastExecutedTests }}
-    Test:
-    <li>Id: {{ .Id }}</li>
-    <li>Project id: {{ .ProjectId }}</li>
-    <li>Executed: {{ $.LeastExecutedTestsNr }} time(s)</li>
+    Test {{ .Name }} [{{ .Id }}]: executed: {{ $.LeastExecutedTestsNr }} time(s)</li>
     <br><br>
     {{ end }}
 
@@ -120,9 +108,9 @@
 
     <h2>Per user views </h2>
     {{ range $mac, $statsPerUserList := .StatisticsPerUsers }}
-    <h3>User MAC: <b>{{ $mac }}</b></h3>
+    <h3>User <b>{{ $mac }}</b></h3>
     {{ range $stat := $statsPerUserList }}
-    <h4><p>User {{ .Username }} at time: {{ .Day }} had {{ .NoOfImages }} images with a total of {{ .NoOfVulnerabilities }} vulnerabilities for the tested images</p></h4>
+    <h4><p>At {{ .Day }}, {{ .NoOfVulnerabilities }} vulnerabilities have been found in {{ .NoOfImages }} the tested images</p></h4>
     {{ range $image, $noOfVulnerabilities := .Vulnerabilities }}
     <p> Image <b>{{ $image }}</b> has <b>{{ $noOfVulnerabilities }}</b> vulnerabilities</p>
     {{ end }}
