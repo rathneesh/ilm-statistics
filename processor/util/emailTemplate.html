@@ -4,57 +4,114 @@
     <meta charset="UTF-8">
     <title>ILM Statistics</title>
 </head>
-<body>
+<body style="font-family: sans-serif">
 
     <h1>ILM Statistics</h1>
 
     <h2>Overview</h2>
+
     Projects
-    <ul>
-        <li>Success rate: {{.SuccessRate}}%</li>
-        <li>Failure rate: {{.FailureRate}}%</li>
-    </ul>
+    <table>
+    <tr>
+    <td>Success rate:</td><td> {{.SuccessRate}}%</td>
+    </tr>
+    <tr>
+    <td>Failure rate:</td><td> {{.FailureRate}}%</td>
+    </tr>
+    </table>
+    <br>
+
+    
     {{.Images}} images, {{.Tests}} tests, {{.Projects}} projects
-    <ul>
-        <li>In average {{.AverageImagesPerProject}} images/project</li>
-        <li>In average {{.AverageTestsPerProject}} tests/project</li>
-    </ul>
+    <table>
+    <tr>
+        <td>In average</td><td>{{.AverageImagesPerProject}}</td><td> images/project</td>
+        </tr>
+        <tr>
+        <td>In average</td><td> {{.AverageTestsPerProject}}</td> <td>tests/project</td>
+        </tr>
+    </table>
+
 
     <hr>
 
     <h2>Projects</h2>
     <h3>Projects: success and failure rate</h3>
-
-    {{ range $project := .ProjectsList }}
-    Project {{ .Name }} [{{ .Id }}]:
-    <li>Success rate: {{ (index $.ProjectsSuccess .Id) }}%</li>
-    <li>Failure rate: {{ index $.ProjectsFailure .Id }}%</li>
-    <br><br>
+    
+    <table border="1">
+    <tr>
+    	<th>Project</th>
+    	<th>Success rate</th>
+    	<th>Failure rate</th>
+    </tr>
+    {{ range $project := .ProjectsList }} 
+    <tr>
+    	<td>{{ .Name }} [{{ .Id }}]</td>
+    	<td>{{ (index $.ProjectsSuccess .Id) }}%</td>
+    	<td>{{ index $.ProjectsFailure .Id }}%</td>
+    </tr>
     {{ end }}
+    </table>
 
-    <h3>Most executed projects</h3>
-    The most executed projects were ran {{ .MaxProjectPopularity }} times
+    <br>
+
+    <h3>Most executed project</h3>
+    The most executed project was ran {{ .MaxProjectPopularity }} times
     <br><br>
     {{ range $projectId, $project := .MostPopularProjects }}
-    Project {{ $project.Name }} [{{ $projectId }}]:
-    <li> Creation time: {{ $project.CreationTime }}</li>
-    <li> Status: {{ $project.Status }}</li>
-    <br><br>
+    <table>
+    <tr>
+       	<td>Project</td>
+       	<td>{{ $project.Name }} [{{ $projectId }}]</td>
+   	</tr>
+    <tr>
+    	<td>Creation time:</td>
+    	<td>{{ $project.CreationTime }}</td>
+    </tr>
+    <tr> 
+    	<td>Status:</td>
+    	<td>{{ $project.Status }}</td>
+    </tr>
+    
+    </table>
     {{ end }}
+    <br>
 
     <hr>
 
     <h2>Images</h2>
     <h3>Overall number of tags applied: {{ .NumberOfImages }}</h3>
     <h3>Most used tags</h3>
+    
+    <table border="1">
+    <tr>
+    <th>Image</th>
+    <th>Occurences</th>
+    </tr>
     {{ range $image := .MostUsedImages}}
-    <li>{{ $image }} - {{ $.MostUsedImageOccurrence }} occurrence(s)</li>
+    <tr>
+    	<td>{{ $image }}</td>
+    	<td>{{ $.MostUsedImageOccurrence }}</td>
+    </tr>
     {{ end }}
+    </table>
+    
 
     <h3>Least used tags</h3>
+    
+    <table border="1">
+    <tr>
+    	<th>Image</th>
+    	<th>Occurences</th>
+    </tr>
     {{ range $image := .LeastUsedImages}}
-    <li>{{ $image }} - {{ $.LeastUsedImageOccurrence }} occurrence(s)</li>
+    <tr>
+    	<td>{{ $image }}:</td>
+    	<td>{{ $.LeastUsedImageOccurrence }}</td>
+    </tr>
     {{ end }}
+    </table>
+    
 
     <h3>Occurrences of images in projects</h3>
     <ol>
@@ -62,10 +119,21 @@
         <li> {{ $image }}</li>
         <ul>
             {{ range $project := $projectList }}
-            <li> Project: {{ $project.Name }} [{{ $project.Id }}]</li>
-            <li> Creation time: {{ $project.CreationTime }}</li>
-            <li> Status: {{ $project.Status }}</li>
-            <br><br>
+            <table>
+            <tr> 
+            	<td>Project:</td>
+            	<td>{{ $project.Name }} [{{ $project.Id }}]</td>
+            </tr>
+            <tr> 
+            	<td>Creation time:</td>
+            	<td>{{ $project.CreationTime }}</td>
+            </tr>
+            <tr> 
+            	<td>Status:</td>
+            	<td>{{ $project.Status }}</td>
+            </tr>
+            </table>
+            <br>
             {{ end }}
         </ul>
         {{ end }}
@@ -75,16 +143,39 @@
 
     <h2>Tests</h2>
     <h2>Most executed tests</h2>
+    <table border="1">
+    <tr>
+    	<th>Id</th>
+    	<th>Name</th>
+    	<th>Executions</th>
+    </tr>
     {{ range $test := .MostExecutedTests }}
-    Test {{ .Name }} [{{ .Id }}]: executed: {{ $.MostExecutedTestsNr }} time(s)</li>
-    <br><br>
+    <tr>
+    	<td>[{{ .Id }}]</td>
+    	<td>{{ .Name }}</td>
+    	<td>{{ $.MostExecutedTestsNr }}</td>
+    </tr>
     {{ end }}
+    </table>
+    <br>
 
     <h2>Least executed tests</h2>
+    <table border="1">
+    <tr>
+    	<th>Id</th>
+    	<th>Name</th>
+    	<th>Executions</th>
+    </tr>
     {{ range $test := .LeastExecutedTests }}
-    Test {{ .Name }} [{{ .Id }}]: executed: {{ $.LeastExecutedTestsNr }} time(s)</li>
-    <br><br>
+    <tr>
+
+    	<td>[{{ .Id }}]</td>
+    	<td>{{ .Name }}</td>
+    	<td>{{ $.LeastExecutedTestsNr }}</td>
+    </tr>
     {{ end }}
+    </table>
+    <br>
 
     <hr>
 
@@ -93,9 +184,14 @@
     <h2>Today's user activity</h2>
     <h3>Number of tests started in each hour</h3>
 
+	<table>
     {{ range $key, $value := .Hours }}
-    <li>{{ $key }}:00 - {{ $key }}:59 : {{ $value }}</li>
+    <tr>
+    	<td>{{ $key }}:00 - {{ $key }}:59 :</td>
+    	<td>{{ $value }}</td>
+    </tr>
     {{ end }}
+    </table>
 
     <br>
     <b>Busiest times of the day:</b>
@@ -111,9 +207,19 @@
     <h3>User <b>{{ $mac }}</b></h3>
     {{ range $stat := $statsPerUserList }}
     <h4><p>At {{ .Day }}, {{ .NoOfVulnerabilities }} vulnerabilities have been found in {{ .NoOfImages }} the tested images</p></h4>
+
+    <table border="1">
+    <tr>
+    	<th>Image</th>
+    	<th>Vulnerabilities</th>
+    </tr>
     {{ range $image, $noOfVulnerabilities := .Vulnerabilities }}
-    <p> Image <b>{{ $image }}</b> has <b>{{ $noOfVulnerabilities }}</b> vulnerabilities</p>
+    <tr>
+    	<td>{{ $image }}</td>
+    	<td>{{ $noOfVulnerabilities }}</td>
+    </tr>
     {{ end }}
+    </table>
     {{ end }}
     {{ end }}
 
