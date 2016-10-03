@@ -50,50 +50,6 @@ func TestMergeImageLists(t *testing.T) {
 	}
 }
 
-func TestMergeAccountLists(t *testing.T) {
-
-	// Merge 3 empty lists
-
-	initList := []model.Account{}
-	addedAccounts := []model.Account{}
-	deletedAccounts := []model.Account{}
-
-	if len(MergeAccountLists(initList, addedAccounts, deletedAccounts)) != 0 {
-		t.Error("Merging three empty list resulted in a non-empty list")
-	}
-
-	// Merge 1 added account
-
-	addedAccounts = []model.Account{{Id: "1"}}
-	add, del := DiffAccountList(MergeAccountLists(initList, addedAccounts, deletedAccounts), addedAccounts)
-	if len(MergeAccountLists(initList, addedAccounts, deletedAccounts)) != 1 || len(add) != 0 || len(del) != 0 {
-		t.Error("Adding a one-elemented list to the initial list gave an unexpected result")
-	}
-
-
-	// Merge 1 deleted account
-
-	initList = MergeAccountLists(initList, addedAccounts, deletedAccounts)
-	addedAccounts = []model.Account{}
-	deletedAccounts = []model.Account{{Id: "1"}}
-
-	add, del = DiffAccountList(MergeAccountLists(initList, addedAccounts, deletedAccounts), []model.Account{})
-	if len(MergeAccountLists(initList, addedAccounts, deletedAccounts)) != 0 || len(add) != 0 || len(del) != 0 {
-		t.Error("Deleting a one-elemented list to the initial list gave an unexpected result")
-	}
-
-	// Delete 1 account, add another 1
-
-	initList = []model.Account{{Id: "1"}}
-	deletedAccounts = []model.Account{{Id: "1"}}
-	addedAccounts = []model.Account{{Id: "1"}}
-	add, del = DiffAccountList(MergeAccountLists(initList, addedAccounts, deletedAccounts), []model.Account{{Id: "1"}})
-
-	if len(MergeAccountLists(initList, addedAccounts, deletedAccounts)) != 1 || len(add) != 0 || len(del) != 0 {
-		t.Error("Adding and deleting a one-elemented list to the initial list gave an unexpected result")
-	}
-}
-
 func TestMergeProjectLists(t *testing.T) {
 
 	// Merge 3 empty lists
@@ -284,7 +240,7 @@ func TestMergeResultLists(t *testing.T) {
 
 	// Merge 1 added build result
 
-	addedResults = []model.BuildResult{{ID: "1"}}
+	addedResults = []model.BuildResult{{Id: "1"}}
 	add, del := DiffResultList(MergeResultLists(initList, addedResults, deletedResults), addedResults)
 	if len(MergeResultLists(initList, addedResults, deletedResults)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error("Adding a one-elemented list to the initial list gave an unexpected result")
@@ -295,7 +251,7 @@ func TestMergeResultLists(t *testing.T) {
 
 	initList = MergeResultLists(initList, addedResults, deletedResults)
 	addedResults = []model.BuildResult{}
-	deletedResults = []model.BuildResult{{ID: "1"}}
+	deletedResults = []model.BuildResult{{Id: "1"}}
 
 	add, del = DiffResultList(MergeResultLists(initList, addedResults, deletedResults), []model.BuildResult{})
 	if len(MergeResultLists(initList, addedResults, deletedResults)) != 0 || len(add) != 0 || len(del) != 0 {
@@ -304,10 +260,10 @@ func TestMergeResultLists(t *testing.T) {
 
 	// Delete 1 build result, add another 1
 
-	initList = []model.BuildResult{{ID: "1"}}
-	deletedResults = []model.BuildResult{{ID: "1"}}
-	addedResults = []model.BuildResult{{ID: "1"}}
-	add, del = DiffResultList(MergeResultLists(initList, addedResults, deletedResults), []model.BuildResult{{ID: "1"}})
+	initList = []model.BuildResult{{Id: "1"}}
+	deletedResults = []model.BuildResult{{Id: "1"}}
+	addedResults = []model.BuildResult{{Id: "1"}}
+	add, del = DiffResultList(MergeResultLists(initList, addedResults, deletedResults), []model.BuildResult{{Id: "1"}})
 
 	if len(MergeResultLists(initList, addedResults, deletedResults)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error("Adding a one-elemented list to the initial list gave an unexpected result")
@@ -375,10 +331,6 @@ func TestMergeDiff(t *testing.T) {
 		t.Error("Empty image lists' merging does not result in empty list")
 	}
 
-	if len(dataDiff.Accounts) != 0 {
-		t.Error("Empty account lists' merging does not result in empty list")
-	}
-
 	if len(dataDiff.Projects) != 0 {
 		t.Error("Empty project lists' merging does not result in empty list")
 	}
@@ -399,10 +351,6 @@ func TestMergeDiff(t *testing.T) {
 		t.Error("Empty build result lists' merging does not result in empty list")
 	}
 
-	if len(dataDiff.Repositories) != 0 {
-		t.Error("Empty repository lists' merging does not result in empty list")
-	}
-
 	if !dataDiff.Day.IsZero() {
 		t.Error("Null time value merging results in non-null value")
 	}
@@ -417,7 +365,6 @@ func TestMergeDiff(t *testing.T) {
 			Name: "Image1",
 			ImageId: "1",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
@@ -428,27 +375,11 @@ func TestMergeDiff(t *testing.T) {
 			Name: "Image2",
 			ImageId: "2",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
 			SkipImageBuild: "false",
-		}},
-		Accounts: []model.Account{{
-			Id: "1",
-			FirstName: "Bruce",
-			LastName: "Wayne",
-			Username: "batman",
-			Password: "batmobile",
-			Roles: []string{"hero", "billionaire", "philanthropist"},
-		}, {
-			Id: "2",
-			FirstName: "Bruce",
-			LastName: "Wayne",
-			Username: "batman",
-			Password: "batmobile",
-			Roles: []string{"hero", "billionaire", "philanthropist"},
 		}},
 		Projects: []model.Project{{
 			Id: "1",
@@ -503,34 +434,14 @@ func TestMergeDiff(t *testing.T) {
 				},
 			}},
 		Results: []model.BuildResult{{
-			ID: "1",
+			Id: "1",
 			BuildId: "1",
 			ResultEntries: []string{"1","2"},
-		},
+			},
 			{
-				ID: "2",
+				Id: "2",
 				BuildId: "2",
 				ResultEntries: []string{"1","2"},
-			}},
-		Repositories: []model.Repository{{
-			Name: "Repo1",
-			Tag: "private",
-			FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-			Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-			HasProblems: false,
-			Message: "msg",
-			RegistryUrl: "localhost:5000",
-			RegistryName: "Reggy",
-		},
-			{
-				Name: "Repo2",
-				Tag: "public",
-				FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-				Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-				HasProblems: false,
-				Message: "msg",
-				RegistryUrl: "localhost:5000",
-				RegistryName: "Repsy",
 			}},
 		Day: time.Now(),
 	}
@@ -544,7 +455,6 @@ func TestMergeDiff(t *testing.T) {
 			Name: "Image1",
 			ImageId: "1",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
@@ -555,28 +465,11 @@ func TestMergeDiff(t *testing.T) {
 			Name: "Image2",
 			ImageId: "2",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
 			SkipImageBuild: "false",
-		}},
-		AddedAccounts: []model.Account{},
-		DeletedAccounts: []model.Account{{
-			Id: "1",
-			FirstName: "Bruce",
-			LastName: "Wayne",
-			Username: "batman",
-			Password: "batmobile",
-			Roles: []string{"hero", "billionaire", "philanthropist"},
-		}, {
-			Id: "2",
-			FirstName: "Bruce",
-			LastName: "Wayne",
-			Username: "batman",
-			Password: "batmobile",
-			Roles: []string{"hero", "billionaire", "philanthropist"},
 		}},
 		AddedProjects: []model.Project{},
 		DeletedProjects: []model.Project{{
@@ -636,12 +529,12 @@ func TestMergeDiff(t *testing.T) {
 			}},
 		AddedResults: []model.BuildResult{},
 		DeletedResults: []model.BuildResult{{
-			ID: "1",
+			Id: "1",
 			BuildId: "1",
 			ResultEntries: []string{"1","2"},
 		},
 			{
-				ID: "2",
+				Id: "2",
 				BuildId: "2",
 				ResultEntries: []string{"1","2"},
 			}},
@@ -680,10 +573,6 @@ func TestMergeDiff(t *testing.T) {
 		t.Error("Image lists are not merging correctly")
 	}
 
-	if len(dataDiff.Accounts) != 0 {
-		t.Error("Account lists are not merging correctly")
-	}
-
 	if len(dataDiff.Projects) != 0 {
 		t.Error("Project lists are not merging correctly")
 	}
@@ -704,10 +593,6 @@ func TestMergeDiff(t *testing.T) {
 		t.Error("Build result lists are not merging correctly")
 	}
 
-	if len(dataDiff.Repositories) != 0 {
-		t.Error("Repository lists are not merging correctly")
-	}
-
 	finalData = model.CollectedDataDiff{}
 	finalData.MAC = "co:mp:ut:er"
 
@@ -719,10 +604,6 @@ func TestMergeDiff(t *testing.T) {
 
 	if len(dataDiff.Images) != 2 {
 		t.Error("Image lists are not merging correctly")
-	}
-
-	if len(dataDiff.Accounts) != 2 {
-		t.Error("Account lists are not merging correctly")
 	}
 
 	if len(dataDiff.Projects) != 2 {
@@ -744,9 +625,4 @@ func TestMergeDiff(t *testing.T) {
 	if len(dataDiff.Results) != 2 {
 		t.Error("Build result lists are not merging correctly")
 	}
-
-	if len(dataDiff.Repositories) != 2 {
-		t.Error("Repository lists are not merging correctly")
-	}
-
 }

@@ -15,9 +15,6 @@ func CmpImages(img1, img2 model.Image) bool {
 	if img1.Description != img2.Description {
 		return false
 	}
-	if img1.Status != img2.Status {
-		return false
-	}
 	if img1.RegistryId != img2.RegistryId {
 		return false
 	}
@@ -47,42 +44,6 @@ func CmpImages(img1, img2 model.Image) bool {
 		return false
 	}
 
-	return true
-}
-
-//Compare two accounts
-func CmpAccounts(acc1, acc2 model.Account) bool {
-	if acc1.Id != acc2.Id {
-		return false
-	}
-	if acc1.FirstName != acc2.FirstName {
-		return false
-	}
-	if acc1.LastName != acc2.LastName {
-		return false
-	}
-	if acc1.Username != acc2.Username {
-		return false
-	}
-	if acc1.Password != acc2.Password {
-		return false
-	}
-
-	if len(acc1.Roles) != len(acc2.Roles) {
-		return false
-	} else {
-		similar := 0
-		for i := 0; i < len(acc1.Roles); i++ {
-			for j := 0; j < len(acc2.Roles); j++ {
-				if acc1.Roles[i] == acc2.Roles[j] {
-					similar ++
-				}
-			}
-		}
-		if similar != len(acc1.Roles) {
-			return false
-		}
-	}
 	return true
 }
 
@@ -158,7 +119,7 @@ func CmpRegistries(reg1, reg2 model.Registry) bool {
 
 //Compre two BuildResults
 func CmpBuildResults(res1, res2 model.BuildResult) bool {
-	if res1.ID != res2.ID{
+	if res1.Id != res2.Id{
 		return false
 	}
 	if res1.BuildId != res2.BuildId {
@@ -247,11 +208,6 @@ func CmpCollectedData(data1 model.CollectedData, data2 model.CollectedData) bool
 		eq = false
 	}
 
-	addedAccounts, deletedAccounts := DiffAccountList(data1.Accounts, data2.Accounts)
-	if !(len(addedAccounts) == 0 && len(deletedAccounts) == 0) {
-		eq = false
-	}
-
 	addedProjects, deletedProjects := DiffProjectList(data1.Projects, data2.Projects)
 	if !(len(addedProjects) == 0 && len(deletedProjects) == 0) {
 		eq = false
@@ -274,11 +230,6 @@ func CmpCollectedData(data1 model.CollectedData, data2 model.CollectedData) bool
 
 	addedResults, deletedResults := DiffResultList(data1.Results, data2.Results)
 	if !(len(addedResults) == 0 && len(deletedResults) == 0) {
-		eq = false
-	}
-
-	addedRepositories, deletedRepositories := DiffRepositoryList(data1.Repositories, data2.Repositories)
-	if !(len(addedRepositories) == 0 && len(deletedRepositories) == 0) {
 		eq = false
 	}
 

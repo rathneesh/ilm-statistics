@@ -71,3 +71,7 @@ func GetIp(w http.ResponseWriter, r *http.Request) {
 func SendStatistics(){
 	service.SendStatistics()
 }
+
+func SendStatisticsForced(w http.ResponseWriter, r *http.Request) {
+	service.SendStatistics()
+}

@@ -33,6 +33,12 @@ var routes = Routes{
 		"/usage",
 		GetIp,
 	},
+	Route{
+		"SendMail",
+		"Get",
+		"/sendmail",
+		SendStatisticsForced,
+	},
 }
 
 func NewRouter() *mux.Router {

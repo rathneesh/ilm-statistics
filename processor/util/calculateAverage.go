@@ -45,7 +45,6 @@ func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
 	for i:=0; i<len(stat); i++ {
 
 		//Number all the accounts and projects
-		s.Accounts += len(stat[i].Accounts)
 		s.Projects.Total += len(stat[i].Projects)
 
 		//Overall project success/failure rate
@@ -246,7 +245,6 @@ func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
 	}
 
 	s.NumberOfImages = len(s.ImagesInProjects)
-	s.AvgAccountPerUser = float64(s.Accounts)/float64(s.Users)
 	s.Projects.AvgTestsInProjects = float64(s.Tests.Total)/float64(s.Projects.Total)
 	s.Projects.AvgImagesInProjects = float64(s.Projects.ImagesInProjects)/float64(s.Projects.Total)
 	s.Projects.SuccessRate = float64(s.Projects.Passed*100)/float64(s.Projects.Total)

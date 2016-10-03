@@ -38,40 +38,6 @@ func DiffImageList(oldImgs, newImgs []model.Image) ([]model.Image, []model.Image
 	return addedImages, deletedImages
 }
 
-func DiffAccountList(oldAccounts, newAccounts []model.Account) ([]model.Account, []model.Account) {
-
-	addedAccounts := []model.Account{}
-	deletedAccounts := []model.Account{}
-
-	for _, acc1 := range newAccounts {
-		found := false
-		for _, acc2 := range oldAccounts {
-			if CmpAccounts(acc1, acc2) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			addedAccounts = append(addedAccounts, acc1)
-		}
-	}
-
-	for _, acc1 := range oldAccounts {
-		found := false
-		for _, acc2 := range newAccounts {
-			if CmpAccounts(acc1, acc2) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			deletedAccounts = append(deletedAccounts, acc1)
-		}
-	}
-
-	return addedAccounts, deletedAccounts
-}
-
 func DiffProjectList(oldProjects, newProjects []model.Project) ([]model.Project, []model.Project) {
 
 	addedProjects := []model.Project{}
@@ -284,13 +250,11 @@ func DiffCollectedData(oldData, newData model.CollectedData) model.CollectedData
 		difference.NewUserName = newData.Username
 	}
 	difference.AddedImages, difference.DeletedImages = DiffImageList(oldData.Images, newData.Images)
-	difference.AddedAccounts, difference.DeletedAccounts = DiffAccountList(oldData.Accounts, newData.Accounts)
 	difference.AddedProjects, difference.DeletedProjects = DiffProjectList(oldData.Projects, newData.Projects)
 	difference.AddedBuilds, difference.DeletedBuilds = DiffBuildList(oldData.Builds, newData.Builds)
 	difference.AddedRegistries, difference.DeletedRegistries = DiffRegistryList(oldData.Registries, newData.Registries)
 	difference.AddedTests, difference.DeletedTests = DiffTestList(oldData.Tests, newData.Tests)
 	difference.AddedResults, difference.DeletedResults = DiffResultList(oldData.Results, newData.Results)
-	difference.AddedRepositories, difference.DeletedRepositories = DiffRepositoryList(oldData.Repositories, newData.Repositories)
 	if newData.Day != oldData.Day {
 		difference.NewDay = newData.Day
 	}

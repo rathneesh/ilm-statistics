@@ -13,7 +13,6 @@ func TestCmpImages(t *testing.T){
 		Name: "Image1",
 		ImageId: "1",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -25,7 +24,6 @@ func TestCmpImages(t *testing.T){
 		Name: "Image1",
 		ImageId: "1",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -62,14 +60,8 @@ func TestCmpImages(t *testing.T){
 
 	// One image is different from the other in one field (Status)
 	img2.Description = "A cool new image with all that fancy stuff"
-	img2.Status = "old"
-
-	if CmpImages(img1,img2) {
-		t.Error("Two non-equal images evaluated as equal (different Status)")
-	}
-
+	
 	// One image is different from the other in one field (RegistryId)
-	img2.Status = "new"
 	img2.RegistryId = "45"
 
 	if CmpImages(img1,img2) {
@@ -107,85 +99,6 @@ func TestCmpImages(t *testing.T){
 	if CmpImages(img1,img2) {
 		t.Error("Two non-equal images evaluated as equal (different SkipImageBuild)")
 	}
-}
-
-func TestCmpAccounts(t *testing.T) {
-
-	// Two similar accounts
-	acc1 := model.Account{
-		Id: "1",
-		FirstName: "Bruce",
-		LastName: "Wayne",
-		Username: "batman",
-		Password: "batmobile",
-		Roles: []string{"hero", "billionaire", "philanthropist"},
-	}
-	acc2 := model.Account{
-		Id: "1",
-		FirstName: "Bruce",
-		LastName: "Wayne",
-		Username: "batman",
-		Password: "batmobile",
-		Roles: []string{"hero", "billionaire", "philanthropist"},
-	}
-	if !CmpAccounts(acc1, acc2){
-		t.Error("Two equal accounts evaluated as non-equal")
-	}
-
-	// One account is different from the other in one field (Id)
-	acc2.Id = "2"
-
-	if CmpAccounts(acc1, acc2){
-		t.Error("Two non-equal accounts evaluated as equal (different Id)")
-	}
-
-	// One account is different from the other in one field (FirstName)
-	acc2.Id = "1"
-	acc2.FirstName = "Brian"
-
-	if CmpAccounts(acc1, acc2){
-		t.Error("Two non-equal accounts evaluated as equal (different FirstName)")
-	}
-
-	// One account is different from the other in one field (LastName)
-	acc2.FirstName = "Bruce"
-	acc2.LastName = "Lee"
-
-	if CmpAccounts(acc1, acc2){
-		t.Error("Two non-equal accounts evaluated as equal (different LastName)")
-	}
-
-	// One account is different from the other in one field (Username)
-	acc2.LastName = "Wayne"
-	acc2.Username = "batsy"
-
-	if CmpAccounts(acc1, acc2){
-		t.Error("Two non-equal accounts evaluated as equal (different Username)")
-	}
-
-	// One account is different from the other in one field (Password)
-	acc2.Username = "batman"
-	acc2.Password = "#batmobile"
-
-	if CmpAccounts(acc1, acc2){
-		t.Error("Two non-equal accounts evaluated as equal (different Password)")
-	}
-
-	// One account is different from the other in one field (Roles)
-	acc2.Password = "batmobile"
-	acc2.Roles = []string{}
-
-	if CmpAccounts(acc1, acc2){
-		t.Error("Two non-equal accounts evaluated as equal (different Roles)")
-	}
-
-	// One account is different from the other in one field (different order in Roles) -> they should evaluate as equal
-	acc2.Roles = []string{"billionaire", "philanthropist", "hero"}
-
-	if !CmpAccounts(acc1, acc2){
-		t.Error("Two equal accounts evaluated as non-equal (different order in Roles)")
-	}
-
 }
 
 func TestCmpProviders(t *testing.T) {
@@ -312,7 +225,6 @@ func TestCmpProjects(t *testing.T) {
 			Name: "Image1",
 			ImageId: "1",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
@@ -324,7 +236,6 @@ func TestCmpProjects(t *testing.T) {
 			Name: "Image1",
 			ImageId: "12",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
@@ -344,7 +255,6 @@ func TestCmpProjects(t *testing.T) {
 			Name: "Image1",
 			ImageId: "12",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
@@ -356,7 +266,6 @@ func TestCmpProjects(t *testing.T) {
 			Name: "Image1",
 			ImageId: "1",
 			Description: "A cool new image with all that fancy stuff",
-			Status: "new",
 			RegistryId: "42",
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
@@ -500,13 +409,13 @@ func TestCmpBuildResults(t *testing.T) {
 
 	// Two equal buildResults
 	res1 := model.BuildResult{
-		ID: "1",
+		Id: "1",
 		BuildId: "1",
 		ResultEntries: []string{"1","2"},
 	}
 
 	res2 := model.BuildResult{
-		ID: "1",
+		Id: "1",
 		BuildId: "1",
 		ResultEntries: []string{"1","2"},
 	}
@@ -516,14 +425,14 @@ func TestCmpBuildResults(t *testing.T) {
 	}
 
 	// One of the build results is different from the other in one field (ID)
-	res2.ID = "2"
+	res2.Id = "2"
 
 	if CmpBuildResults(res1,res2){
 		t.Error("Two non-equal build results evaluated as equal (different ID)")
 	}
 
 	// One of the build results is different from the other in one field (BuildId)
-	res2.ID = "1"
+	res2.Id = "1"
 	res2.BuildId = "2"
 
 	if CmpBuildResults(res1,res2){
@@ -660,13 +569,6 @@ func TestCmpCollectedData(t *testing.T) {
 		t.Error("Two equal structs evaluated as non-equal (username set)")
 	}
 
-	data1.Accounts = append(data1.Accounts, model.Account{Id: "1"})
-	data2.Accounts = append(data2.Accounts, model.Account{Id: "1"})
-
-	if !CmpCollectedData(data1, data2) {
-		t.Error("Two equal structs evaluated as non-equal (accounts set)")
-	}
-
 	data1.Projects = append(data1.Projects, model.Project{Id: "1"})
 	data2.Projects = append(data2.Projects, model.Project{Id: "1"})
 
@@ -695,18 +597,11 @@ func TestCmpCollectedData(t *testing.T) {
 		t.Error("Two equal structs evaluated as non-equal (tests set)")
 	}
 
-	data1.Results = append(data1.Results, model.BuildResult{ID: "1"})
-	data2.Results = append(data2.Results, model.BuildResult{ID: "1"})
+	data1.Results = append(data1.Results, model.BuildResult{Id: "1"})
+	data2.Results = append(data2.Results, model.BuildResult{Id: "1"})
 
 	if !CmpCollectedData(data1, data2) {
 		t.Error("Two equal structs evaluated as non-equal (build results set)")
-	}
-
-	data1.Repositories = append(data1.Repositories, model.Repository{Name: "1"})
-	data2.Repositories = append(data2.Repositories, model.Repository{Name: "1"})
-
-	if !CmpCollectedData(data1, data2) {
-		t.Error("Two equal structs evaluated as non-equal (repositories set)")
 	}
 
 	data1.Day = time.Now()

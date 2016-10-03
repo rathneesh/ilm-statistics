@@ -14,7 +14,6 @@ func TestDiffImageList(t *testing.T) {
 		Name: "Image1",
 		ImageId: "1",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -25,7 +24,6 @@ func TestDiffImageList(t *testing.T) {
 		Name: "Image2",
 		ImageId: "2",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -38,7 +36,6 @@ func TestDiffImageList(t *testing.T) {
 		Name: "Image1",
 		ImageId: "1",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -49,7 +46,6 @@ func TestDiffImageList(t *testing.T) {
 		Name: "Image2",
 		ImageId: "2",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -68,7 +64,6 @@ func TestDiffImageList(t *testing.T) {
 		Name: "Image3",
 		ImageId: "3",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -91,7 +86,6 @@ func TestDiffImageList(t *testing.T) {
 		Name: "Image4",
 		ImageId: "4",
 		Description: "A cool new image with all that fancy stuff",
-		Status: "new",
 		RegistryId: "42",
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
@@ -104,88 +98,6 @@ func TestDiffImageList(t *testing.T) {
 
 	if len(addedImgs) != 0 || len(deletedImgs) != 1 || !CmpImages(deletedImgs[0], img){
 		t.Error("Deleted image not recognized")
-	}
-
-}
-
-func TestDiffAccountList(t *testing.T) {
-
-	// Test for two similar lists
-	accs1 := []model.Account{{
-		Id: "1",
-		FirstName: "Bruce",
-		LastName: "Wayne",
-		Username: "batman",
-		Password: "batmobile",
-		Roles: []string{"hero", "billionaire", "philanthropist"},
-	}, {
-		Id: "2",
-		FirstName: "Bruce",
-		LastName: "Wayne",
-		Username: "batman",
-		Password: "batmobile",
-		Roles: []string{"hero", "billionaire", "philanthropist"},
-	}}
-
-	accs2 := []model.Account{{
-		Id: "1",
-		FirstName: "Bruce",
-		LastName: "Wayne",
-		Username: "batman",
-		Password: "batmobile",
-		Roles: []string{"hero", "billionaire", "philanthropist"},
-	}, {
-		Id: "2",
-		FirstName: "Bruce",
-		LastName: "Wayne",
-		Username: "batman",
-		Password: "batmobile",
-		Roles: []string{"hero", "billionaire", "philanthropist"},
-	}}
-
-	addedAccounts, deletedAccounts := DiffAccountList(accs1, accs2)
-
-	if len(addedAccounts) != 0 || len(deletedAccounts) != 0 {
-		t.Error("Two similar lists evaluated as different")
-	}
-
-	// Test for adding account
-	acc := model.Account{
-		Id: "3",
-		FirstName: "Charlie",
-		LastName: "Brown",
-		Username: "snoopy",
-		Password: "snoops",
-		Roles: []string{"owner", "boy"},
-	}
-
-	accs2 = append(accs2, acc)
-
-
-	addedAccounts, deletedAccounts = DiffAccountList(accs1, accs2)
-
-	if len(addedAccounts) != 1 || len(deletedAccounts) != 0 || !CmpAccounts(addedAccounts[0], acc){
-		t.Error("Added account not recognized", accs1)
-	}
-
-	// Test for deleting account
-	accs1 = append(accs1, acc)
-	acc = model.Account{
-		Id: "4",
-		FirstName: "Waldo",
-		LastName: "Odlaw",
-		Username: "whereami",
-		Password: "findme",
-		Roles: []string{"cartoon character", "white and red striped"},
-	}
-
-	accs1 = append(accs1, acc)
-
-
-	addedAccounts, deletedAccounts = DiffAccountList(accs1, accs2)
-
-	if len(addedAccounts) != 0 || len(deletedAccounts) != 1 || !CmpAccounts(deletedAccounts[0], acc){
-		t.Error("Deleted account not recognized", accs1)
 	}
 
 }
@@ -506,12 +418,12 @@ func TestDiffResultList(t *testing.T) {
 
 	results1 := []model.BuildResult{
 		{
-			ID: "1",
+			Id: "1",
 			BuildId: "1",
 			ResultEntries: []string{"1","2"},
 		},
 		{
-			ID: "2",
+			Id: "2",
 			BuildId: "2",
 			ResultEntries: []string{"1","2"},
 		},
@@ -519,12 +431,12 @@ func TestDiffResultList(t *testing.T) {
 
 	results2 := []model.BuildResult{
 		{
-			ID: "1",
+			Id: "1",
 			BuildId: "1",
 			ResultEntries: []string{"1","2"},
 		},
 		{
-			ID: "2",
+			Id: "2",
 			BuildId: "2",
 			ResultEntries: []string{"1","2"},
 		},
@@ -539,7 +451,7 @@ func TestDiffResultList(t *testing.T) {
 	// Test for adding result
 
 	result := model.BuildResult{
-		ID: "3",
+		Id: "3",
 		BuildId: "3",
 		ResultEntries: []string{"1","2"},
 	}
@@ -557,7 +469,7 @@ func TestDiffResultList(t *testing.T) {
 	results1 = append(results1, result)
 
 	result = model.BuildResult{
-		ID: "4",
+		Id: "4",
 		BuildId: "4",
 		ResultEntries: []string{"1", "2"},
 	}
@@ -689,14 +601,6 @@ func TestDiffCollectedData(t *testing.T) {
 		t.Error("Non-empty list resulted from differentiating two empty lists (Deleted Images)")
 	}
 
-	if len(diff.AddedAccounts) != 0 {
-		t.Error("Non-empty list resulted from differentiating two empty lists (Added Accounts)")
-	}
-
-	if len(diff.DeletedAccounts) != 0 {
-		t.Error("Non-empty list resulted from differentiating two empty lists (Deleted Accounts)")
-	}
-
 	if len(diff.AddedProjects) != 0 {
 		t.Error("Non-empty list resulted from differentiating two empty lists (Added Projects)")
 	}
@@ -753,8 +657,6 @@ func TestDiffCollectedData(t *testing.T) {
 	newData.Username = "uname"
 	newData.Images = append(newData.Images, model.Image{Id: "1", Name: "image1"})
 	oldData.Images = append(oldData.Images, model.Image{Id: "2", Name: "image2"})
-	newData.Accounts = append(newData.Accounts, model.Account{Id: "1"})
-	oldData.Accounts = append(oldData.Accounts, model.Account{Id: "2"})
 	newData.Projects = append(newData.Projects, model.Project{Id: "1"})
 	oldData.Projects = append(oldData.Projects, model.Project{Id: "2"})
 	newData.Builds = append(newData.Builds, model.Build{Id: "1"})
@@ -763,10 +665,8 @@ func TestDiffCollectedData(t *testing.T) {
 	oldData.Registries = append(oldData.Registries, model.Registry{Id: "2"})
 	newData.Tests = append(newData.Tests, model.Test{Id: "1"})
 	oldData.Tests = append(oldData.Tests, model.Test{Id: "2"})
-	newData.Results = append(newData.Results, model.BuildResult{ID: "1"})
-	oldData.Results = append(oldData.Results, model.BuildResult{ID: "2"})
-	newData.Repositories = append(newData.Repositories, model.Repository{Name: "1"})
-	oldData.Repositories = append(oldData.Repositories, model.Repository{Name: "2"})
+	newData.Results = append(newData.Results, model.BuildResult{Id: "1"})
+	oldData.Results = append(oldData.Results, model.BuildResult{Id: "2"})
 	newData.Day = time.Now()
 
 	diff = DiffCollectedData(oldData, newData)
@@ -781,14 +681,6 @@ func TestDiffCollectedData(t *testing.T) {
 
 	if len(diff.DeletedImages) != 1 {
 		t.Error("Image list differentiation does not work (delete)")
-	}
-
-	if len(diff.AddedAccounts) != 1 {
-		t.Error("Account list differentiation does not work (add)")
-	}
-
-	if len(diff.DeletedAccounts) != 1 {
-		t.Error("Account list differentiation does not work (delete)")
 	}
 
 	if len(diff.AddedProjects) != 1 {

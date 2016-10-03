@@ -8,26 +8,24 @@ type CollectedData struct {
 	MAC          string
 	Username     string
 	Images       []Image
-	Accounts     []Account
 	Projects     []Project
 	Builds       []Build
 	Registries   []Registry
 	Tests        []Test
 	Results      []BuildResult
-	Repositories []Repository
 	Day          time.Time
 }
 
 type Build struct {
-	Id        string
-	ProjectId string
-	TestId    string
-	StartTime string
-	Status    Status
+	Id        string `json:"id,omitempty"`
+	ProjectId string `json:"projectId"`
+	TestId    string `json:"testId"`
+	StartTime string `json:"startTime,omitempty"`
+	Status    Status `json:"status,omitempty"`
 }
 
 type Status struct {
-	Status string
+	Status string `json:"status"`
 }
 
 type Results struct {
@@ -35,36 +33,26 @@ type Results struct {
 }
 
 type Project struct {
-	Id           string
-	Name         string
-	CreationTime string
-	Status       string
-	ImageIds     []string
-	TestIds      []string
-	Images       []Image
-	Tests        []Test
-}
-
-type Account struct {
-	Id        string
-	FirstName string
-	LastName  string
-	Username  string
-	Password  string
-	Roles     []string
+	Id           string `json:"id,omitempty"`
+	Name         string `json:"name"`
+	CreationTime string `json:"creationTime"`
+	Status       string `json:"status"`
+	ImageIds     []string `json:"imageids"`
+	TestIds      []string `json:"testids"`
+	Images       []Image `json:"images,omitempty"`
+	Tests        []Test `json:"tests,omitempty"`
 }
 
 type Image struct {
-	Id             string
-	Name           string
-	ImageId        string
-	Description    string
-	Status         string
-	RegistryId     string
-	Tag            string
-	IlmTags        []string
-	Location       string
-	SkipImageBuild string
+	Id             string `json:"id,omitempty"`
+	Name           string `json:"name"`
+	ImageId        string `json:"imageId"`
+	Description    string `json:"description"`
+	RegistryId     string `json:"registryId"`
+	Tag            string `json:"tag"`
+	IlmTags        []string `json:"ilmTags"`
+	Location       string `json:"location"`
+	SkipImageBuild  bool `json:"skipImageBuild"`
 }
 
 type Repository struct {
@@ -90,24 +78,28 @@ type Signature struct {
 type Header struct {
 	Algorithm string
 }
+
 type Registry struct {
-	Id   string
-	Name string
-	Addr string
+	Id   string `json:"id,omitempty" gorethink:"id,omitempty"`
+	Name string `json:"name,omitempty" gorethink:"name,omitempty"`
+	Addr string `json:"addr,omitempty" gorethink:"addr,omitempty"`
 }
+
 type Test struct {
-	Id       string
-	Name     string
-	Provider Provider
+	Id       string `json:"id,omitempty" gorethink:"id,omitempty"`
+	Name     string `json:"name" gorethink:"name"`
+	Provider Provider `json:"provider" gorethink:"provider"`
 }
+
 type Provider struct {
-	ProviderType string
+	ProviderType string `json:"providerType" gorethink:"providerType"`
 }
+
 type BuildResult struct {
-	ID             string
-	BuildId        string
-	ResultEntries  []string
-	TargetArtifact TargetArtifact
+	Id            string `json:"-" gorethink:"id,omitempty"`
+	BuildId        string `json:"buildId" gorethink:"buildId"`
+	ResultEntries  []string `json:"resultEntries" gorethink:"resultEntries"`
+	TargetArtifact TargetArtifact `json:"targetArtifact" gorethink:"targetArtifact"`
 }
 type TargetArtifact struct {
 	Artifact Artifact
@@ -172,8 +164,6 @@ type CollectedDataDiff struct {
 	NewUserName         string
 	AddedImages         []Image
 	DeletedImages       []Image
-	AddedAccounts       []Account
-	DeletedAccounts     []Account
 	AddedProjects       []Project
 	DeletedProjects     []Project
 	AddedBuilds         []Build

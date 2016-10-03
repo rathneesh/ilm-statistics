@@ -19,13 +19,11 @@ func MergeDiff(oldData model.CollectedData, newData model.CollectedDataDiff) mod
 		data.Username = oldData.Username
 	}
 	data.Images = MergeImageLists(oldData.Images, newData.AddedImages, newData.DeletedImages)
-	data.Accounts = MergeAccountLists(oldData.Accounts, newData.AddedAccounts, newData.DeletedAccounts)
 	data.Projects = MergeProjectLists(oldData.Projects, newData.AddedProjects, newData.DeletedProjects)
 	data.Builds = MergeBuildLists(oldData.Builds, newData.AddedBuilds, newData.DeletedBuilds)
 	data.Registries = MergeRegistryLists(oldData.Registries, newData.AddedRegistries, newData.DeletedRegistries)
 	data.Tests = MergeTestLists(oldData.Tests, newData.AddedTests, newData.DeletedTests)
 	data.Results = MergeResultLists(oldData.Results, newData.AddedResults, newData.DeletedResults)
-	data.Repositories = MergeRepositoryLists(oldData.Repositories, newData.AddedRepositories, newData.DeletedRepositories)
 	data.Day = newData.NewDay
 
 	return data
@@ -48,28 +46,6 @@ func MergeImageLists(starterImages []model.Image, addedImages []model.Image, del
 
 	for _, img := range addedImages {
 		result = append(result, img)
-	}
-
-	return result
-}
-
-func MergeAccountLists(starterAccounts []model.Account, addedAccounts []model.Account, deletedAccounts []model.Account) []model.Account {
-	result := []model.Account{}
-
-	isDeleted := map[string]model.Account{}
-
-	for _, acc := range deletedAccounts {
-		isDeleted[acc.Id] = acc
-	}
-
-	for _, acc := range starterAccounts {
-		if !CmpAccounts(isDeleted[acc.Id], acc) {
-			result = append(result, acc)
-		}
-	}
-
-	for _, acc := range addedAccounts {
-		result = append(result, acc)
 	}
 
 	return result
@@ -169,11 +145,11 @@ func MergeResultLists(starterResults []model.BuildResult, addedResults []model.B
 	isDeleted := map[string]model.BuildResult{}
 
 	for _, res := range deletedResults {
-		isDeleted[res.ID] = res
+		isDeleted[res.Id] = res
 	}
 
 	for _, res := range starterResults {
-		if !CmpBuildResults(isDeleted[res.ID], res) {
+		if !CmpBuildResults(isDeleted[res.Id], res) {
 			result = append(result, res)
 		}
 	}
