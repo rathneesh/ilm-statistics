@@ -44,10 +44,10 @@
     	<th>Success rate</th>
     	<th>Failure rate</th>
     </tr>
-    {{ range $project := .ProjectsList }} 
+    {{ range $id, $project := .ProjectsList }}
     <tr>
-    	<td>{{ .Name }} [{{ .Id }}]</td>
-    	<td>{{ (index $.ProjectsSuccess .Id) }}%</td>
+    	<td>{{ $project.Name }} [{{ $id }}]</td>
+    	<td>{{ index $.ProjectsSuccess .Id }}%</td>
     	<td>{{ index $.ProjectsFailure .Id }}%</td>
     </tr>
     {{ end }}
@@ -58,11 +58,11 @@
     <h3>Most executed project</h3>
     The most executed project was ran {{ .MaxProjectPopularity }} times
     <br><br>
-    {{ range $projectId, $project := .MostPopularProjects }}
+    {{ range $project := .MostPopularProjects }}
     <table>
     <tr>
        	<td>Project</td>
-       	<td>{{ $project.Name }} [{{ $projectId }}]</td>
+       	<td>{{ $project.Name }} [{{ $project.Id }}]</td>
    	</tr>
     <tr>
     	<td>Creation time:</td>
@@ -80,7 +80,7 @@
     <hr>
 
     <h2>Images</h2>
-    <h3>Overall number of tags applied: {{ .NumberOfImages }}</h3>
+    <h3>Overall number of tags applied: {{ .Images }}</h3>
     <h3>Most used tags</h3>
     
     <table border="1">
@@ -88,30 +88,13 @@
     <th>Image</th>
     <th>Occurences</th>
     </tr>
-    {{ range $image := .MostUsedImages}}
+    {{ range $pair := .MostUsedImages}}
     <tr>
-    	<td>{{ $image }}</td>
-    	<td>{{ $.MostUsedImageOccurrence }}</td>
+    	<td>{{ $pair.Key }}</td>
+    	<td>{{ $pair.Value }}</td>
     </tr>
     {{ end }}
     </table>
-    
-
-    <h3>Least used tags</h3>
-    
-    <table border="1">
-    <tr>
-    	<th>Image</th>
-    	<th>Occurences</th>
-    </tr>
-    {{ range $image := .LeastUsedImages}}
-    <tr>
-    	<td>{{ $image }}:</td>
-    	<td>{{ $.LeastUsedImageOccurrence }}</td>
-    </tr>
-    {{ end }}
-    </table>
-    
 
     <h3>Occurrences of images in projects</h3>
     <ol>
@@ -202,26 +185,20 @@
     <hr>
     {{ end }}
 
-    <h2>Per user views </h2>
-    {{ range $mac, $statsPerUserList := .StatisticsPerUsers }}
-    <h3>User <b>{{ $mac }}</b></h3>
-    {{ range $stat := $statsPerUserList }}
-    <h4><p>At {{ .Day }}, {{ .NoOfVulnerabilities }} vulnerabilities have been found in {{ .NoOfImages }} the tested images</p></h4>
+    <h2>Image ranking </h2>
 
     <table border="1">
     <tr>
     	<th>Image</th>
     	<th>Vulnerabilities</th>
     </tr>
-    {{ range $image, $noOfVulnerabilities := .Vulnerabilities }}
+    {{ range $pair := .Vulnerabilities }}
     <tr>
-    	<td>{{ $image }}</td>
-    	<td>{{ $noOfVulnerabilities }}</td>
+    	<td>{{ $pair.Key }}</td>
+    	<td>{{ $pair.Value }}</td>
     </tr>
     {{ end }}
     </table>
-    {{ end }}
-    {{ end }}
 
 </body>
 </html>

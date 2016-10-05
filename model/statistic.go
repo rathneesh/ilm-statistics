@@ -124,6 +124,7 @@ type Statistic struct {
 	Accounts          int
 	AvgAccountPerUser float64
 	Projects          struct {
+		IdToProject	    map[string]Project
 		Total               int
 		ImagesInProjects    int
 		AvgTestsInProjects  float64
@@ -141,22 +142,17 @@ type Statistic struct {
 	HourlyActivities         map[int]int
 	BusiestHours             []int
 	Registries               int
-	MostPopularProjects      map[string]Project
+	MostPopularProjects      []Project
 	MaxProjectPopularity     int
 	ImagesInProjects         map[string][]Project
 	ProjectsSuccess          map[string]float64
 	ProjectsFailure          map[string]float64
-	ScriptProjects           []Project
-	MostUsedImages           []string
-	MostUsedImageOccurrence  int
-	LeastUsedImages          []string
-	LeastUsedImageOccurrence int
-	NumberOfImages           int
+	MostUsedImages           PairList
 	MostExecutedTests        []Test
 	MostExecutedTestsNr      int
 	LeastExecutedTests       []Test
 	LeastExecutedTestsNr     int
-	StatisticsPerUsers       map[string][]StatPerUser
+	Vulnerabilities          PairList
 }
 
 type CollectedDataDiff struct {
@@ -179,10 +175,14 @@ type CollectedDataDiff struct {
 	NewDay 		    time.Time
 }
 
-type StatPerUser struct {
-	Username string
-	Day time.Time
-	Vulnerabilities map[string]int
-	NoOfVulnerabilities int
-	NoOfImages int
+
+type Pair struct {
+	Key string
+	Value int
 }
+
+type PairList []Pair
+
+func (p PairList) Len() int { return len(p) }
+func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p PairList) Swap(i, j int){ p[i], p[j] = p[j], p[i] }

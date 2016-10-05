@@ -27,6 +27,7 @@ var fileMutex sync.Mutex
 
 func init() {
 	log.Println("Initializing repository")
+	statistics = map[string]model.CollectedData{}
 	UpdateTmpFileName()
 	InitFromFile()
 }
@@ -95,7 +96,10 @@ func GetTodaysData() []model.CollectedData {
 }
 func UpdateTmpFileName(){
 	a := []string{FOLDER,strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())),EXTENSION}
-	tmpfilename = strings.Join(a, "")
+	if tmpfilename != strings.Join(a, "") {
+		statistics = map[string]model.CollectedData{}
+		tmpfilename = strings.Join(a, "")
+	}
 }
 
 func IsDataForToday() bool{

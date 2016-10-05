@@ -8,6 +8,7 @@ import (
 	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"regexp"
+	"sort"
 )
 
 const (
@@ -15,241 +16,323 @@ const (
 	FAILURE = "finished_failed"
 )
 
-func StatisticsCalculateAverages(stat []model.CollectedData) model.Statistic{
+func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic{
+
+	idToProject := mapIdToProject(dataList)
+	idToTest := mapIdToTest(dataList)
+	nameToImage := mapNameToImage(dataList)
+	idToBuild := mapIdToBuild(dataList)
 
 	//Initializing the required values
-	var s model.Statistic
-	s.Users = len(stat);
-	s.Accounts = 0
-	s.Projects.Total = 0
-	s.Projects.ImagesInProjects = 0
-	s.Projects.Passed = 0
-	s.Projects.Failed = 0
-	s.Registries = 0
-	s.Tests.Total = 0
-	s.HourlyActivities = map[int]int{}
-	projectsPopularity := map[string]int{}
-	s.MaxProjectPopularity = 0
-	var projectId map[string]bool
-	s.ImagesInProjects = map[string][]model.Project{}
-	s.ProjectsFailure = map[string]float64{}
-	s.ProjectsSuccess = map[string]float64{}
-	projectsOtherOutcome := map[string]float64{}
-	s.MostExecutedTestsNr = 0
-	s.LeastExecutedTestsNr = math.MaxInt32
+	s := model.Statistic{}
+
+	s.Projects.IdToProject = idToProject
+	s.Projects.Total = CalculateNumberOfProjects(idToProject)
+	s.Projects.ImagesInProjects = CalculateNumberOfImages(nameToImage)
+	s.Projects.AvgTestsInProjects = CalculateAverageTestPerProject(idToTest, idToProject)
+	s.Projects.AvgImagesInProjects = CalculateAverageImagePerProject(nameToImage, idToProject)
+	s.Projects.SuccessRate, s.Projects.FailureRate = CalculateAllProjectsOutcomeRates(idToProject)
+	s.Tests.Total = CalculateNumberOfTests(idToTest)
+	s.MostUsedImages = CalculateMostUsedImages(idToProject)
+
+	s.HourlyActivities = CalculateNumberOfTestsInEachHour(idToBuild, idToTest)
+	s.BusiestHours = CalculateBusiestHours(idToBuild, idToTest)
+	s.MostPopularProjects, s.MaxProjectPopularity = CalculateMostExecutedProjects(idToBuild, idToProject)
+	s.ImagesInProjects = ShowImagesInProjects(idToProject)
+	s.ProjectsSuccess, s.ProjectsFailure = CalculatePerProjectOutcomeRates(idToBuild, idToProject)
+	s.MostExecutedTests, s.MostExecutedTestsNr = CalculateMostExecutedTests(idToBuild, idToTest)
+	s.LeastExecutedTests, s.LeastExecutedTestsNr = CalculateLeastExecutedTests(idToBuild, idToTest)
+	s.Vulnerabilities = CalculateNoOfVulnerabilitiesFound(dataList)
+
+
+	return s
+}
+
+func mapIdToProject(dataList []model.CollectedData) map[string]model.Project {
+	idToProject := map[string]model.Project{}
+	for _, data := range dataList{
+		for _, project := range data.Projects {
+			idToProject[project.Id] = project
+		}
+	}
+	return idToProject
+}
+
+func mapIdToTest(dataList []model.CollectedData) map[string]model.Test {
+	idToTest := map[string]model.Test{}
+	for _, data := range dataList{
+		for _, test := range data.Tests {
+			idToTest[test.Id] = test
+		}
+	}
+	return idToTest
+}
+
+func mapNameToImage(dataList []model.CollectedData) map[string]model.Image {
+	nameToImage := map[string]model.Image{}
+	for _, data := range dataList {
+		for _, image := range data.Images {
+			nameToImage[image.Name+":"+image.Tag] = image
+		}
+	}
+	return nameToImage
+}
+
+func mapIdToBuild(dataList []model.CollectedData) map[string]model.Build {
+	idToBuild := map[string]model.Build{}
+	for _, data := range dataList {
+		for _, build := range data.Builds {
+			idToBuild[build.Id] = build
+		}
+	}
+	return idToBuild
+}
+
+
+func CalculateNumberOfImages(nameToImage map[string]model.Image) int {
+	return len(nameToImage)
+}
+
+func CalculateNumberOfTests(idToTest map[string]model.Test) int {
+	return len(idToTest)
+}
+
+func CalculateNumberOfProjects(idToProject map[string]model.Project) int {
+	return len(idToProject)
+}
+
+func CalculateAverageImagePerProject(nameToImage map[string]model.Image, idToProject map[string]model.Project) float64 {
+	return float64(CalculateNumberOfImages(nameToImage))/float64(CalculateNumberOfProjects(idToProject))
+}
+
+func CalculateAverageTestPerProject(idToTest map[string]model.Test, idToProject map[string]model.Project) float64 {
+	return float64(CalculateNumberOfTests(idToTest))/float64(CalculateNumberOfProjects(idToProject))
+}
+
+func CalculateAllProjectsOutcomeRates(idToProject map[string]model.Project) (float64, float64) {
+	projectsSuccess := 0
+	projectsFailure := 0
+
+	for _, project := range idToProject {
+		if project.Status == SUCCESS {
+			projectsSuccess ++
+		}
+		if project.Status == FAILURE {
+			projectsFailure ++
+		}
+	}
+
+	return float64(projectsSuccess * 100)/float64(projectsSuccess+projectsFailure), float64(projectsFailure * 100)/float64(projectsSuccess+projectsFailure)
+}
+
+func CalculatePerProjectOutcomeRates(idToBuild map[string]model.Build, idToProject map[string]model.Project) (map[string]float64, map[string]float64){
+	projectsSuccess := map[string]float64{}
+	projectsFailure := map[string]float64{}
+
+	for _, build := range idToBuild {
+		if build.Status.Status == SUCCESS {
+			projectsSuccess[build.ProjectId]++
+		} else if build.Status.Status == FAILURE {
+			projectsFailure[build.ProjectId]++
+		}
+	}
+
+	for id := range idToProject {
+		projectsSuccess[id] = float64(projectsSuccess[id] * 100)/float64(projectsSuccess[id]+projectsFailure[id])
+		projectsFailure[id] = float64(projectsFailure[id] * 100)/float64(projectsSuccess[id]+projectsFailure[id])
+	}
+
+	return projectsSuccess, projectsFailure
+}
+
+func CalculateMostExecutedProjects(idToBuild map[string]model.Build, idToProject map[string]model.Project) ([]model.Project, int) {
+	mostExecutedProjects := map[string]int{}
+
+	for _, build := range idToBuild {
+		mostExecutedProjects[build.ProjectId]++
+	}
+
+	max := 0
+	projects := []model.Project{}
+	for id, occurrence := range mostExecutedProjects{
+		if occurrence > max {
+			projects = []model.Project{idToProject[id]}
+			max = occurrence
+		} else if occurrence == max {
+			projects = append(projects, idToProject[id])
+		}
+	}
+
+	return projects, max
+}
+
+func CalculateMostUsedImages(idToProject map[string]model.Project) model.PairList{
+	mostUsedImages := map[string]int{}
+
+	for _, project := range idToProject {
+		for _, image := range project.Images {
+			mostUsedImages[image.Name+":"+image.Tag]++
+		}
+	}
+
+	return rankByValue(mostUsedImages)
+}
+
+func ShowImagesInProjects(idToProject map[string]model.Project) map[string][]model.Project {
+	imagesInProjects := map[string][]model.Project{}
+
+	for _, project := range idToProject{
+		for _, image := range project.Images {
+			imagesInProjects[image.Name+":"+image.Tag] = append(imagesInProjects[image.Name+":"+image.Tag], project)
+		}
+	}
+
+	return imagesInProjects
+}
+
+func CalculateMostExecutedTests(idToBuild map[string]model.Build, idToTest map[string]model.Test) ([]model.Test, int){
 	buildsToTest := map[string][]model.Build{}
-	s.StatisticsPerUsers = map[string][]model.StatPerUser{}
+	mostExecutedTestsNr := 0
+	mostExecutedTests := []model.Test{}
 
+	for _, build := range idToBuild {
+		buildsToTest[build.TestId] = append(buildsToTest[build.TestId], build)
+	}
 
-	//iterate through the statistics
-	for i:=0; i<len(stat); i++ {
+	for _, test := range idToTest {
+		buildListLength := len(buildsToTest[test.Id])
+		if mostExecutedTestsNr < buildListLength {
+			mostExecutedTestsNr = buildListLength
+			mostExecutedTests = []model.Test{test}
+		} else if mostExecutedTestsNr == buildListLength {
+			mostExecutedTests = append(mostExecutedTests, test)
+		}
+	}
 
-		//Number all the accounts and projects
-		s.Projects.Total += len(stat[i].Projects)
+	return mostExecutedTests, mostExecutedTestsNr
+}
 
-		//Overall project success/failure rate
-		for j := 0; j < len(stat[i].Projects); j++ {
-			if stat[i].Projects[j].Status == SUCCESS {
-				s.Projects.Passed++
-			} else if stat[i].Projects[j].Status == FAILURE {
-				s.Projects.Failed++
-			}
+func CalculateLeastExecutedTests(idToBuild map[string]model.Build, idToTest map[string]model.Test) ([]model.Test, int){
+	buildsToTest := map[string][]model.Build{}
+	leastExecutedTestsNr := math.MaxInt32
+	leastExecutedTests := []model.Test{}
 
-			//Images in projects
-			for k := 0; k < len(stat[i].Projects[j].Images); k++ {
-				s.ImagesInProjects[strings.Join([]string{stat[i].Projects[j].Images[k].Name, ":", stat[i].Projects[j].Images[k].Tag},"")] = append(s.ImagesInProjects[strings.Join([]string{stat[i].Projects[j].Images[k].Name, ":", stat[i].Projects[j].Images[k].Tag},"")], stat[i].Projects[j])
-			}
+	for _, build := range idToBuild {
+		buildsToTest[build.TestId] = append(buildsToTest[build.TestId], build)
+	}
+
+	for _, test := range idToTest {
+		buildListLength := len(buildsToTest[test.Id])
+		if leastExecutedTestsNr > buildListLength {
+			leastExecutedTestsNr = buildListLength
+			leastExecutedTests = []model.Test{test}
+		} else if leastExecutedTestsNr == buildListLength {
+			leastExecutedTests = append(leastExecutedTests, test)
+		}
+	}
+
+	return leastExecutedTests, leastExecutedTestsNr
+}
+
+func CalculateNumberOfTestsInEachHour(idToBuild map[string]model.Build, idToTest map[string]model.Test) map[int]int {
+	hourlyActivities := map[int]int{}
+
+	for _, build := range idToBuild {
+		//Get the build's date and today's date in different variables - for the comparision below
+		datetime := strings.Split(build.StartTime, "T")
+		date := strings.Split(datetime[0], "-")
+		now := time.Now()
+
+		year, err := strconv.Atoi(date[0])
+		if err != nil {
+			log.Println(err)
 		}
 
+		month, err := strconv.Atoi(date[1])
+		if err != nil {
+			log.Println(err)
+		}
 
-		//Iterate through the builds
-		for j := 0; j < len(stat[i].Builds); j++ {
+		day, err := strconv.Atoi(date[2])
+		if err != nil {
+			log.Println(err)
+		}
 
-			//Get the build's date and today's date in different variables - for the comparision below
-			datetime := strings.Split(stat[i].Builds[j].StartTime,"T")
-			date := strings.Split(datetime[0],"-")
-			now := time.Now()
+		//It is triggered at midnight, has to calculate for the day before
+		day += 1
 
-
-			year, err := strconv.Atoi(date[0])
-			if err != nil {
-				log.Println(err)
-			}
-
-			month, err := strconv.Atoi(date[1])
-			if err != nil {
-				log.Println(err)
-			}
-
-			day, err := strconv.Atoi(date[2])
-			if err != nil {
-				log.Println(err)
-			}
-
-			//It is triggered at midnight, has to calculate for the day before
-			day += 1
-
-
-			t := strings.Split(datetime[1],":")
-			hour := t[0]
-			hr, err := strconv.Atoi(hour);
-			if err != nil {
-				log.Println(err)
-			} else {
-				//Number today's hourly activities
-				if (year == now.Year() && time.Month(month) == now.Month() && day == now.Day()){
-					for k := 0; k < len(stat[i].Tests); k++ {
-						if (stat[i].Builds[j].TestId == stat[i].Tests[k].Id) {
-							s.HourlyActivities[hr]++
-						}
+		t := strings.Split(datetime[1], ":")
+		hour := t[0]
+		hr, err := strconv.Atoi(hour);
+		if err != nil {
+			log.Println(err)
+		} else {
+			//Number today's hourly activities
+			if (year == now.Year() && time.Month(month) == now.Month() && day == now.Day()) {
+				for id := range idToTest{
+					if (build.TestId == id) {
+						hourlyActivities[hr]++
 					}
 				}
 			}
-
-			// Most popular projects
-			projectsPopularity[stat[i].Builds[j].ProjectId]++
-
-			//Per project success/failure rate
-			if stat[i].Builds[j].Status.Status == SUCCESS {
-				s.ProjectsSuccess[stat[i].Builds[j].ProjectId]++
-			} else if stat[i].Builds[j].Status.Status == FAILURE {
-				s.ProjectsFailure[stat[i].Builds[j].ProjectId]++
-			} else {
-				projectsOtherOutcome[stat[i].Builds[j].ProjectId]++
-			}
-
-			// Most/Least executed tests
-			buildsToTest[stat[i].Builds[j].TestId] = append(buildsToTest[stat[i].Builds[j].TestId], stat[i].Builds[j])
-		}
-
-		s.Projects.ImagesInProjects += len(stat[i].Images)
-
-		//TODO find unique registries - when statistics regarding registries will be needed
-		s.Registries += len(stat[i].Registries)
-		s.Tests.Total += len(stat[i].Tests)
-
-		//Most popular projects
-		for projid, occurrence := range projectsPopularity {
-			if occurrence > s.MaxProjectPopularity {
-				projectId = make(map[string]bool)
-				projectId[projid] = true
-				s.MaxProjectPopularity = occurrence
-			} else if occurrence == s.MaxProjectPopularity {
-				projectId[projid] = true
-			}
 		}
 	}
 
-	//Most popular projects
-	s.MostPopularProjects = make(map[string]model.Project)
-	for j := 0; j < len(stat); j++ {
-		for k := 0; k < len(stat[j].Projects); k++ {
-			s.ScriptProjects = append(s.ScriptProjects, stat[j].Projects[k])
+	return hourlyActivities
+}
 
-			for id, _ := range projectId {
-				if stat[j].Projects[k].Id == id {
-					s.MostPopularProjects[id] = stat[j].Projects[k]
-				}
-			}
+func CalculateBusiestHours(idToBuild map[string]model.Build, idToTest map[string]model.Test) []int {
+	hourlyActivities := CalculateNumberOfTestsInEachHour(idToBuild, idToTest)
 
-			//Project success/failure rate - calculate in percents
-			totalNoOfBuilds := s.ProjectsSuccess[stat[j].Projects[k].Id] + s.ProjectsFailure[stat[j].Projects[k].Id] + projectsOtherOutcome[stat[j].Projects[k].Id]
-			if totalNoOfBuilds != 0 {
-				s.ProjectsSuccess[stat[j].Projects[k].Id] = float64(s.ProjectsSuccess[stat[j].Projects[k].Id] * 100) / float64(totalNoOfBuilds)
-				s.ProjectsFailure[stat[j].Projects[k].Id] = float64(s.ProjectsFailure[stat[j].Projects[k].Id] * 100) / float64(totalNoOfBuilds)
-			} else {
-				s.ProjectsSuccess[stat[j].Projects[k].Id] = 0
-				s.ProjectsFailure[stat[j].Projects[k].Id] = 0
-			}
-		}
-
-		// Most/least executed tests
-		for _, test := range stat[j].Tests {
-			buildListLength := len(buildsToTest[test.Id])
-			if s.MostExecutedTestsNr < buildListLength {
-				s.MostExecutedTestsNr = buildListLength
-				s.MostExecutedTests = []model.Test{test}
-			} else if s.MostExecutedTestsNr == buildListLength {
-				s.MostExecutedTests = append(s.MostExecutedTests, test)
-			}
-
-			if s.LeastExecutedTestsNr > buildListLength {
-				s.LeastExecutedTestsNr = buildListLength
-				s.LeastExecutedTests = []model.Test{test}
-			} else if s.LeastExecutedTestsNr == buildListLength {
-				s.LeastExecutedTests = append(s.LeastExecutedTests, test)
-			}
-		}
-	}
-
-
-	//Tests/hour - busiest hours
-	s.BusiestHours = []int{}
-	max := s.HourlyActivities[0]
+	busiestHours := []int{}
+	max := hourlyActivities[0]
 	for i := 1; i < 24; i++ {
-		if s.HourlyActivities[i] > max {
-			s.BusiestHours = []int{i}
-			max = s.HourlyActivities[i]
-		} else if s.HourlyActivities[i] == max {
-			s.BusiestHours = append(s.BusiestHours, i)
+		if hourlyActivities[i] > max {
+			busiestHours = []int{i}
+			max = hourlyActivities[i]
+		} else if hourlyActivities[i] == max {
+			busiestHours = append(busiestHours, i)
 		}
 	}
 
-	// Most/least used images and their occurences
-	s.MostUsedImageOccurrence = 0
-	s.LeastUsedImageOccurrence = math.MaxInt32
-	for imageName, projectList := range s.ImagesInProjects {
-		if s.MostUsedImageOccurrence < len(projectList){
-			s.MostUsedImageOccurrence = len(projectList)
-			s.MostUsedImages = []string{imageName}
-		} else if s.MostUsedImageOccurrence == len(projectList) {
-			s.MostUsedImages = append(s.MostUsedImages, imageName)
-		}
+	return busiestHours
+}
 
-		if s.LeastUsedImageOccurrence > len(projectList) {
-			s.LeastUsedImageOccurrence = len(projectList)
-			s.LeastUsedImages = []string{imageName}
-		} else if s.LeastUsedImageOccurrence == len(projectList) {
-			s.LeastUsedImages = append(s.LeastUsedImages, imageName)
-		}
-	}
+func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData) model.PairList{
+	vulnerabilities := map[string]int{}
 
-
-	//Statistics per user - days, nr of images, nr of vulnerabilities
-	for _, st := range stat {
-		auxStatPerUser := model.StatPerUser{}
-		auxStatPerUser.Day = st.Day
-		auxStatPerUser.Username = st.Username
-		auxStatPerUser.NoOfVulnerabilities = 0
-		auxStatPerUser.NoOfImages = 0
-		auxStatPerUser.Vulnerabilities = map[string]int{}
-		for _, results := range st.Results {
+	for _, data := range dataList {
+		for _, results := range data.Results {
 			for _, entry := range results.ResultEntries {
 				if strings.Contains(entry, "SUCCESS:") || strings.Contains(entry, "FAILURE:") {
 					re := regexp.MustCompile("[0-9]+")
-					vulnerabilities := re.FindAllString(entry, -1)
-					noOfVulnerabilities, err := strconv.Atoi(vulnerabilities[0])
+					vulnerabilitiesAux := re.FindAllString(entry, -1)
+					noOfVulnerabilities, err := strconv.Atoi(vulnerabilitiesAux[0])
 					reImage := regexp.MustCompile("[^ ]+:[^ ]+")
 					registryAndImage := reImage.FindAllString(entry, -1)
 					if err != nil {
 						log.Println(err)
 					} else {
-						auxStatPerUser.Vulnerabilities[strings.Join(registryAndImage, " ")] = noOfVulnerabilities
-						auxStatPerUser.NoOfImages ++
-						auxStatPerUser.NoOfVulnerabilities += noOfVulnerabilities
+						vulnerabilities[strings.Join(registryAndImage, " ")] = noOfVulnerabilities
 					}
 				}
 			}
 		}
-		s.StatisticsPerUsers[st.MAC] = append(s.StatisticsPerUsers[st.MAC], auxStatPerUser)
 	}
 
-	s.NumberOfImages = len(s.ImagesInProjects)
-	s.Projects.AvgTestsInProjects = float64(s.Tests.Total)/float64(s.Projects.Total)
-	s.Projects.AvgImagesInProjects = float64(s.Projects.ImagesInProjects)/float64(s.Projects.Total)
-	s.Projects.SuccessRate = float64(s.Projects.Passed*100)/float64(s.Projects.Total)
-	s.Projects.FailureRate = float64(s.Projects.Failed*100)/float64(s.Projects.Total)
+	return rankByValue(vulnerabilities)
+}
 
-	// Return all in a statistics object
-	return s
+
+//As seen in http://stackoverflow.com/questions/18695346/how-to-sort-a-mapstringint-by-its-values
+
+func rankByValue(stringToInt map[string]int) model.PairList{
+	pl := make(model.PairList, len(stringToInt))
+	i := 0
+	for k, v := range stringToInt {
+		pl[i] = model.Pair{k, v}
+		i++
+	}
+	sort.Sort(sort.Reverse(pl))
+	return pl
 }

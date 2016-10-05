@@ -47,22 +47,20 @@ func SendEmailTemplate(stat model.Statistic) {
 		AverageImagesPerProject string
 		SuccessRate string
 		FailureRate string
-		MostPopularProjects map[string]model.Project
+		MostPopularProjects []model.Project
 		MaxProjectPopularity int
 		ImagesInProjects map[string][]model.Project
-		ProjectsList []model.Project
+		ProjectsList map[string]model.Project
 		ProjectsSuccess map[string]string
 		ProjectsFailure map[string]string
-		MostUsedImages []string
-		MostUsedImageOccurrence int
+		MostUsedImages model.PairList
 		LeastUsedImages []string
 		LeastUsedImageOccurrence int
-		NumberOfImages int
 		MostExecutedTests []model.Test
 		MostExecutedTestsNr int
 		LeastExecutedTests []model.Test
 		LeastExecutedTestsNr int
-		StatisticsPerUsers map[string][]model.StatPerUser
+		Vulnerabilities model.PairList
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,
@@ -80,17 +78,13 @@ func SendEmailTemplate(stat model.Statistic) {
 		MostPopularProjects: stat.MostPopularProjects,
 		MaxProjectPopularity: stat.MaxProjectPopularity,
 		ImagesInProjects: stat.ImagesInProjects,
-		ProjectsList: stat.ScriptProjects,
+		ProjectsList: stat.Projects.IdToProject,
 		MostUsedImages: stat.MostUsedImages,
-		MostUsedImageOccurrence: stat.MostUsedImageOccurrence,
-		LeastUsedImages: stat.LeastUsedImages,
-		LeastUsedImageOccurrence: stat.LeastUsedImageOccurrence,
-		NumberOfImages: stat.NumberOfImages,
 		MostExecutedTests: stat.MostExecutedTests,
 		MostExecutedTestsNr: stat.MostExecutedTestsNr,
 		LeastExecutedTests: stat.LeastExecutedTests,
 		LeastExecutedTestsNr: stat.LeastExecutedTestsNr,
-		StatisticsPerUsers: stat.StatisticsPerUsers,
+		Vulnerabilities: stat.Vulnerabilities,
 
 	}
 
