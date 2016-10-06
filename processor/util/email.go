@@ -60,7 +60,7 @@ func SendEmailTemplate(stat model.Statistic) {
 		MostExecutedTestsNr int
 		LeastExecutedTests []model.Test
 		LeastExecutedTestsNr int
-		Vulnerabilities model.PairList
+		Vulnerabilities model.NoOfVulnerabilitiesWithLinksList
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,

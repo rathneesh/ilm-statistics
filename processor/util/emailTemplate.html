@@ -191,11 +191,13 @@
     <tr>
     	<th>Image</th>
     	<th>Vulnerabilities</th>
+        <th>Link</th>
     </tr>
-    {{ range $pair := .Vulnerabilities }}
+    {{ range $vulnerability := .Vulnerabilities }}
     <tr>
-    	<td>{{ $pair.Key }}</td>
-    	<td>{{ $pair.Value }}</td>
+    	<td>{{ $vulnerability.ImageId }}</td>
+    	<td>{{ $vulnerability.LinkAndNo.Value }}</td>
+        <td>{{ $vulnerability.LinkAndNo.Key }}</td>
     </tr>
     {{ end }}
     </table>

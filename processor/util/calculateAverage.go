@@ -42,7 +42,7 @@ func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic
 	s.ProjectsSuccess, s.ProjectsFailure = CalculatePerProjectOutcomeRates(idToBuild, idToProject)
 	s.MostExecutedTests, s.MostExecutedTestsNr = CalculateMostExecutedTests(idToBuild, idToTest)
 	s.LeastExecutedTests, s.LeastExecutedTestsNr = CalculateLeastExecutedTests(idToBuild, idToTest)
-	s.Vulnerabilities = CalculateNoOfVulnerabilitiesFound(dataList)
+	s.Vulnerabilities = CalculateNoOfVulnerabilitiesFound(dataList, idToBuild)
 
 
 	return s
@@ -298,8 +298,9 @@ func CalculateBusiestHours(idToBuild map[string]model.Build, idToTest map[string
 	return busiestHours
 }
 
-func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData) model.PairList{
-	vulnerabilities := map[string]int{}
+func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData, idToBuild map[string]model.Build) model.NoOfVulnerabilitiesWithLinksList {
+	imageToNoOfVulnerability := map[string]int{}
+	imageToReport := map[string]string{}
 
 	for _, data := range dataList {
 		for _, results := range data.Results {
@@ -313,16 +314,25 @@ func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData) model.Pai
 					if err != nil {
 						log.Println(err)
 					} else {
-						vulnerabilities[strings.Join(registryAndImage, " ")] = noOfVulnerabilities
+						imageToNoOfVulnerability[strings.Join(registryAndImage, "")] = noOfVulnerabilities
+						imageToReport[strings.Join(registryAndImage, "")] = strings.Join([]string{"/projects/", idToBuild[results.BuildId].ProjectId, "/tests/", idToBuild[results.BuildId].TestId, "/results", results.TargetArtifact.Artifact.ImageId}, "")
 					}
 				}
 			}
 		}
 	}
 
-	return rankByValue(vulnerabilities)
-}
+	sortedImageToNoOfVulnerability := rankByValue(imageToNoOfVulnerability)
+	vulnerabilities := make(model.NoOfVulnerabilitiesWithLinksList, len(sortedImageToNoOfVulnerability))
 
+	i := 0
+	for _, pair := range sortedImageToNoOfVulnerability {
+		vulnerabilities[i] = model.NoOfVulnerabilitiesWithLinks{pair.Key, model.Pair{imageToReport[pair.Key], pair.Value}}
+		i++
+	}
+
+	return vulnerabilities
+}
 
 //As seen in http://stackoverflow.com/questions/18695346/how-to-sort-a-mapstringint-by-its-values
 
