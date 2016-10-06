@@ -1,6 +1,8 @@
 subject: ILM Statistics
-smptserver: server:25
+smptserver: server
+smtpport: 25
 from: from@domain
+password: pwd
 to:
   - recipient1@domain
   - recipient2@domain

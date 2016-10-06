@@ -21,8 +21,10 @@ const (
 
 type EmailConfig struct {
 	Subject string
-	SmptServer string
+	SmtpServer string
+	SmtpPort string
 	From string
+	Password string
 	To []string
 }
 
@@ -139,9 +141,9 @@ func (r *Request) SendEmail() (bool, error) {
 	subject := "Subject: " + r.subject + "\n"
 	to := "To: " + strings.TrimSuffix(strings.Join(emailConfig.To, ","), ",")
 	msg := []byte(subject + "From: " + emailConfig.From + "\n" + to + "\n;" + mime + "\n\r" + r.body)
-	addr := emailConfig.SmptServer
+	addr := emailConfig.SmtpServer + ":" + emailConfig.SmtpPort
 
-	err := smtp.SendMail(addr, nil, emailConfig.From, r.to, msg)
+	err := smtp.SendMail(addr, smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SmtpServer), emailConfig.From, r.to, msg)
 	if err != nil {
 		log.Println(err)
 		return false, err
