@@ -13,6 +13,7 @@ func MergeDiff(oldData model.CollectedData, newData model.CollectedDataDiff) mod
 		return model.CollectedData{}
 	}
 	data.MAC = newData.MAC
+	data.Ip = newData.Ip
 	if newData.NewUserName != "" {
 		data.Username = newData.NewUserName
 	} else {

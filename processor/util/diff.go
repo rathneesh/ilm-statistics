@@ -245,6 +245,7 @@ func DiffRepositoryList(oldRepositories, newRepositories []model.Repository) ([]
 func DiffCollectedData(oldData, newData model.CollectedData) model.CollectedDataDiff {
 	difference := model.CollectedDataDiff{}
 	difference.MAC = newData.MAC
+	difference.Ip = newData.Ip
 
 	if newData.Username != oldData.Username {
 		difference.NewUserName = newData.Username

@@ -8,8 +8,15 @@
 
     <h1>ILM Statistics</h1>
 
-    {{ if not .Projects }}
-    There was no data for today.
+    {{ range $curr := . }}
+
+    <hr>
+    {{ if $curr.Ip }}
+    <h2>IP: {{ $curr.Ip }}</h2>
+    {{ end }}
+
+    {{ if not $curr.Projects }}
+    There was no useful data for today.
     {{ else }}
 
     <h2>Overview</h2>
@@ -17,22 +24,22 @@
     Projects
     <table>
     <tr>
-    <td>Success rate:</td><td> {{.SuccessRate}}%</td>
+    <td>Success rate:</td><td> {{$curr.SuccessRate}}%</td>
     </tr>
     <tr>
-    <td>Failure rate:</td><td> {{.FailureRate}}%</td>
+    <td>Failure rate:</td><td> {{$curr.FailureRate}}%</td>
     </tr>
     </table>
     <br>
 
     
-    {{.Images}} images, {{.Tests}} tests, {{.Projects}} projects
+    {{$curr.Images}} images, {{$curr.Tests}} tests, {{$curr.Projects}} projects
     <table>
     <tr>
-        <td>In average</td><td>{{.AverageImagesPerProject}}</td><td> images/project</td>
+        <td>In average</td><td>{{$curr.AverageImagesPerProject}}</td><td> images/project</td>
         </tr>
         <tr>
-        <td>In average</td><td> {{.AverageTestsPerProject}}</td> <td>tests/project</td>
+        <td>In average</td><td> {{$curr.AverageTestsPerProject}}</td> <td>tests/project</td>
         </tr>
     </table>
 
@@ -48,11 +55,11 @@
     	<th>Success rate</th>
     	<th>Failure rate</th>
     </tr>
-    {{ range $id, $project := .ProjectsList }}
+    {{ range $id, $project := $curr.ProjectsList }}
     <tr>
     	<td>{{ $project.Name }} [{{ $id }}]</td>
-    	<td>{{ index $.ProjectsSuccess .Id }}%</td>
-    	<td>{{ index $.ProjectsFailure .Id }}%</td>
+    	<td>{{ index $curr.ProjectsSuccess $id }}%</td>
+    	<td>{{ index $curr.ProjectsFailure $id }}%</td>
     </tr>
     {{ end }}
     </table>
@@ -60,9 +67,9 @@
     <br>
 
     <h3>Most executed project</h3>
-    The most executed project was ran {{ .MaxProjectPopularity }} times
+    The most executed project was ran {{ $curr.MaxProjectPopularity }} times
     <br><br>
-    {{ range $project := .MostPopularProjects }}
+    {{ range $project := $curr.MostPopularProjects }}
     <table>
     <tr>
        	<td>Project</td>
@@ -91,18 +98,22 @@
         <tr>
             <th>Image</th>
             <th>Vulnerabilities</th>
+            {{ if $curr.Ip }}
             <th>Link</th>
+            {{ end }}
         </tr>
-        {{ range $vulnerability := .Vulnerabilities }}
+        {{ range $vulnerability := $curr.Vulnerabilities }}
         <tr>
             <td>{{ $vulnerability.ImageId }}</td>
             <td>{{ $vulnerability.LinkAndNo.Value }}</td>
-            <td>{{ $vulnerability.LinkAndNo.Key }}</td>
+            {{ if $curr.Ip }}
+            <td>http://{{ $curr.Ip }}:8082/{{ $vulnerability.LinkAndNo.Key }}</td>
+            {{ end }}
         </tr>
         {{ end }}
     </table>
 
-    <h3>Overall number of tags applied: {{ .Images }}</h3>
+    <h3>Overall number of tags applied: {{ $curr.Images }}</h3>
     <h3>Most used tags</h3>
     
     <table border="1">
@@ -110,7 +121,7 @@
     <th>Image</th>
     <th>Occurences</th>
     </tr>
-    {{ range $pair := .MostUsedImages}}
+    {{ range $pair := $curr.MostUsedImages}}
     <tr>
     	<td>{{ $pair.Key }}</td>
     	<td>{{ $pair.Value }}</td>
@@ -120,7 +131,7 @@
 
     <h3>Occurrences of images in projects</h3>
     <ol>
-        {{ range $image, $projectList := .ImagesInProjects }}
+        {{ range $image, $projectList := $curr.ImagesInProjects }}
         <li> {{ $image }}</li>
         <ul>
             {{ range $project := $projectList }}
@@ -146,7 +157,7 @@
 
     <h3>Images in registries</h3>
     <ol>
-        {{ range $registry, $imageNameList := .ImagesInRegistries }}
+        {{ range $registry, $imageNameList := $curr.ImagesInRegistries }}
         <li> {{ $registry }}</li>
         <ul>
             {{ range $image := $imageNameList }}
@@ -166,11 +177,11 @@
     	<th>Name</th>
     	<th>Executions</th>
     </tr>
-    {{ range $test := .MostExecutedTests }}
+    {{ range $test := $curr.MostExecutedTests }}
     <tr>
-    	<td>[{{ .Id }}]</td>
-    	<td>{{ .Name }}</td>
-    	<td>{{ $.MostExecutedTestsNr }}</td>
+    	<td>[{{ $test.Id }}]</td>
+    	<td>{{ $test.Name }}</td>
+    	<td>{{ $curr.MostExecutedTestsNr }}</td>
     </tr>
     {{ end }}
     </table>
@@ -183,12 +194,12 @@
     	<th>Name</th>
     	<th>Executions</th>
     </tr>
-    {{ range $test := .LeastExecutedTests }}
+    {{ range $test := $curr.LeastExecutedTests }}
     <tr>
 
-    	<td>[{{ .Id }}]</td>
-    	<td>{{ .Name }}</td>
-    	<td>{{ $.LeastExecutedTestsNr }}</td>
+    	<td>[{{ $test.Id }}]</td>
+    	<td>{{ $test.Name }}</td>
+    	<td>{{ $curr.LeastExecutedTestsNr }}</td>
     </tr>
     {{ end }}
     </table>
@@ -197,12 +208,12 @@
     <hr>
 
 
-    {{ if .IsActivity }}
+    {{ if $curr.IsActivity }}
     <h2>Today's user activity</h2>
     <h3>Number of tests started in each hour</h3>
 
 	<table>
-    {{ range $key, $value := .Hours }}
+    {{ range $key, $value := $curr.Hours }}
     <tr>
     	<td>{{ $key }}:00 - {{ $key }}:59 :</td>
     	<td>{{ $value }}</td>
@@ -212,12 +223,15 @@
 
     <br>
     <b>Busiest times of the day:</b>
-    {{ range $hr := .BusiestHours }}
+    {{ range $hr := $curr.BusiestHours }}
     <li>{{ $hr }}:00 - {{ $hr }}:59</li>
     {{ end }}
 
     {{ end }}
 
+    {{ end }}
+
+    <hr>
     {{ end }}
 </body>
 </html>

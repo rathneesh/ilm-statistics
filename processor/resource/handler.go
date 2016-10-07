@@ -35,6 +35,7 @@ func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 	}
+	stat.Ip = r.RemoteAddr
 	stat.Day = time.Now()
 	stat = service.CreateStatistic(stat)
 

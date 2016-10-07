@@ -19,13 +19,13 @@ func SendStatistics() {
 	stats := repository.GetTodaysData()
 
 	// Calculate the average
-	s := util.StatisticsCalculateAverages(stats)
+	s, sforIps := util.StatisticsCalculateAverages(stats)
 
 	// Add the day
 	s.Day = time.Now()
 
 	// Email the statistics
-	util.SendEmailTemplate(s)
+	util.SendEmailTemplate(s, sforIps)
 
 	// Save today's averages to file
 	repository.SaveStatisticsToFile(s)

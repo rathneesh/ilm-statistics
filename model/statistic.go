@@ -6,6 +6,7 @@ import (
 
 type CollectedData struct {
 	MAC          string
+	Ip           string
 	Username     string
 	Images       []Image
 	Projects     []Project
@@ -158,6 +159,7 @@ type Statistic struct {
 
 type CollectedDataDiff struct {
 	MAC                 string
+	Ip		    string
 	NewUserName         string
 	AddedImages         []Image
 	DeletedImages       []Image

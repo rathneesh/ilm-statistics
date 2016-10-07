@@ -16,8 +16,21 @@ const (
 	FAILURE = "finished_failed"
 )
 
-func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic{
+func StatisticsCalculateAverages(dataList []model.CollectedData) (model.Statistic, map[string]model.Statistic) {
 
+	s := ConstructStatistics(dataList)
+
+	separatedByIp := SeparateByIp(dataList)
+	averagesForIndividualIps := map[string]model.Statistic{}
+
+	for ip, data := range separatedByIp {
+		averagesForIndividualIps[ip] = ConstructStatistics(data)
+	}
+
+	return s, averagesForIndividualIps
+}
+
+func ConstructStatistics(dataList []model.CollectedData) model.Statistic {
 	idToProject := mapIdToProject(dataList)
 	idToTest := mapIdToTest(dataList)
 	nameToImage := mapNameToImage(dataList)
@@ -44,7 +57,6 @@ func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic
 	s.LeastExecutedTests, s.LeastExecutedTestsNr = CalculateLeastExecutedTests(idToBuild, idToTest)
 	s.Vulnerabilities = CalculateNoOfVulnerabilitiesFound(dataList, idToBuild)
 	s.RegistriesAndImages = ShowImagesInRegistries(nameToImage, idToRegistry)
-
 
 	return s
 }
@@ -371,3 +383,14 @@ func ShowImagesInRegistries(nameToImage map[string]model.Image, idToRegistry map
 
 	return imagesInRegistries
 }
+
+func SeparateByIp(dataList []model.CollectedData) map[string][]model.CollectedData{
+	separatedByIp := map[string][]model.CollectedData{}
+
+	for _, data := range dataList {
+		separatedByIp[data.Ip] = append(separatedByIp[data.Ip],data)
+	}
+
+	return separatedByIp
+}
+
