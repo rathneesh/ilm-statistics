@@ -145,6 +145,7 @@ type Statistic struct {
 	MostPopularProjects      []Project
 	MaxProjectPopularity     int
 	ImagesInProjects         map[string][]Project
+	RegistriesAndImages      map[string][]string
 	ProjectsSuccess          map[string]float64
 	ProjectsFailure          map[string]float64
 	MostUsedImages           PairList

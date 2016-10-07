@@ -8,6 +8,10 @@
 
     <h1>ILM Statistics</h1>
 
+    {{ if not .Projects }}
+    There was no data for today.
+    {{ else }}
+
     <h2>Overview</h2>
 
     Projects
@@ -80,6 +84,24 @@
     <hr>
 
     <h2>Images</h2>
+
+    <h3>Image ranking </h3>
+
+    <table border="1">
+        <tr>
+            <th>Image</th>
+            <th>Vulnerabilities</th>
+            <th>Link</th>
+        </tr>
+        {{ range $vulnerability := .Vulnerabilities }}
+        <tr>
+            <td>{{ $vulnerability.ImageId }}</td>
+            <td>{{ $vulnerability.LinkAndNo.Value }}</td>
+            <td>{{ $vulnerability.LinkAndNo.Key }}</td>
+        </tr>
+        {{ end }}
+    </table>
+
     <h3>Overall number of tags applied: {{ .Images }}</h3>
     <h3>Most used tags</h3>
     
@@ -117,6 +139,18 @@
             </tr>
             </table>
             <br>
+            {{ end }}
+        </ul>
+        {{ end }}
+    </ol>
+
+    <h3>Images in registries</h3>
+    <ol>
+        {{ range $registry, $imageNameList := .ImagesInRegistries }}
+        <li> {{ $registry }}</li>
+        <ul>
+            {{ range $image := $imageNameList }}
+            <li>{{ $image }}</li>
             {{ end }}
         </ul>
         {{ end }}
@@ -182,25 +216,8 @@
     <li>{{ $hr }}:00 - {{ $hr }}:59</li>
     {{ end }}
 
-    <hr>
     {{ end }}
 
-    <h2>Image ranking </h2>
-
-    <table border="1">
-    <tr>
-    	<th>Image</th>
-    	<th>Vulnerabilities</th>
-        <th>Link</th>
-    </tr>
-    {{ range $vulnerability := .Vulnerabilities }}
-    <tr>
-    	<td>{{ $vulnerability.ImageId }}</td>
-    	<td>{{ $vulnerability.LinkAndNo.Value }}</td>
-        <td>{{ $vulnerability.LinkAndNo.Key }}</td>
-    </tr>
     {{ end }}
-    </table>
-
 </body>
 </html>

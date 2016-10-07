@@ -22,6 +22,7 @@ func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic
 	idToTest := mapIdToTest(dataList)
 	nameToImage := mapNameToImage(dataList)
 	idToBuild := mapIdToBuild(dataList)
+	idToRegistry := mapIdToRegistry(dataList)
 
 	//Initializing the required values
 	s := model.Statistic{}
@@ -34,7 +35,6 @@ func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic
 	s.Projects.SuccessRate, s.Projects.FailureRate = CalculateAllProjectsOutcomeRates(idToProject)
 	s.Tests.Total = CalculateNumberOfTests(idToTest)
 	s.MostUsedImages = CalculateMostUsedImages(idToProject)
-
 	s.HourlyActivities = CalculateNumberOfTestsInEachHour(idToBuild, idToTest)
 	s.BusiestHours = CalculateBusiestHours(idToBuild, idToTest)
 	s.MostPopularProjects, s.MaxProjectPopularity = CalculateMostExecutedProjects(idToBuild, idToProject)
@@ -43,6 +43,7 @@ func StatisticsCalculateAverages(dataList []model.CollectedData) model.Statistic
 	s.MostExecutedTests, s.MostExecutedTestsNr = CalculateMostExecutedTests(idToBuild, idToTest)
 	s.LeastExecutedTests, s.LeastExecutedTestsNr = CalculateLeastExecutedTests(idToBuild, idToTest)
 	s.Vulnerabilities = CalculateNoOfVulnerabilitiesFound(dataList, idToBuild)
+	s.RegistriesAndImages = ShowImagesInRegistries(nameToImage, idToRegistry)
 
 
 	return s
@@ -86,6 +87,16 @@ func mapIdToBuild(dataList []model.CollectedData) map[string]model.Build {
 		}
 	}
 	return idToBuild
+}
+
+func mapIdToRegistry(dataList []model.CollectedData) map[string]model.Registry {
+	idToRegistry := map[string]model.Registry{}
+	for _, data := range dataList {
+		for _, registry := range data.Registries {
+			idToRegistry[registry.Id] = registry
+		}
+	}
+	return idToRegistry
 }
 
 
@@ -345,4 +356,18 @@ func rankByValue(stringToInt map[string]int) model.PairList{
 	}
 	sort.Sort(sort.Reverse(pl))
 	return pl
+}
+
+func ShowImagesInRegistries(nameToImage map[string]model.Image, idToRegistry map[string]model.Registry) map[string][]string {
+	imagesInRegistries := map[string][]string{}
+
+	for name, image := range nameToImage {
+		if (image.Location == "Public Registry") {
+			imagesInRegistries["Public Registry"] = append(imagesInRegistries["Public Registry"], name)
+		} else {
+			imagesInRegistries[idToRegistry[image.RegistryId].Name+"("+idToRegistry[image.RegistryId].Addr+")"] = append(imagesInRegistries[image.RegistryId], name)
+		}
+	}
+
+	return imagesInRegistries
 }

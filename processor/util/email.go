@@ -63,6 +63,7 @@ func SendEmailTemplate(stat model.Statistic) {
 		LeastExecutedTests []model.Test
 		LeastExecutedTestsNr int
 		Vulnerabilities model.NoOfVulnerabilitiesWithLinksList
+		ImagesInRegistries map[string][]string
 	}{
 		Users: stat.Users,
 		Accounts: stat.Accounts,
@@ -87,7 +88,7 @@ func SendEmailTemplate(stat model.Statistic) {
 		LeastExecutedTests: stat.LeastExecutedTests,
 		LeastExecutedTestsNr: stat.LeastExecutedTestsNr,
 		Vulnerabilities: stat.Vulnerabilities,
-
+		ImagesInRegistries: stat.RegistriesAndImages,
 	}
 
 	if len(templateData.Hours) != 0 {
