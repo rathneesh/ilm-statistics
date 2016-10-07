@@ -10,6 +10,7 @@ import (
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"github.com/ilm-statistics/ilm-statistics/processor/service"
 	"math"
+	"strings"
 )
 
 func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +36,7 @@ func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 	}
-	stat.Ip = r.RemoteAddr
+	stat.Ip = strings.Split(r.RemoteAddr, ":")[0]
 	stat.Day = time.Now()
 	stat = service.CreateStatistic(stat)
 
