@@ -114,9 +114,15 @@ func (r *Request) SendEmail() (bool, error) {
 	m.From = mail.Address{Address: emailConfig.From}
 	m.To = emailConfig.To
 
+	if err := m.AttachBuffer("statisticsForAll.html", []byte(r.body), false); err != nil {
+		log.Println(err)
+		return false, err
+	}
+
+
 	auth := smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SmtpServer)
 	if err := email.Send(addr, auth, m); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return false, err
 	}
 
