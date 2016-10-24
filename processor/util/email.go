@@ -74,9 +74,15 @@ func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statisti
 
 	templateData := ConvertStatToTemplate(statForIp)
 
+
+	statforIpEmail := map[string]model.Statistic{}
+	statforIpEmail[""] = stat
+
+	templateDataForEmail := ConvertStatToTemplate(statforIpEmail)
+
 	log.Println("Creating new e-mail request")
-	r := NewRequest(emailConfig.To, emailConfig.Subject, "")
-	err := r.ParseTemplate(TEMPLATEPATH, templateData)
+	r := NewRequest(emailConfig.To, emailConfig.Subject, "", nil)
+	err := r.ParseTemplate(TEMPLATEPATH, templateData, templateDataForEmail)
 	if err != nil {
 		log.Println(err)
 		log.Println("Template could not be parsed")
@@ -96,13 +102,15 @@ type Request struct {
 	to      []string
 	subject string
 	body    string
+	attachment []byte
 }
 
-func NewRequest(to []string, subject, body string) *Request {
+func NewRequest(to []string, subject, body string, attachment []byte) *Request {
 	return &Request{
 		to:      to,
 		subject: subject,
 		body:    body,
+		attachment: attachment,
 	}
 }
 
@@ -114,7 +122,7 @@ func (r *Request) SendEmail() (bool, error) {
 	m.From = mail.Address{Address: emailConfig.From}
 	m.To = emailConfig.To
 
-	if err := m.AttachBuffer("statisticsForAll.html", []byte(r.body), false); err != nil {
+	if err := m.AttachBuffer("statisticsForAll.html", []byte(r.attachment), false); err != nil {
 		log.Println(err)
 		return false, err
 	}
@@ -129,7 +137,7 @@ func (r *Request) SendEmail() (bool, error) {
 	return true, nil
 }
 
-func (r *Request) ParseTemplate(templateFileName string, data interface{}) error {
+func (r *Request) ParseTemplate(templateFileName string, data interface{}, dataForMail interface{}) error {
 	log.Println("Start parsing the e-mail template")
 	t, err := template.ParseFiles(templateFileName)
 	if err != nil {
@@ -137,12 +145,27 @@ func (r *Request) ParseTemplate(templateFileName string, data interface{}) error
 		return err
 	}
 	buf := new(bytes.Buffer)
-	if err = t.Execute(buf, data); err != nil {
+	if err = t.Execute(buf, dataForMail); err != nil {
 		log.Println(err)
 		return err
 	}
 	r.body = buf.String()
 	log.Println("End parsing the e-mail template")
+
+	log.Println("Start parsing the attachment template")
+	t, err = template.ParseFiles(templateFileName)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	buf = new(bytes.Buffer)
+	if err = t.Execute(buf, data); err != nil {
+		log.Println(err)
+		return err
+	}
+	r.attachment = buf.Bytes()
+	log.Println("End parsing the attachment template")
+
 	return nil
 }
 
