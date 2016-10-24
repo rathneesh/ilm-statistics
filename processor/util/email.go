@@ -7,14 +7,14 @@ import (
 	"log"
 	"strconv"
 	"github.com/ilm-statistics/ilm-statistics/model"
-	"strings"
 	"path/filepath"
 	"io/ioutil"
 	"gopkg.in/yaml.v2"
+	"github.com/scorredoira/email"
+	"net/mail"
 )
 
 const (
-	MIME = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	EMAILCONFIGFILE = "./emailConfig.yml"
 	TEMPLATEPATH = "./processor/util/emailTemplate.html"
 )
@@ -107,17 +107,19 @@ func NewRequest(to []string, subject, body string) *Request {
 }
 
 func (r *Request) SendEmail() (bool, error) {
-	mime := MIME
-	subject := "Subject: " + r.subject + "\n"
-	to := "To: " + strings.TrimSuffix(strings.Join(emailConfig.To, ","), ",")
-	msg := []byte(subject + "From: " + emailConfig.From + "\n" + to + "\n;" + mime + "\n\r" + r.body)
+
 	addr := emailConfig.SmtpServer + ":" + emailConfig.SmtpPort
 
-	err := smtp.SendMail(addr, smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SmtpServer), emailConfig.From, r.to, msg)
-	if err != nil {
-		log.Println(err)
+	m := email.NewHTMLMessage(r.subject, r.body)
+	m.From = mail.Address{Address: emailConfig.From}
+	m.To = emailConfig.To
+
+	auth := smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SmtpServer)
+	if err := email.Send(addr, auth, m); err != nil {
+		log.Fatal(err)
 		return false, err
 	}
+
 	return true, nil
 }
 

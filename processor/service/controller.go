@@ -25,7 +25,7 @@ func SendStatistics() {
 	s.Day = time.Now()
 
 	// Email the statistics
-	util.SendEmailTemplate(s, sforIps)
+	go util.SendEmailTemplate(s, sforIps)
 
 	// Save today's averages to file
 	repository.SaveStatisticsToFile(s)
