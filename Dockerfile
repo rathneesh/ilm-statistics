@@ -1,6 +1,6 @@
 FROM golang:1.6
 
-RUN go get github.com/gorilla/mux && go get gopkg.in/yaml.v2 && go get github.com/robfig/cron
+RUN go get github.com/gorilla/mux && go get gopkg.in/yaml.v2 && go get github.com/robfig/cron && go get github.com/scorredoira/email
 
 ENV PATH $PATH:/go/bin:/usr/local/go/bin
 
