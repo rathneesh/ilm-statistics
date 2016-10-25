@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ILM Statistics</title>
+    <style>
+        .expandable {
+            display:none;
+            margin: 10px;
+        }
+        div {
+            margin: 10px;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        tr.projects{
+            background-color: #00B388;
+            color: white;
+        }
+        tr.images{
+            background-color: #FF8D6D;
+            color: white;
+        }
+        tr.tests{
+            background-color: #614767;
+            color: white;
+        }
+    </style>
+
+    <script language="JavaScript" type="text/javascript">
+        function openClose(theID) {
+            if (document.getElementById(theID).style.display == "block") { document.getElementById(theID).style.display = "none" }
+            else { document.getElementById(theID).style.display = "block" } }
+
+    </script>
+</head>
+<body style="font-family: sans-serif">
+
+    <h1>ILM Statistics</h1>
+    {{ range $curr := . }}
+
+    <hr>
+    <div>
+
+        {{ if $curr.Ip }}
+            <div onClick="openClose('{{ $curr.Ip }}')" style="cursor:hand; cursor:pointer"><b>IP: {{ $curr.Ip }} </b><b><u>[click to expand]</u></b><br></div>
+            <div id="{{ $curr.Ip }}" class="expandable">
+        {{ else }}
+            <div>
+        {{ end }}
+
+        {{ if not $curr.Projects }}
+        There was no useful data for today.
+        {{ else }}
+
+        <h2>Overview</h2>
+
+        Projects
+        <table>
+            <tr>
+                <td>Success rate:</td><td> {{$curr.SuccessRate}}%</td>
+            </tr>
+            <tr>
+                <td>Failure rate:</td><td> {{$curr.FailureRate}}%</td>
+            </tr>
+        </table>
+        <br>
+
+
+        {{$curr.Images}} images, {{$curr.Tests}} tests, {{$curr.Projects}} projects
+        <table>
+            <tr>
+                <td>In average</td><td>{{$curr.AverageImagesPerProject}}</td><td> images/project</td>
+            </tr>
+            <tr>
+                <td>In average</td><td> {{$curr.AverageTestsPerProject}}</td> <td>tests/project</td>
+            </tr>
+        </table>
+
+
+                <div onClick="openClose('{{ $curr.Ip }}project')" style="cursor:hand; cursor:pointer"><b>Projects </b><b><u>[click to expand]</u></b><br></div>
+                <div id="{{ $curr.Ip }}project" class="expandable">
+        <h3>Projects: success and failure rate</h3>
+
+        <table border="1">
+            <tr class="projects">
+                <th>Project</th>
+                <th>Success rate</th>
+                <th>Failure rate</th>
+            </tr>
+            {{ range $id, $project := $curr.ProjectsList }}
+            <tr>
+                <td>{{ $project.Name }} [{{ $id }}]</td>
+                <td>{{ index $curr.ProjectsSuccess $id }}%</td>
+                <td>{{ index $curr.ProjectsFailure $id }}%</td>
+            </tr>
+            {{ end }}
+        </table>
+
+        <br>
+
+        <h3>Most executed project</h3>
+        The most executed project was ran {{ $curr.MaxProjectPopularity }} times
+        <br><br>
+        {{ range $project := $curr.MostPopularProjects }}
+        <table>
+            <tr>
+                <td>Project</td>
+                <td>{{ $project.Name }} [{{ $project.Id }}]</td>
+            </tr>
+            <tr>
+                <td>Creation time:</td>
+                <td>{{ $project.CreationTime }}</td>
+            </tr>
+            <tr>
+                <td>Status:</td>
+                <td>{{ $project.Status }}</td>
+            </tr>
+
+        </table>
+        {{ end }}
+        <br>
+
+                    </div>
+
+
+
+                <div onClick="openClose('{{ $curr.Ip }}image')" style="cursor:hand; cursor:pointer"><b>Images </b><b><u>[click to expand]</u></b><br></div>
+                <div id="{{ $curr.Ip }}image" class="expandable">
+
+        <h3>Image ranking </h3>
+
+        <table border="1">
+            <tr class="images">
+                <th>Image</th>
+                <th>Vulnerabilities</th>
+                {{ if $curr.Ip }}
+                <th>Link</th>
+                {{ end }}
+            </tr>
+            {{ range $vulnerability := $curr.Vulnerabilities }}
+            <tr>
+                <td>{{ $vulnerability.ImageId }}</td>
+                <td>{{ $vulnerability.LinkAndNo.Value }}</td>
+                {{ if $curr.Ip }}
+                <td><a href="http://{{ $curr.Ip }}:8082/{{ $vulnerability.LinkAndNo.Key }}">http://{{ $curr.Ip }}:8082/{{ $vulnerability.LinkAndNo.Key }}</a></td>
+                {{ end }}
+            </tr>
+            {{ end }}
+        </table>
+
+        <h3>Overall number of tags applied: {{ $curr.Images }}</h3>
+        <h3>Most used tags</h3>
+
+        <table border="1">
+            <tr class="images">
+                <th class="images">Image</th>
+                <th class="images">Occurences</th>
+            </tr>
+            {{ range $pair := $curr.MostUsedImages}}
+            <tr>
+                <td>{{ $pair.Key }}</td>
+                <td>{{ $pair.Value }}</td>
+            </tr>
+            {{ end }}
+        </table>
+
+        <h3>Occurrences of images in projects</h3>
+        <ol>
+            {{ range $image, $projectList := $curr.ImagesInProjects }}
+            <li> {{ $image }}</li>
+            <ul>
+                {{ range $project := $projectList }}
+                <table>
+                    <tr>
+                        <td>Project:</td>
+                        <td>{{ $project.Name }} [{{ $project.Id }}]</td>
+                    </tr>
+                    <tr>
+                        <td>Creation time:</td>
+                        <td>{{ $project.CreationTime }}</td>
+                    </tr>
+                    <tr>
+                        <td>Status:</td>
+                        <td>{{ $project.Status }}</td>
+                    </tr>
+                </table>
+                <br>
+                {{ end }}
+            </ul>
+            {{ end }}
+        </ol>
+
+        <h3>Images in registries</h3>
+        <ol>
+            {{ range $registry, $imageNameList := $curr.ImagesInRegistries }}
+            <li> {{ $registry }}</li>
+            <ul>
+                {{ range $image := $imageNameList }}
+                <li>{{ $image }}</li>
+                {{ end }}
+            </ul>
+            {{ end }}
+        </ol>
+</div>
+
+                <div onClick="openClose('{{ $curr.Ip }}test')" style="cursor:hand; cursor:pointer"><b>Tests </b><b><u>[click to expand]</u></b><br></div>
+                <div id="{{ $curr.Ip }}test" class="expandable">
+        <h2>Tests</h2>
+        <h2>Most executed tests</h2>
+        <table border="1">
+            <tr class="tests">
+                <th>Id</th>
+                <th>Name</th>
+                <th>Executions</th>
+            </tr>
+            {{ range $test := $curr.MostExecutedTests }}
+            <tr>
+                <td>[{{ $test.Id }}]</td>
+                <td>{{ $test.Name }}</td>
+                <td>{{ $curr.MostExecutedTestsNr }}</td>
+            </tr>
+            {{ end }}
+        </table>
+        <br>
+
+        <h2>Least executed tests</h2>
+        <table border="1">
+            <tr class="tests">
+                <th>Id</th>
+                <th>Name</th>
+                <th>Executions</th>
+            </tr>
+            {{ range $test := $curr.LeastExecutedTests }}
+            <tr>
+
+                <td>[{{ $test.Id }}]</td>
+                <td>{{ $test.Name }}</td>
+                <td>{{ $curr.LeastExecutedTestsNr }}</td>
+            </tr>
+            {{ end }}
+        </table>
+        <br>
+
+
+
+
+        {{ if $curr.IsActivity }}
+        <hr>
+        <h2>Today's user activity</h2>
+        <h3>Number of tests started in each hour</h3>
+
+        <table>
+            {{ range $key, $value := $curr.Hours }}
+            <tr>
+                <td>{{ $key }}:00 - {{ $key }}:59 :</td>
+                <td>{{ $value }}</td>
+            </tr>
+            {{ end }}
+        </table>
+
+        <br>
+        <b>Busiest times of the day:</b>
+        {{ range $hr := $curr.BusiestHours }}
+        <li>{{ $hr }}:00 - {{ $hr }}:59</li>
+        {{ end }}
+
+        {{ end }}
+</div>
+        {{ end }}
+
+
+        </div>
+            </div>
+    {{ end }}
+</body>
+</html>

@@ -17,6 +17,7 @@ import (
 const (
 	EMAILCONFIGFILE = "./emailConfig.yml"
 	TEMPLATEPATH = "./processor/util/emailTemplate.html"
+	ATTACHMENTPATH = "./processor/util/attachmentTemplate.html"
 )
 
 type EmailConfig struct {
@@ -82,7 +83,7 @@ func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statisti
 
 	log.Println("Creating new e-mail request")
 	r := NewRequest(emailConfig.To, emailConfig.Subject, "", nil)
-	err := r.ParseTemplate(TEMPLATEPATH, templateData, templateDataForEmail)
+	err := r.ParseTemplate(ATTACHMENTPATH, TEMPLATEPATH, templateData, templateDataForEmail)
 	if err != nil {
 		log.Println(err)
 		log.Println("Template could not be parsed")
@@ -137,7 +138,7 @@ func (r *Request) SendEmail() (bool, error) {
 	return true, nil
 }
 
-func (r *Request) ParseTemplate(templateFileName string, data interface{}, dataForMail interface{}) error {
+func (r *Request) ParseTemplate(attachmentTemplateFileName string, templateFileName string, data interface{}, dataForMail interface{}) error {
 	log.Println("Start parsing the e-mail template")
 	t, err := template.ParseFiles(templateFileName)
 	if err != nil {
@@ -153,7 +154,7 @@ func (r *Request) ParseTemplate(templateFileName string, data interface{}, dataF
 	log.Println("End parsing the e-mail template")
 
 	log.Println("Start parsing the attachment template")
-	t, err = template.ParseFiles(templateFileName)
+	t, err = template.ParseFiles(attachmentTemplateFileName)
 	if err != nil {
 		log.Println(err)
 		return err
