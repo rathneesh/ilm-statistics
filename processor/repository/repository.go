@@ -15,12 +15,14 @@ import (
 )
 
 const (
-	FILENAME = "data/statistics.json"
 	FOLDER = "data/"
+	HTMLFOLDER = "web/"
 	EXTENSION = ".json"
+	HTMLEXTENSION = ".html"
 	DELIMITER = "-"
 )
 var tmpfilename string
+var tmpHtmlFileName string
 var statistics map[string]model.CollectedData
 var diffData []model.CollectedDataDiff
 var fileMutex sync.Mutex
@@ -95,10 +97,14 @@ func GetTodaysData() []model.CollectedData {
 	return stats
 }
 func UpdateTmpFileName(){
-	a := []string{FOLDER,strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())),EXTENSION}
-	if tmpfilename != strings.Join(a, "") {
+	tmpData := []string{FOLDER, strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())), EXTENSION}
+	tmpDataHtml := []string{HTMLFOLDER, strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())), HTMLEXTENSION}
+	if tmpfilename != strings.Join(tmpData, "") {
 		statistics = map[string]model.CollectedData{}
-		tmpfilename = strings.Join(a, "")
+		tmpfilename = strings.Join(tmpData, "")
+	}
+	if tmpHtmlFileName != strings.Join(tmpDataHtml, ""){
+		tmpHtmlFileName = strings.Join(tmpDataHtml, "")
 	}
 }
 
@@ -111,26 +117,30 @@ func IsDataForToday() bool{
 	return true
 }
 
-func SaveStatisticsToFile(s model.Statistic){
-	f, err := os.OpenFile(FILENAME, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+func SaveStatisticsToFile(attachment []byte){
+	log.Println("Saving the sent statistics to a html file")
+	f, err := os.OpenFile(tmpHtmlFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer f.Close()
 
-	data, err := json.MarshalIndent(s, "", "  ")
-	if _, err = f.Write(data); err != nil {
+	fileMutex.Lock()
+	if _, err = f.Write(attachment); err != nil {
 		log.Println(err)
 		return
 	}
-
+	defer fileMutex.Unlock()
 	UpdateTmpFileName()
+	log.Println("Saved the statistics to ./"+tmpHtmlFileName)
 }
 
 func InitFromFile(){
 	log.Println("Loading past data into memory from", tmpfilename)
 	os.Mkdir("." + string(filepath.Separator) + "data", 0777)
+	os.Mkdir("." + string(filepath.Separator) + "web", 0777)
+
 
 	statistics = map[string]model.CollectedData{}
 	diffData = []model.CollectedDataDiff{}

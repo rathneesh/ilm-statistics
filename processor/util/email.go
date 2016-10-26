@@ -18,6 +18,7 @@ const (
 	EMAILCONFIGFILE = "./emailConfig.yml"
 	TEMPLATEPATH = "./processor/util/emailTemplate.html"
 	ATTACHMENTPATH = "./processor/util/attachmentTemplate.html"
+	ATTACHMENTNAME = "statisticsForAll.html"
 )
 
 type EmailConfig struct {
@@ -65,7 +66,7 @@ type StatsToSendList []StatsToSend
 
 var emailConfig EmailConfig
 
-func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statistic) {
+func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statistic) ([]byte, error){
 	log.Println("Start initializing the e-mail")
 
 	log.Println("Loading e-mail configurations from file")
@@ -87,13 +88,16 @@ func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statisti
 	if err != nil {
 		log.Println(err)
 		log.Println("Template could not be parsed")
+		return nil, err
 	} else {
 		log.Println("Sending the e-mail")
 		_, e := r.SendEmail()
 		if e != nil {
 			log.Println(e)
+			return nil, err
 		}
 	}
+	return r.attachment, nil
 
 }
 
@@ -123,7 +127,7 @@ func (r *Request) SendEmail() (bool, error) {
 	m.From = mail.Address{Address: emailConfig.From}
 	m.To = emailConfig.To
 
-	if err := m.AttachBuffer("statisticsForAll.html", []byte(r.attachment), false); err != nil {
+	if err := m.AttachBuffer(ATTACHMENTNAME, []byte(r.attachment), false); err != nil {
 		log.Println(err)
 		return false, err
 	}
@@ -140,34 +144,36 @@ func (r *Request) SendEmail() (bool, error) {
 
 func (r *Request) ParseTemplate(attachmentTemplateFileName string, templateFileName string, data interface{}, dataForMail interface{}) error {
 	log.Println("Start parsing the e-mail template")
-	t, err := template.ParseFiles(templateFileName)
-	if err != nil {
+	var err error
+	var byteBody []byte
+	if byteBody, err = ParseTemplate(templateFileName, dataForMail); err != nil {
 		log.Println(err)
 		return err
 	}
-	buf := new(bytes.Buffer)
-	if err = t.Execute(buf, dataForMail); err != nil {
-		log.Println(err)
-		return err
-	}
-	r.body = buf.String()
+	r.body = string(byteBody)
 	log.Println("End parsing the e-mail template")
-
 	log.Println("Start parsing the attachment template")
-	t, err = template.ParseFiles(attachmentTemplateFileName)
-	if err != nil {
+	if r.attachment, err = ParseTemplate(attachmentTemplateFileName, data); err != nil {
 		log.Println(err)
 		return err
 	}
-	buf = new(bytes.Buffer)
-	if err = t.Execute(buf, data); err != nil {
-		log.Println(err)
-		return err
-	}
-	r.attachment = buf.Bytes()
 	log.Println("End parsing the attachment template")
 
 	return nil
+}
+
+func ParseTemplate(fileName string, data interface{}) ([]byte, error) {
+	t, err := template.ParseFiles(fileName)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	buf := new(bytes.Buffer)
+	if err = t.Execute(buf, data); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 func ParseEmailConfigFile() {

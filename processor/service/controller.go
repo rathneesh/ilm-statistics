@@ -25,10 +25,17 @@ func SendStatistics() {
 	s.Day = time.Now()
 
 	// Email the statistics
-	go util.SendEmailTemplate(s, sforIps)
+	go func() {
+		attachment, err := util.SendEmailTemplate(s, sforIps)
+		if err != nil {
+			log.Println(err)
+		} else {
+			// Save today's averages to file
+			repository.SaveStatisticsToFile(attachment)
+		}
+	}()
 
-	// Save today's averages to file
-	repository.SaveStatisticsToFile(s)
+
 }
 
 func CreateStatistic(stat model.CollectedData) model.CollectedData{
