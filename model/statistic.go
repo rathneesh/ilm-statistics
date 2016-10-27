@@ -173,8 +173,6 @@ type CollectedDataDiff struct {
 	DeletedTests        []Test
 	AddedResults        []BuildResult
 	DeletedResults      []BuildResult
-	AddedRepositories   []Repository
-	DeletedRepositories []Repository
 	NewDay 		    time.Time
 }
 

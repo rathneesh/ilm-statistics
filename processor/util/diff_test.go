@@ -18,7 +18,7 @@ func TestDiffImageList(t *testing.T) {
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}, {
 		Id: "2",
 		Name: "Image2",
@@ -28,7 +28,7 @@ func TestDiffImageList(t *testing.T) {
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}}
 
 	imgs2 := []model.Image{{
@@ -40,7 +40,7 @@ func TestDiffImageList(t *testing.T) {
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}, {
 		Id: "2",
 		Name: "Image2",
@@ -50,7 +50,7 @@ func TestDiffImageList(t *testing.T) {
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}}
 
 	addedImgs, deletedImgs := DiffImageList(imgs1, imgs2)
@@ -68,7 +68,7 @@ func TestDiffImageList(t *testing.T) {
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}
 	imgs2 = append(imgs2, img)
 
@@ -90,7 +90,7 @@ func TestDiffImageList(t *testing.T) {
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}
 	imgs1 = append(imgs1, img)
 
@@ -641,14 +641,6 @@ func TestDiffCollectedData(t *testing.T) {
 		t.Error("Non-empty list resulted from differentiating two empty lists (Deleted Results)")
 	}
 
-	if len(diff.AddedRepositories) != 0 {
-		t.Error("Non-empty list resulted from differentiating two empty lists (Added Repositories)")
-	}
-
-	if len(diff.DeletedRepositories) != 0 {
-		t.Error("Non-empty list resulted from differentiating two empty lists (Deleted Repositories)")
-	}
-
 	if !diff.NewDay.IsZero() {
 		t.Error("Time difference found between to zero entities (New Day)")
 	}
@@ -721,14 +713,6 @@ func TestDiffCollectedData(t *testing.T) {
 
 	if len(diff.DeletedResults) != 1 {
 		t.Error("Result list differentiation does not work (delete)")
-	}
-
-	if len(diff.AddedRepositories) != 1 {
-		t.Error("Repository list differentiation does not work (add)")
-	}
-
-	if len(diff.DeletedRepositories) != 1 {
-		t.Error("Repository list differentiation does not work (delete)")
 	}
 
 	if diff.NewDay != newData.Day {

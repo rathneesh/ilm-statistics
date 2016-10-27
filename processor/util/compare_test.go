@@ -17,7 +17,7 @@ func TestCmpImages(t *testing.T){
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}
 	img2 := model.Image{
 		Id: "1",
@@ -28,7 +28,7 @@ func TestCmpImages(t *testing.T){
 		Tag: "awesome",
 		IlmTags: []string{"yay", "hooray"},
 		Location: "public registry",
-		SkipImageBuild: "false",
+		SkipImageBuild: false,
 	}
 
 	if !CmpImages(img1,img2) {
@@ -94,7 +94,7 @@ func TestCmpImages(t *testing.T){
 
 	// One image is different from the other in one field (SkipImageBuild)
 	img2.Location = "public registry"
-	img2.SkipImageBuild = "true"
+	img2.SkipImageBuild = true
 
 	if CmpImages(img1,img2) {
 		t.Error("Two non-equal images evaluated as equal (different SkipImageBuild)")
@@ -229,7 +229,7 @@ func TestCmpProjects(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		},
 		{
 			Id: "12",
@@ -240,7 +240,7 @@ func TestCmpProjects(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		},
 	}
 
@@ -259,7 +259,7 @@ func TestCmpProjects(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		},
 		{
 			Id: "1",
@@ -270,7 +270,7 @@ func TestCmpProjects(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		},
 	}
 

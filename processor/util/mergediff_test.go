@@ -369,7 +369,7 @@ func TestMergeDiff(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		}, {
 			Id: "2",
 			Name: "Image2",
@@ -379,7 +379,7 @@ func TestMergeDiff(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		}},
 		Projects: []model.Project{{
 			Id: "1",
@@ -459,7 +459,7 @@ func TestMergeDiff(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		}, {
 			Id: "2",
 			Name: "Image2",
@@ -469,7 +469,7 @@ func TestMergeDiff(t *testing.T) {
 			Tag: "awesome",
 			IlmTags: []string{"yay", "hooray"},
 			Location: "public registry",
-			SkipImageBuild: "false",
+			SkipImageBuild: false,
 		}},
 		AddedProjects: []model.Project{},
 		DeletedProjects: []model.Project{{
@@ -537,27 +537,6 @@ func TestMergeDiff(t *testing.T) {
 				Id: "2",
 				BuildId: "2",
 				ResultEntries: []string{"1","2"},
-			}},
-		AddedRepositories: []model.Repository{},
-		DeletedRepositories: []model.Repository{{
-			Name: "Repo1",
-			Tag: "private",
-			FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-			Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-			HasProblems: false,
-			Message: "msg",
-			RegistryUrl: "localhost:5000",
-			RegistryName: "Reggy",
-		},
-			{
-				Name: "Repo2",
-				Tag: "public",
-				FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-				Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-				HasProblems: false,
-				Message: "msg",
-				RegistryUrl: "localhost:5000",
-				RegistryName: "Repsy",
 			}},
 		NewDay: time.Now(),
 	}

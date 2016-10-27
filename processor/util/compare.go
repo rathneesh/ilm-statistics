@@ -201,37 +201,35 @@ func CmpRepositories(repo1, repo2 model.Repository) bool{
 // Compare two collected data entities
 func CmpCollectedData(data1 model.CollectedData, data2 model.CollectedData) bool {
 
-	eq := true
-
 	addedImages, deletedImages := DiffImageList(data1.Images, data2.Images)
 	if !(len(addedImages) == 0 && len(deletedImages) == 0) {
-		eq = false
+		return false
 	}
 
 	addedProjects, deletedProjects := DiffProjectList(data1.Projects, data2.Projects)
 	if !(len(addedProjects) == 0 && len(deletedProjects) == 0) {
-		eq = false
+		return false
 	}
 
 	addedBuilds, deletedBuilds := DiffBuildList(data1.Builds, data2.Builds)
 	if !(len(addedBuilds) == 0 && len(deletedBuilds) == 0) {
-		eq = false
+		return false
 	}
 
 	addedRegistries, deletedRegistries := DiffRegistryList(data1.Registries, data2.Registries)
 	if !(len(addedRegistries) == 0 && len(deletedRegistries) == 0) {
-		eq = false
+		return false
 	}
 
 	addedTests, deletedTests := DiffTestList(data1.Tests, data2.Tests)
 	if !(len(addedTests) == 0 && len(deletedTests) == 0) {
-		eq = false
+		return false
 	}
 
 	addedResults, deletedResults := DiffResultList(data1.Results, data2.Results)
 	if !(len(addedResults) == 0 && len(deletedResults) == 0) {
-		eq = false
+		return false
 	}
 
-	return (data1.MAC == data2.MAC && data1.Username == data2.Username && data1.Day.Equal(data2.Day) && eq)
+	return (data1.Ip == data2.Ip && data1.Username == data2.Username && data1.Day.Equal(data2.Day))
 }
