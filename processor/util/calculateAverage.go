@@ -350,7 +350,7 @@ func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData, idToBuild
 
 	i := 0
 	for _, pair := range sortedImageToNoOfVulnerability {
-		vulnerabilities[i] = model.NoOfVulnerabilitiesWithLinks{pair.Key, model.Pair{imageToReport[pair.Key], pair.Value}}
+		vulnerabilities[i] = model.NoOfVulnerabilitiesWithLinks{pair.Key, model.Pair{Key: imageToReport[pair.Key], Value: pair.Value}}
 		i++
 	}
 
@@ -376,8 +376,10 @@ func ShowImagesInRegistries(nameToImage map[string]model.Image, idToRegistry map
 	for name, image := range nameToImage {
 		if (image.Location == "Public Registry") {
 			imagesInRegistries["Public Registry"] = append(imagesInRegistries["Public Registry"], name)
+		} else if CmpRegistries(idToRegistry[image.RegistryId], model.Registry{}) {
+			imagesInRegistries["Unidentifiable Registry"] = append(imagesInRegistries[image.RegistryId], name)
 		} else {
-			imagesInRegistries[idToRegistry[image.RegistryId].Name+"("+idToRegistry[image.RegistryId].Addr+")"] = append(imagesInRegistries[image.RegistryId], name)
+			imagesInRegistries[idToRegistry[image.RegistryId].Name+"("+idToRegistry[image.RegistryId].Addr+")"] = append(imagesInRegistries[idToRegistry[image.RegistryId].Name+"("+idToRegistry[image.RegistryId].Addr+")"], name)
 		}
 	}
 
@@ -386,11 +388,17 @@ func ShowImagesInRegistries(nameToImage map[string]model.Image, idToRegistry map
 
 func SeparateByIp(dataList []model.CollectedData) map[string][]model.CollectedData{
 	separatedByIp := map[string][]model.CollectedData{}
-
 	for _, data := range dataList {
-		separatedByIp[data.Ip] = append(separatedByIp[data.Ip],data)
+		separatedByIp[data.Ip] = appendIfMissingCollectedData(separatedByIp[data.Ip], data)
 	}
-
 	return separatedByIp
 }
 
+func appendIfMissingCollectedData(dataList []model.CollectedData, data model.CollectedData) []model.CollectedData {
+	for _, e := range dataList {
+		if CmpCollectedData(e, data) {
+			return dataList
+		}
+	}
+	return append(dataList, data)
+}

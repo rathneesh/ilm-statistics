@@ -7,6 +7,8 @@ import (
 )
 
 func TestCmpImages(t *testing.T){
+	t.Parallel()
+
 	// Two equal images
 	img1 := model.Image{
 		Id: "1",
@@ -102,6 +104,7 @@ func TestCmpImages(t *testing.T){
 }
 
 func TestCmpProviders(t *testing.T) {
+	t.Parallel()
 
 	// Two equal providers
 	prov1 := model.Provider{
@@ -124,6 +127,7 @@ func TestCmpProviders(t *testing.T) {
 }
 
 func TestCmpTests(t *testing.T) {
+	t.Parallel()
 
 	//Two equal tests
 	test1 := model.Test{
@@ -162,6 +166,7 @@ func TestCmpTests(t *testing.T) {
 }
 
 func TestCmpProjects(t *testing.T) {
+	t.Parallel()
 
 	//Two equal projects
 	proj1 := model.Project{
@@ -300,6 +305,7 @@ func TestCmpProjects(t *testing.T) {
 }
 
 func TestCmpBuilds(t *testing.T) {
+	t.Parallel()
 
 	// Two equal builds
 	build1 := model.Build{
@@ -363,6 +369,7 @@ func TestCmpBuilds(t *testing.T) {
 }
 
 func TestCmpRegistries(t *testing.T) {
+	t.Parallel()
 
 	// Two equal registries
 	reg1 := model.Registry{
@@ -406,6 +413,7 @@ func TestCmpRegistries(t *testing.T) {
 }
 
 func TestCmpBuildResults(t *testing.T) {
+	t.Parallel()
 
 	// Two equal buildResults
 	res1 := model.BuildResult{
@@ -456,6 +464,7 @@ func TestCmpBuildResults(t *testing.T) {
 }
 
 func TestCmpRepositories(t *testing.T) {
+	t.Parallel()
 
 	// Two equal repositories
 	repo1 := model.Repository{
@@ -547,6 +556,8 @@ func TestCmpRepositories(t *testing.T) {
 }
 
 func TestCmpCollectedData(t *testing.T) {
+	t.Parallel()
+
 	data1 := model.CollectedData{}
 	data2 := model.CollectedData{}
 

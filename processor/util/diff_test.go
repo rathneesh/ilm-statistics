@@ -7,6 +7,7 @@ import (
 )
 
 func TestDiffImageList(t *testing.T) {
+	t.Parallel()
 
 	// Test if two lists of images are equal
 	imgs1 := []model.Image{{
@@ -103,6 +104,7 @@ func TestDiffImageList(t *testing.T) {
 }
 
 func TestDiffProjectList(t *testing.T) {
+	t.Parallel()
 
 	// Test for two similar lists
 	projs1 := []model.Project {
@@ -188,6 +190,7 @@ func TestDiffProjectList(t *testing.T) {
 }
 
 func TestDiffBuildList(t *testing.T) {
+	t.Parallel()
 
 	// Test for two similar lists
 
@@ -268,6 +271,7 @@ func TestDiffBuildList(t *testing.T) {
 }
 
 func TestDiffRegistryList(t *testing.T) {
+	t.Parallel()
 
 	// Test for two similar lists
 
@@ -337,6 +341,7 @@ func TestDiffRegistryList(t *testing.T) {
 }
 
 func TestDiffTestList(t *testing.T) {
+	t.Parallel()
 
 	// Test for two similar lists
 
@@ -413,6 +418,7 @@ func TestDiffTestList(t *testing.T) {
 }
 
 func TestDiffResultList(t *testing.T) {
+	t.Parallel()
 
 	// Test for two similar lists
 
@@ -484,6 +490,7 @@ func TestDiffResultList(t *testing.T) {
 }
 
 func TestDiffRepositoryList(t *testing.T) {
+	t.Parallel()
 
 	// Test for two similar lists
 
@@ -585,6 +592,8 @@ func TestDiffRepositoryList(t *testing.T) {
 }
 
 func TestDiffCollectedData(t *testing.T) {
+	t.Parallel()
+
 	oldData := model.CollectedData{}
 	newData := model.CollectedData{}
 	diff := DiffCollectedData(oldData, newData)

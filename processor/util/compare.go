@@ -231,5 +231,5 @@ func CmpCollectedData(data1 model.CollectedData, data2 model.CollectedData) bool
 		return false
 	}
 
-	return (data1.Ip == data2.Ip && data1.Username == data2.Username && data1.Day.Equal(data2.Day))
+	return (data1.Ip == data2.Ip && data1.MAC == data2.MAC && data1.Username == data2.Username && data1.Day.Equal(data2.Day))
 }

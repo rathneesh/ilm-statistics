@@ -7,6 +7,7 @@ import (
 )
 
 func TestMergeImageLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -51,6 +52,7 @@ func TestMergeImageLists(t *testing.T) {
 }
 
 func TestMergeProjectLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -95,6 +97,7 @@ func TestMergeProjectLists(t *testing.T) {
 }
 
 func TestMergeBuildLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -139,6 +142,7 @@ func TestMergeBuildLists(t *testing.T) {
 }
 
 func TestMergeRegistryLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -183,6 +187,7 @@ func TestMergeRegistryLists(t *testing.T) {
 }
 
 func TestMergeTestLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -227,6 +232,7 @@ func TestMergeTestLists(t *testing.T) {
 }
 
 func TestMergeResultLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -271,6 +277,7 @@ func TestMergeResultLists(t *testing.T) {
 }
 
 func TestMergeRepositoryLists(t *testing.T) {
+	t.Parallel()
 
 	// Merge 3 empty lists
 
@@ -315,6 +322,7 @@ func TestMergeRepositoryLists(t *testing.T) {
 }
 
 func TestMergeDiff(t *testing.T) {
+	t.Parallel()
 
 	// Merge 2 empty objects
 
