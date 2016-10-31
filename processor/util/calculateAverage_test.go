@@ -322,4 +322,200 @@ func TestCalculateNoOfVulnerabilitiesFound(t *testing.T) {
 	if len(result) != 0 {
 		t.Error(testedFuncName + "returned data on empty dataList")
 	}
+
+	//map with 1 element but has 0 vulnerabilities
+	dataList = []model.CollectedData{{Ip:"1234", Results: []model.BuildResult{{BuildId: "1", ResultEntries: []string{"SUCCESS: Clair found 0 vulnerabilties in image alpine:2.6."}, TargetArtifact: model.TargetArtifact{Artifact: model.Artifact{ImageId: "dockerImageId"}}}}}}
+	idToBuild = map[string]model.Build{}
+	idToBuild["1"] = model.Build{Id: "1", ProjectId: "project1", TestId: "test1" }
+	result = CalculateNoOfVulnerabilitiesFound(dataList, idToBuild)
+
+	if len(result) != 1 {
+		t.Error(testedFuncName + "returned data list length != 1")
+	}
+	if result[0].ImageId != "alpine:2.6" {
+		t.Error(testedFuncName + "returned wrong image id")
+	}
+	if result[0].LinkAndNo.Value != 0 {
+		t.Error(testedFuncName + "returned non-zero value for zero vulnerabilities")
+	}
+	if result[0].LinkAndNo.Key != "/projects/project1/tests/test1/resultsdockerImageId"{
+		t.Error(testedFuncName + "returned wrong link")
+	}
+
+
+	//map with 1 element but can't be analyzed
+	dataList = []model.CollectedData{{Ip:"1234", Results: []model.BuildResult{{BuildId: "1", ResultEntries: []string{"Could not get features and vulnerabilities for layer  of image rethinkdb:2.3, error information - Got response 404 with message {\"Error\":{\"Message\":\"DB is being updated so no query to it can be done\"}}\n"}, TargetArtifact: model.TargetArtifact{Artifact: model.Artifact{ImageId: "dockerImageId"}}}}}}
+	idToBuild = map[string]model.Build{}
+	idToBuild["1"] = model.Build{Id: "1", ProjectId: "project1", TestId: "test1" }
+	result = CalculateNoOfVulnerabilitiesFound(dataList, idToBuild)
+
+	if len(result) != 0 {
+		t.Error(testedFuncName + "returned data list length != 1")
+	}
+}
+
+func TestCalculatePerProjectsOutcomeRates(t *testing.T) {
+	testedFuncName := "CalculatePerProjectOutcomeRates: "
+
+	// nil, nil
+	resultSucc, resultFail := CalculatePerProjectOutcomeRates(nil, nil)
+	if len(resultSucc) != 0 {
+		t.Error(testedFuncName, "returned non-empty map for successful outcome rates")
+	}
+	if len(resultFail) != 0 {
+		t.Error(testedFuncName, "returned non-empty map for failed outcome rates")
+	}
+
+	// 1 irrelevant build, 1 project
+	idToBuild := map[string]model.Build{}
+	idToBuild["1"] = model.Build{Id:"1", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToProject := map[string]model.Project{}
+	idToProject["2"] = model.Project{Id:"2"}
+	resultSucc, resultFail = CalculatePerProjectOutcomeRates(idToBuild, idToProject)
+	if len(resultSucc) != 1 {
+		t.Error(testedFuncName, "returned not one element for success on non-related project and build")
+	}
+	if resultSucc["2"] != 0 {
+		t.Error(testedFuncName, "project without build has success rate <> 0")
+	}
+	if len(resultFail) != 1 {
+		t.Error(testedFuncName, "returned not one element for failure on non-related project and build")
+	}
+	if resultFail["2"] != 0 {
+		t.Error(testedFuncName, "project without build has failure rate <> 0")
+	}
+
+
+	// 1 success, 1 failure
+	idToBuild = map[string]model.Build{}
+	idToBuild["1"] = model.Build{Id:"1", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["2"] = model.Build{Id:"2", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToProject = map[string]model.Project{}
+	idToProject["1"] = model.Project{Id:"1"}
+	resultSucc, resultFail = CalculatePerProjectOutcomeRates(idToBuild, idToProject)
+	if len(resultSucc)!=1 {
+		t.Error(testedFuncName, "returned not one element success map on one project")
+	}
+	if len(resultFail)!=1 {
+		t.Error(testedFuncName, "returned not one element failure map on one project")
+	}
+	if resultSucc["1"] != 50 {
+		t.Error(testedFuncName, "success rate for 1s 1f is not 50")
+	}
+	if resultFail["1"] != 50 {
+		t.Error(testedFuncName, "failure rate for 1s 1f is not 50")
+	}
+
+	// 1 success, 4 failure
+	idToBuild = map[string]model.Build{}
+	idToBuild["1"] = model.Build{Id:"1", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["2"] = model.Build{Id:"2", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["3"] = model.Build{Id:"3", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["4"] = model.Build{Id:"4", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["5"] = model.Build{Id:"5", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToProject = map[string]model.Project{}
+	idToProject["1"] = model.Project{Id:"1"}
+	resultSucc, resultFail = CalculatePerProjectOutcomeRates(idToBuild, idToProject)
+	if len(resultSucc)!=1 {
+		t.Error(testedFuncName, "returned not one element success map on one project")
+	}
+	if resultSucc["1"] != 20 {
+		t.Error(testedFuncName, "success rate for 1s 4f is not 20")
+	}
+	if len(resultFail)!=1 {
+		t.Error(testedFuncName, "returned not one element failure map on one project")
+	}
+	if resultFail["1"] != 80 {
+		t.Error(testedFuncName, "failure rate for 1s 4f is not 80")
+	}
+
+	// 6 success, 4 failure
+	idToBuild = map[string]model.Build{}
+	idToBuild["1"] = model.Build{Id:"1", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["2"] = model.Build{Id:"2", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["3"] = model.Build{Id:"3", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["4"] = model.Build{Id:"4", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["5"] = model.Build{Id:"5", ProjectId: "1", Status: model.Status{Status:FAILURE}}
+	idToBuild["6"] = model.Build{Id:"6", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["7"] = model.Build{Id:"7", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["8"] = model.Build{Id:"8", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["9"] = model.Build{Id:"9", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+	idToBuild["10"] = model.Build{Id:"10", ProjectId: "1", Status: model.Status{Status:SUCCESS}}
+
+	idToProject = map[string]model.Project{}
+	idToProject["1"] = model.Project{Id:"1"}
+
+	if len(resultSucc)!=1 {
+		t.Error(testedFuncName, "returned not one element success map on one project")
+	}
+	if resultSucc["1"] != 20 {
+		t.Error(testedFuncName, "success rate for 1s 4f is not 60")
+	}
+	if resultFail["1"] != 80 {
+		t.Error(testedFuncName, "failure rate for 1s 4f is not 40")
+	}
+	if len(resultFail)!=1 {
+		t.Error(testedFuncName, "returned not one element failure map on one project")
+	}
+}
+
+func TestCalculateAllProjectsOutcomeRates(t *testing.T){
+	testedFuncName := "CalculateAllProjectsOutcomeRates: "
+
+	// nil input
+	succ, fail := CalculateAllProjectsOutcomeRates(nil)
+	if succ != 0 {
+		t.Error(testedFuncName, "success rate for empty idToProject map is not 0")
+	}
+	if fail != 0 {
+		t.Error(testedFuncName, "failure rate for empty idToProject map is not 0")
+	}
+
+	// 1s 1f
+	idToProject := map[string]model.Project{}
+	idToProject["1"] = model.Project{Id:"1", Status: SUCCESS}
+	idToProject["2"] = model.Project{Id:"2", Status: FAILURE}
+	succ, fail = CalculateAllProjectsOutcomeRates(idToProject)
+	if succ != 50 {
+		t.Error(testedFuncName, "success rate for 1s 1f idToProject map is not 50")
+	}
+	if fail != 50 {
+		t.Error(testedFuncName, "failure rate for 1s 1f idToProject map is not 50")
+	}
+
+	// 1s 4f
+	idToProject = map[string]model.Project{}
+	idToProject["1"] = model.Project{Id:"1", Status: SUCCESS}
+	idToProject["2"] = model.Project{Id:"2", Status: FAILURE}
+	idToProject["3"] = model.Project{Id:"3", Status: FAILURE}
+	idToProject["4"] = model.Project{Id:"4", Status: FAILURE}
+	idToProject["5"] = model.Project{Id:"5", Status: FAILURE}
+	succ, fail = CalculateAllProjectsOutcomeRates(idToProject)
+	if succ != 20 {
+		t.Error(testedFuncName, "success rate for 1s 4f idToProject map is not 20")
+	}
+	if fail != 80 {
+		t.Error(testedFuncName, "failure rate for 1s 4f idToProject map is not 80")
+	}
+
+	// 6s 4f
+	idToProject = map[string]model.Project{}
+	idToProject["1"] = model.Project{Id:"1", Status: SUCCESS}
+	idToProject["2"] = model.Project{Id:"2", Status: FAILURE}
+	idToProject["3"] = model.Project{Id:"3", Status: FAILURE}
+	idToProject["4"] = model.Project{Id:"4", Status: FAILURE}
+	idToProject["5"] = model.Project{Id:"5", Status: FAILURE}
+	idToProject["6"] = model.Project{Id:"6", Status: SUCCESS}
+	idToProject["7"] = model.Project{Id:"7", Status: SUCCESS}
+	idToProject["8"] = model.Project{Id:"8", Status: SUCCESS}
+	idToProject["9"] = model.Project{Id:"9", Status: SUCCESS}
+	idToProject["10"] = model.Project{Id:"10", Status: SUCCESS}
+
+	succ, fail = CalculateAllProjectsOutcomeRates(idToProject)
+	if succ != 60 {
+		t.Error(testedFuncName, "success rate for 1s 4f idToProject map is not 60")
+	}
+	if fail != 40 {
+		t.Error(testedFuncName, "failure rate for 1s 4f idToProject map is not 40")
+	}
 }

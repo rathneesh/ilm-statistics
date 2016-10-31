@@ -145,6 +145,10 @@ func CalculateAllProjectsOutcomeRates(idToProject map[string]model.Project) (flo
 		}
 	}
 
+	if projectsSuccess+projectsFailure == 0 {
+		return 0, 0
+	}
+
 	return float64(projectsSuccess * 100)/float64(projectsSuccess+projectsFailure), float64(projectsFailure * 100)/float64(projectsSuccess+projectsFailure)
 }
 
@@ -153,16 +157,22 @@ func CalculatePerProjectOutcomeRates(idToBuild map[string]model.Build, idToProje
 	projectsFailure := map[string]float64{}
 
 	for _, build := range idToBuild {
-		if build.Status.Status == SUCCESS {
+		if !CmpProjects(idToProject[build.ProjectId], model.Project{}) && build.Status.Status == SUCCESS{
 			projectsSuccess[build.ProjectId]++
-		} else if build.Status.Status == FAILURE {
+		} else if !CmpProjects(idToProject[build.ProjectId], model.Project{}) && build.Status.Status == FAILURE {
 			projectsFailure[build.ProjectId]++
 		}
 	}
 
 	for id := range idToProject {
-		projectsSuccess[id] = float64(projectsSuccess[id] * 100)/float64(projectsSuccess[id]+projectsFailure[id])
-		projectsFailure[id] = float64(projectsFailure[id] * 100)/float64(projectsSuccess[id]+projectsFailure[id])
+		if projectsSuccess[id]+projectsFailure[id] == 0 {
+			projectsSuccess[id] = 0
+			projectsFailure[id] = 0
+		} else {
+			denominator := float64(projectsSuccess[id] + projectsFailure[id])
+			projectsSuccess[id] = float64(projectsSuccess[id] * 100) / denominator
+			projectsFailure[id] = float64(projectsFailure[id] * 100) / denominator
+		}
 	}
 
 	return projectsSuccess, projectsFailure
@@ -334,6 +344,7 @@ func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData, idToBuild
 					noOfVulnerabilities, err := strconv.Atoi(vulnerabilitiesAux[0])
 					reImage := regexp.MustCompile("[^ ]+:[^ ]+")
 					registryAndImage := reImage.FindAllString(entry, -1)
+					registryAndImage[len(registryAndImage)-1] = strings.TrimSuffix(registryAndImage[len(registryAndImage)-1], ".")
 					if err != nil {
 						log.Println(err)
 					} else {
