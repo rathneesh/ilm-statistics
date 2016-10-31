@@ -47,6 +47,8 @@
     <hr>
 
     <h2>Projects</h2>
+
+    {{ if $curr.ProjectsList }}
     <h3>Projects: success and failure rate</h3>
     
     <table border="1">
@@ -65,6 +67,9 @@
     </table>
 
     <br>
+    {{ end }}
+
+    {{ if $curr.MaxProjectPopularity }}
 
     <h3>Most executed project</h3>
     The most executed project was ran {{ $curr.MaxProjectPopularity }} times
@@ -88,10 +93,12 @@
     {{ end }}
     <br>
 
+    {{ end }}
     <hr>
 
     <h2>Images</h2>
 
+    {{ if $curr.Vulnerabilities }}
     <h3>Image ranking </h3>
 
     <table border="1">
@@ -112,8 +119,11 @@
         </tr>
         {{ end }}
     </table>
+    {{ end }}
 
     <h3>Overall number of tags applied: {{ $curr.Images }}</h3>
+
+    {{ if $curr.MostUsedImages }}
     <h3>Most used tags</h3>
     
     <table border="1">
@@ -129,6 +139,9 @@
     {{ end }}
     </table>
 
+    {{ end }}
+
+    {{ if $curr.ImagesInProjects }}
     <h3>Occurrences of images in projects</h3>
     <ol>
         {{ range $image, $projectList := $curr.ImagesInProjects }}
@@ -154,7 +167,9 @@
         </ul>
         {{ end }}
     </ol>
+    {{ end }}
 
+    {{ if $curr.ImagesInRegistries }}
     <h3>Images in registries</h3>
     <ol>
         {{ range $registry, $imageNameList := $curr.ImagesInRegistries }}
@@ -168,7 +183,9 @@
     </ol>
 
     <hr>
+    {{ end }}
 
+    {{ if $curr.MostExecutedTests }}
     <h2>Tests</h2>
     <h2>Most executed tests</h2>
     <table border="1">
@@ -186,7 +203,9 @@
     {{ end }}
     </table>
     <br>
+    {{ end }}
 
+    {{ if $curr.LeastExecutedTests }}
     <h2>Least executed tests</h2>
     <table border="1">
     <tr>
@@ -206,7 +225,7 @@
     <br>
 
     <hr>
-
+    {{ end }}
 
     {{ if $curr.IsActivity }}
     <h2>Today's user activity</h2>
