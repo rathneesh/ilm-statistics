@@ -10,11 +10,6 @@ import (
 
 func SendStatistics() {
 
-	if !repository.IsDataForToday() {
-		log.Println("There is no data for today")
-		return
-	}
-
 	// Read statistics
 	stats := repository.GetTodaysData()
 
