@@ -12,7 +12,6 @@ import (
 	"github.com/ilm-statistics/ilm-statistics/processor/util"
 	"os"
 	"path/filepath"
-	"fmt"
 )
 
 const (
@@ -32,8 +31,7 @@ func init() {
 	log.Println("Initializing repository")
 	statistics = map[string]model.CollectedData{}
 	UpdateTmpFileName()
-	//InitFromFile()
-	InitFromDir()
+	InitFromFile()
 }
 
 // Save the incoming data into a file
@@ -66,21 +64,26 @@ func CreateStatistic(s model.CollectedData) model.CollectedData {
 }
 
 func GetTodaysData() []model.CollectedData {
-	log.Println("Loading past data into memory from the data folder")
+	log.Println("Getting today's statistics")
 
-	var statsDiff, statsDiffAux []model.CollectedDataDiff
-
-	files, _ := ioutil.ReadDir("./data/")
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-		statsDiffAux, _ = readFromFileIntoStatistics(statistics, "./data/" + f.Name())
-		statsDiff = append(statsDiff, statsDiffAux...)
+	data, err := ioutil.ReadFile(tmpfilename)
+	if err != nil {
+		log.Println(err)
+		return []model.CollectedData{}
+	}
+	var statsDiff []model.CollectedDataDiff
+	err = json.Unmarshal(data, &statsDiff)
+	if err != nil {
+		log.Println(err)
+		return []model.CollectedData{}
 	}
 
 	statisticsMap := map[string]model.CollectedData{}
 
 	stats := []model.CollectedData{}
+
+	// Suppose the data was saved ordered
+	// TODO check the order of the data
 
 	for _, collData := range statsDiff {
 		if statisticsMap[collData.MAC].MAC == ""{
@@ -93,6 +96,7 @@ func GetTodaysData() []model.CollectedData {
 
 	return stats
 }
+
 func UpdateTmpFileName(){
 	tmpData := []string{FOLDER, strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())), EXTENSION}
 	tmpDataHtml := []string{HTMLFOLDER, strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())), HTMLEXTENSION}
@@ -120,8 +124,8 @@ func SaveStatisticsToFile(attachment []byte){
 		return
 	}
 	defer fileMutex.Unlock()
-	UpdateTmpFileName()
 	log.Println("Saved the statistics to ./"+tmpHtmlFileName)
+	UpdateTmpFileName()
 }
 
 func InitFromFile(){
@@ -131,48 +135,70 @@ func InitFromFile(){
 
 
 	statistics = map[string]model.CollectedData{}
+	diffData = []model.CollectedDataDiff{}
 
-	_, statistics = readFromFileIntoStatistics(statistics, tmpfilename)
+	data, err := ioutil.ReadFile(tmpfilename)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = json.Unmarshal(data, &diffData)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
+	for _, collData := range diffData {
+		if statistics[collData.MAC].MAC == ""{
+			statistics[collData.MAC] = model.CollectedData{MAC:collData.MAC}
+		}
+
+		statistics[collData.MAC] = util.MergeDiff(statistics[collData.MAC], collData)
+	}
 }
 
-func readFromFileIntoStatistics(dataMap map[string]model.CollectedData, fileName string) ([]model.CollectedDataDiff, map[string]model.CollectedData){
+func GetDataForEmail() []model.CollectedData {
+	log.Println("Loading past data into memory from the data folder")
+
+	var statsDiff, statsDiffAux []model.CollectedDataDiff
+
+	files, _ := ioutil.ReadDir("."+string(filepath.Separator)+FOLDER)
+
+	for _, f := range files {
+		statsDiffAux = readDiffsFromFile("."+string(filepath.Separator)+FOLDER + f.Name())
+		statsDiff = append(statsDiff, statsDiffAux...)
+	}
+
+	statisticsMap := map[string]model.CollectedData{}
+
+	stats := []model.CollectedData{}
+
+	for _, collData := range statsDiff {
+		if statisticsMap[collData.MAC].MAC == ""{
+			statisticsMap[collData.MAC] = model.CollectedData{MAC:collData.MAC}
+		}
+
+		statisticsMap[collData.MAC] = util.MergeDiff(statisticsMap[collData.MAC], collData)
+		stats = append(stats, statisticsMap[collData.MAC])
+	}
+
+	return stats
+}
+
+func readDiffsFromFile(fileName string) []model.CollectedDataDiff{
+	log.Println("Loading data from "+fileName)
 	diffData = []model.CollectedDataDiff{}
 
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		log.Println(err)
-		return diffData, nil
+		return diffData
 	}
 	err = json.Unmarshal(data, &diffData)
 	if err != nil {
 		log.Println(err)
-		return diffData, nil
+		return diffData
 	}
 
-	for _, collData := range diffData {
-		if dataMap[collData.MAC].MAC == ""{
-			dataMap[collData.MAC] = model.CollectedData{MAC:collData.MAC}
-		}
-
-		dataMap[collData.MAC] = util.MergeDiff(dataMap[collData.MAC], collData)
-	}
-	return diffData, dataMap
-}
-
-func InitFromDir() map[string]model.CollectedData {
-	log.Println("Loading past data into memory from the data folder")
-	os.Mkdir("." + string(filepath.Separator) + "data", 0777)
-	os.Mkdir("." + string(filepath.Separator) + "web", 0777)
-
-	files, _ := ioutil.ReadDir("./data/")
-
-	statistics = map[string]model.CollectedData{}
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-		_, statistics = readFromFileIntoStatistics(statistics, "./data/" + f.Name())
-	}
-
-	return statistics
+	return diffData
 }

@@ -11,9 +11,10 @@ import (
 func SendStatistics() {
 
 	// Read statistics
-	stats := repository.GetTodaysData()
+	stats := repository.GetDataForEmail()
 
 	// Calculate the average
+	log.Println("Calculating the average...")
 	s, sforIps := util.StatisticsCalculateAverages(stats)
 
 	// Add the day

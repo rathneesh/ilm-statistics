@@ -97,7 +97,7 @@
             </tr>
             {{ range $id, $project := $curr.ProjectsList }}
             <tr>
-                <td>{{ $project.Name }} [{{ $id }}]</td>
+                <td>{{ $project.Name }} [{{ printf "%.7s" $id }}]</td>
                 <td>{{ index $curr.ProjectsSuccess $id }}%</td>
                 <td>{{ index $curr.ProjectsFailure $id }}%</td>
             </tr>
@@ -115,7 +115,7 @@
         <table>
             <tr>
                 <td>Project</td>
-                <td>{{ $project.Name }} [{{ $project.Id }}]</td>
+                <td>{{ $project.Name }} [{{ printf "%.7s" $project.Id }}]</td>
             </tr>
             <tr>
                 <td>Creation time:</td>
@@ -190,7 +190,7 @@
                 <table>
                     <tr>
                         <td>Project:</td>
-                        <td>{{ $project.Name }} [{{ $project.Id }}]</td>
+                        <td>{{ $project.Name }} [{{ printf "%.7s" $project.Id }}]</td>
                     </tr>
                     <tr>
                         <td>Creation time:</td>
@@ -238,7 +238,7 @@
             </tr>
             {{ range $test := $curr.MostExecutedTests }}
             <tr>
-                <td>[{{ $test.Id }}]</td>
+                <td>{{ printf "%.7s" $test.Id }}</td>
                 <td>{{ $test.Name }}</td>
                 <td>{{ $curr.MostExecutedTestsNr }}</td>
             </tr>
@@ -258,7 +258,7 @@
             {{ range $test := $curr.LeastExecutedTests }}
             <tr>
 
-                <td>[{{ $test.Id }}]</td>
+                <td>{{ printf "%.7s" $test.Id }}</td>
                 <td>{{ $test.Name }}</td>
                 <td>{{ $curr.LeastExecutedTestsNr }}</td>
             </tr>

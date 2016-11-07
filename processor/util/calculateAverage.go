@@ -17,7 +17,6 @@ const (
 )
 
 func StatisticsCalculateAverages(dataList []model.CollectedData) (model.Statistic, map[string]model.Statistic) {
-
 	s := ConstructStatistics(dataList)
 
 	separatedByIp := SeparateByIp(dataList)
