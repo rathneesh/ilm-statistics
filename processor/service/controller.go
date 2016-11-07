@@ -38,6 +38,6 @@ func CreateStatistic(stat model.CollectedData) model.CollectedData{
 	return repository.CreateStatistic(stat)
 }
 
-func GetTodaysData() []model.CollectedData {
-	return repository.GetTodaysData()
+func GetYesterdaysData() []byte {
+	return repository.GetYesterdaysData()
 }

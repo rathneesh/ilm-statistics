@@ -24,7 +24,7 @@ var routes = Routes{
 	Route{
 		"StatisticsIndex",
 		"GET",
-		"/statistics",
+		"/",
 		GetStatistics,
 	},
 	Route{

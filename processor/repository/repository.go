@@ -63,38 +63,19 @@ func CreateStatistic(s model.CollectedData) model.CollectedData {
 	return s
 }
 
-func GetTodaysData() []model.CollectedData {
+func GetYesterdaysData() []byte {
 	log.Println("Getting today's statistics")
 
-	data, err := ioutil.ReadFile(tmpfilename)
+	yesterday := time.Now().Add(-24 * time.Hour)
+	tmpDataHtmlAux := []string{HTMLFOLDER, strconv.Itoa(int(yesterday.Month())), DELIMITER, strconv.Itoa(int(yesterday.Day())), DELIMITER, strconv.Itoa(int(yesterday.Year())), HTMLEXTENSION}
+	tmpDataHtml := strings.Join(tmpDataHtmlAux, "")
+
+	data, err := ioutil.ReadFile(tmpDataHtml)
 	if err != nil {
 		log.Println(err)
-		return []model.CollectedData{}
+		return []byte{}
 	}
-	var statsDiff []model.CollectedDataDiff
-	err = json.Unmarshal(data, &statsDiff)
-	if err != nil {
-		log.Println(err)
-		return []model.CollectedData{}
-	}
-
-	statisticsMap := map[string]model.CollectedData{}
-
-	stats := []model.CollectedData{}
-
-	// Suppose the data was saved ordered
-	// TODO check the order of the data
-
-	for _, collData := range statsDiff {
-		if statisticsMap[collData.MAC].MAC == ""{
-			statisticsMap[collData.MAC] = model.CollectedData{MAC:collData.MAC}
-		}
-
-		stats = append(stats, util.MergeDiff(statisticsMap[collData.MAC], collData))
-		statisticsMap[collData.MAC] = util.MergeDiff(statisticsMap[collData.MAC], collData)
-	}
-
-	return stats
+	return data
 }
 
 func UpdateTmpFileName(){
