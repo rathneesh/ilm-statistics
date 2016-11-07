@@ -44,7 +44,6 @@ func ConstructStatistics(dataList []model.CollectedData) model.Statistic {
 	s.Projects.ImagesInProjects = CalculateNumberOfImages(nameToImage)
 	s.Projects.AvgTestsInProjects = CalculateAverageTestPerProject(idToTest, idToProject)
 	s.Projects.AvgImagesInProjects = CalculateAverageImagePerProject(nameToImage, idToProject)
-	s.Projects.SuccessRate, s.Projects.FailureRate = CalculateAllProjectsOutcomeRates(idToProject)
 	s.Tests.Total = CalculateNumberOfTests(idToTest)
 	s.MostUsedImages = CalculateMostUsedImages(idToProject)
 	s.HourlyActivities = CalculateNumberOfTestsInEachHour(idToBuild, idToTest)
@@ -52,6 +51,7 @@ func ConstructStatistics(dataList []model.CollectedData) model.Statistic {
 	s.MostPopularProjects, s.MaxProjectPopularity = CalculateMostExecutedProjects(idToBuild, idToProject)
 	s.ImagesInProjects = ShowImagesInProjects(idToProject)
 	s.ProjectsSuccess, s.ProjectsFailure = CalculatePerProjectOutcomeRates(idToBuild, idToProject)
+	s.Projects.SuccessRate, s.Projects.FailureRate = CalculateAllProjectsOutcomeRates(s.ProjectsSuccess, s.ProjectsFailure)
 	s.MostExecutedTests, s.MostExecutedTestsNr = CalculateMostExecutedTests(idToBuild, idToTest)
 	s.LeastExecutedTests, s.LeastExecutedTestsNr = CalculateLeastExecutedTests(idToBuild, idToTest)
 	s.Vulnerabilities = CalculateNoOfVulnerabilitiesFound(dataList, idToBuild)
@@ -131,17 +131,14 @@ func CalculateAverageTestPerProject(idToTest map[string]model.Test, idToProject 
 	return float64(CalculateNumberOfTests(idToTest))/float64(CalculateNumberOfProjects(idToProject))
 }
 
-func CalculateAllProjectsOutcomeRates(idToProject map[string]model.Project) (float64, float64) {
-	projectsSuccess := 0
-	projectsFailure := 0
+func CalculateAllProjectsOutcomeRates(idToSuccess map[string]float64, idToFailure map[string]float64) (float64, float64) {
+	var projectsSuccess, projectsFailure float64
+	projectsSuccess = 0
+	projectsFailure = 0
 
-	for _, project := range idToProject {
-		if project.Status == SUCCESS {
-			projectsSuccess ++
-		}
-		if project.Status == FAILURE {
-			projectsFailure ++
-		}
+	for id := range idToSuccess {
+		projectsSuccess += idToSuccess[id]
+		projectsFailure += idToFailure[id]
 	}
 
 	if projectsSuccess+projectsFailure == 0 {
