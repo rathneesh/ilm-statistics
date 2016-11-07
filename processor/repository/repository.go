@@ -92,7 +92,7 @@ func UpdateTmpFileName(){
 
 func SaveStatisticsToFile(attachment []byte){
 	log.Println("Saving the sent statistics to a html file")
-	f, err := os.OpenFile(tmpHtmlFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(tmpHtmlFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Println(err)
 		return
