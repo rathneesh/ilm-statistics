@@ -28,7 +28,7 @@ func CmpImages(img1, img2 model.Image) bool {
 		for i := 0; i < len(img1.IlmTags); i++ {
 			for j := 0; j < len(img2.IlmTags); j++ {
 				if img1.IlmTags[i] == img2.IlmTags[j] {
-					similar ++
+					similar++
 				}
 			}
 		}
@@ -79,7 +79,7 @@ func CmpProjects(proj1, proj2 model.Project) bool {
 		for i := 0; i < len(proj1.Images); i++ {
 			for j := 0; j < len(proj2.Images); j++ {
 				if CmpImages(proj1.Images[i], proj2.Images[j]) {
-					similar ++
+					similar++
 				}
 			}
 		}
@@ -95,7 +95,7 @@ func CmpProjects(proj1, proj2 model.Project) bool {
 		for i := 0; i < len(proj1.Tests); i++ {
 			for j := 0; j < len(proj2.Tests); j++ {
 				if CmpTests(proj1.Tests[i], proj2.Tests[j]) {
-					similar ++
+					similar++
 				}
 			}
 		}
@@ -108,7 +108,7 @@ func CmpProjects(proj1, proj2 model.Project) bool {
 }
 
 // Compare two builds
-func CmpBuilds(build1, build2 model.Build) bool{
+func CmpBuilds(build1, build2 model.Build) bool {
 	return build1 == build2
 }
 
@@ -119,7 +119,7 @@ func CmpRegistries(reg1, reg2 model.Registry) bool {
 
 //Compre two BuildResults
 func CmpBuildResults(res1, res2 model.BuildResult) bool {
-	if res1.Id != res2.Id{
+	if res1.Id != res2.Id {
 		return false
 	}
 	if res1.BuildId != res2.BuildId {
@@ -132,7 +132,7 @@ func CmpBuildResults(res1, res2 model.BuildResult) bool {
 		for i := 0; i < len(res1.ResultEntries); i++ {
 			for j := 0; j < len(res2.ResultEntries); j++ {
 				if res1.ResultEntries[i] == res2.ResultEntries[j] {
-					similar ++
+					similar++
 				}
 			}
 		}
@@ -144,7 +144,7 @@ func CmpBuildResults(res1, res2 model.BuildResult) bool {
 }
 
 //Compare two repositories
-func CmpRepositories(repo1, repo2 model.Repository) bool{
+func CmpRepositories(repo1, repo2 model.Repository) bool {
 	if repo1.Name != repo2.Name {
 		return false
 	}
@@ -158,7 +158,7 @@ func CmpRepositories(repo1, repo2 model.Repository) bool{
 		for i := 0; i < len(repo1.FsLayers); i++ {
 			for j := 0; j < len(repo2.FsLayers); j++ {
 				if repo1.FsLayers[i] == repo2.FsLayers[j] {
-					similar ++
+					similar++
 				}
 			}
 		}
@@ -174,7 +174,7 @@ func CmpRepositories(repo1, repo2 model.Repository) bool{
 		for i := 0; i < len(repo1.Signatures); i++ {
 			for j := 0; j < len(repo2.Signatures); j++ {
 				if repo1.Signatures[i] == repo2.Signatures[j] {
-					similar ++
+					similar++
 				}
 			}
 		}
@@ -184,16 +184,16 @@ func CmpRepositories(repo1, repo2 model.Repository) bool{
 	}
 
 	if repo1.HasProblems != repo2.HasProblems {
-		return false;
+		return false
 	}
 	if repo1.Message != repo2.Message {
-		return false;
+		return false
 	}
 	if repo1.RegistryUrl != repo2.RegistryUrl {
-		return false;
+		return false
 	}
 	if repo1.RegistryName != repo2.RegistryName {
-		return false;
+		return false
 	}
 	return true
 }

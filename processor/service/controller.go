@@ -1,11 +1,11 @@
 package service
 
 import (
-	"log"
-	"github.com/ilm-statistics/ilm-statistics/processor/util"
-	"time"
-	"github.com/ilm-statistics/ilm-statistics/processor/repository"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"github.com/ilm-statistics/ilm-statistics/processor/repository"
+	"github.com/ilm-statistics/ilm-statistics/processor/util"
+	"log"
+	"time"
 )
 
 func SendStatistics() {
@@ -31,10 +31,9 @@ func SendStatistics() {
 		}
 	}()
 
-
 }
 
-func CreateStatistic(stat model.CollectedData) model.CollectedData{
+func CreateStatistic(stat model.CollectedData) model.CollectedData {
 	return repository.CreateStatistic(stat)
 }
 

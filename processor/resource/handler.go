@@ -1,16 +1,16 @@
 package resource
 
 import (
-	"io/ioutil"
-	"io"
 	"encoding/json"
-	"net/http"
-	"time"
-	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"github.com/ilm-statistics/ilm-statistics/processor/service"
+	"io"
+	"io/ioutil"
+	"log"
 	"math"
+	"net/http"
 	"strings"
+	"time"
 )
 
 func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func GetIp(w http.ResponseWriter, r *http.Request) {
 	log.Printf("IP of sender: %s", r.RemoteAddr)
 }
 
-func SendStatistics(){
+func SendStatistics() {
 	service.SendStatistics()
 }
 

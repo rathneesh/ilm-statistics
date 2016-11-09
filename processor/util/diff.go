@@ -192,7 +192,7 @@ func DiffResultList(oldResults, newResults []model.BuildResult) ([]model.BuildRe
 		}
 	}
 
-	for _, res1 := range oldResults{
+	for _, res1 := range oldResults {
 		found := false
 		for _, res2 := range newResults {
 			if CmpBuildResults(res1, res2) {

@@ -39,7 +39,7 @@ func MergeImageLists(starterImages []model.Image, addedImages []model.Image) []m
 	return starterImages
 }
 
-func appendIfMissingImage(imageList []model.Image, image model.Image) []model.Image{
+func appendIfMissingImage(imageList []model.Image, image model.Image) []model.Image {
 	for _, e := range imageList {
 		if CmpImages(e, image) {
 			return imageList
@@ -56,7 +56,7 @@ func MergeProjectLists(starterProjects []model.Project, addedProjects []model.Pr
 	return starterProjects
 }
 
-func appendIfMissingProject(projectList []model.Project, project model.Project) []model.Project{
+func appendIfMissingProject(projectList []model.Project, project model.Project) []model.Project {
 	for _, e := range projectList {
 		if CmpProjects(e, project) {
 			return projectList
@@ -73,7 +73,7 @@ func MergeBuildLists(starterBuilds []model.Build, addedBuilds []model.Build) []m
 	return starterBuilds
 }
 
-func appendIfMissingBuild(buildList []model.Build, build model.Build) []model.Build{
+func appendIfMissingBuild(buildList []model.Build, build model.Build) []model.Build {
 	for _, e := range buildList {
 		if CmpBuilds(e, build) {
 			return buildList
@@ -90,7 +90,7 @@ func MergeRegistryLists(starterRegistries []model.Registry, addedRegistries []mo
 	return starterRegistries
 }
 
-func appendIfMissingRegistry(registryList []model.Registry, registry model.Registry) []model.Registry{
+func appendIfMissingRegistry(registryList []model.Registry, registry model.Registry) []model.Registry {
 	for _, e := range registryList {
 		if CmpRegistries(e, registry) {
 			return registryList
@@ -107,7 +107,7 @@ func MergeTestLists(starterTests []model.Test, addedTests []model.Test) []model.
 	return starterTests
 }
 
-func appendIfMissingTest(testList []model.Test, test model.Test) []model.Test{
+func appendIfMissingTest(testList []model.Test, test model.Test) []model.Test {
 	for _, e := range testList {
 		if CmpTests(e, test) {
 			return testList
@@ -124,7 +124,7 @@ func MergeResultLists(starterResults []model.BuildResult, addedResults []model.B
 	return starterResults
 }
 
-func appendIfMissingResult(resultList []model.BuildResult, result model.BuildResult) []model.BuildResult{
+func appendIfMissingResult(resultList []model.BuildResult, result model.BuildResult) []model.BuildResult {
 	for _, e := range resultList {
 		if CmpBuildResults(e, result) {
 			return resultList

@@ -1,26 +1,27 @@
 package repository
 
 import (
-	"time"
 	"encoding/json"
-	"io/ioutil"
-	"strings"
-	"strconv"
-	"log"
-	"sync"
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"github.com/ilm-statistics/ilm-statistics/processor/util"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 )
 
 const (
-	FOLDER = "data/"
-	HTMLFOLDER = "web/"
-	EXTENSION = ".json"
+	FOLDER        = "data/"
+	HTMLFOLDER    = "web/"
+	EXTENSION     = ".json"
 	HTMLEXTENSION = ".html"
-	DELIMITER = "-"
+	DELIMITER     = "-"
 )
+
 var tmpfilename string
 var tmpHtmlFileName string
 var statistics map[string]model.CollectedData
@@ -78,19 +79,19 @@ func GetYesterdaysData() []byte {
 	return data
 }
 
-func UpdateTmpFileName(){
+func UpdateTmpFileName() {
 	tmpData := []string{FOLDER, strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())), EXTENSION}
 	tmpDataHtml := []string{HTMLFOLDER, strconv.Itoa(int(time.Now().Month())), DELIMITER, strconv.Itoa(int(time.Now().Day())), DELIMITER, strconv.Itoa(int(time.Now().Year())), HTMLEXTENSION}
 	if tmpfilename != strings.Join(tmpData, "") {
 		statistics = map[string]model.CollectedData{}
 		tmpfilename = strings.Join(tmpData, "")
 	}
-	if tmpHtmlFileName != strings.Join(tmpDataHtml, ""){
+	if tmpHtmlFileName != strings.Join(tmpDataHtml, "") {
 		tmpHtmlFileName = strings.Join(tmpDataHtml, "")
 	}
 }
 
-func SaveStatisticsToFile(attachment []byte){
+func SaveStatisticsToFile(attachment []byte) {
 	log.Println("Saving the sent statistics to a html file")
 	f, err := os.OpenFile(tmpHtmlFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
@@ -105,15 +106,14 @@ func SaveStatisticsToFile(attachment []byte){
 		return
 	}
 	defer fileMutex.Unlock()
-	log.Println("Saved the statistics to ./"+tmpHtmlFileName)
+	log.Println("Saved the statistics to ./" + tmpHtmlFileName)
 	UpdateTmpFileName()
 }
 
-func InitFromFile(){
+func InitFromFile() {
 	log.Println("Loading past data into memory from", tmpfilename)
-	os.Mkdir("." + string(filepath.Separator) + "data", 0777)
-	os.Mkdir("." + string(filepath.Separator) + "web", 0777)
-
+	os.Mkdir("."+string(filepath.Separator)+"data", 0777)
+	os.Mkdir("."+string(filepath.Separator)+"web", 0777)
 
 	statistics = map[string]model.CollectedData{}
 	diffData = []model.CollectedDataDiff{}
@@ -130,8 +130,8 @@ func InitFromFile(){
 	}
 
 	for _, collData := range diffData {
-		if statistics[collData.MAC].MAC == ""{
-			statistics[collData.MAC] = model.CollectedData{MAC:collData.MAC}
+		if statistics[collData.MAC].MAC == "" {
+			statistics[collData.MAC] = model.CollectedData{MAC: collData.MAC}
 		}
 
 		statistics[collData.MAC] = util.MergeDiff(statistics[collData.MAC], collData)
@@ -143,10 +143,10 @@ func GetDataForEmail() []model.CollectedData {
 
 	var statsDiff, statsDiffAux []model.CollectedDataDiff
 
-	files, _ := ioutil.ReadDir("."+string(filepath.Separator)+FOLDER)
+	files, _ := ioutil.ReadDir("." + string(filepath.Separator) + FOLDER)
 
 	for _, f := range files {
-		statsDiffAux = readDiffsFromFile("."+string(filepath.Separator)+FOLDER + f.Name())
+		statsDiffAux = readDiffsFromFile("." + string(filepath.Separator) + FOLDER + f.Name())
 		statsDiff = append(statsDiff, statsDiffAux...)
 	}
 
@@ -155,8 +155,8 @@ func GetDataForEmail() []model.CollectedData {
 	stats := []model.CollectedData{}
 
 	for _, collData := range statsDiff {
-		if statisticsMap[collData.MAC].MAC == ""{
-			statisticsMap[collData.MAC] = model.CollectedData{MAC:collData.MAC}
+		if statisticsMap[collData.MAC].MAC == "" {
+			statisticsMap[collData.MAC] = model.CollectedData{MAC: collData.MAC}
 		}
 
 		statisticsMap[collData.MAC] = util.MergeDiff(statisticsMap[collData.MAC], collData)
@@ -166,8 +166,8 @@ func GetDataForEmail() []model.CollectedData {
 	return stats
 }
 
-func readDiffsFromFile(fileName string) []model.CollectedDataDiff{
-	log.Println("Loading data from "+fileName)
+func readDiffsFromFile(fileName string) []model.CollectedDataDiff {
+	log.Println("Loading data from " + fileName)
 	diffData = []model.CollectedDataDiff{}
 
 	data, err := ioutil.ReadFile(fileName)

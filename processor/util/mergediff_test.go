@@ -1,8 +1,8 @@
 package util
 
 import (
-	"testing"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"testing"
 	"time"
 )
 
@@ -34,7 +34,6 @@ func TestMergeImageLists(t *testing.T) {
 		t.Error(testedFuncName + "Adding a the same element again to the initial list gave an unexpected result")
 	}
 
-
 }
 
 func TestMergeProjectLists(t *testing.T) {
@@ -57,7 +56,6 @@ func TestMergeProjectLists(t *testing.T) {
 	if len(MergeProjectLists(initList, addedProjects)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error("Adding a one-elemented list to the initial list gave an unexpected result")
 	}
-
 
 	// Merge already present project
 
@@ -85,7 +83,7 @@ func TestMergeBuildLists(t *testing.T) {
 
 	// Merge 1 added build
 
-	addedBuilds = []model.Build{{ Id: "1"}}
+	addedBuilds = []model.Build{{Id: "1"}}
 	add, del := DiffBuildList(MergeBuildLists(initList, addedBuilds), addedBuilds)
 	if len(MergeBuildLists(initList, addedBuilds)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error(testedFuncName, "Adding a one-elemented list to the initial list gave an unexpected result")
@@ -122,7 +120,6 @@ func TestMergeRegistryLists(t *testing.T) {
 	if len(MergeRegistryLists(initList, addedRegistries)) != 1 || len(add) != 0 || len(del) != 0 {
 		t.Error(testedFuncName, "Adding a one-elemented list to the initial list gave an unexpected result")
 	}
-
 
 	// Merge already present registry
 
@@ -187,7 +184,6 @@ func TestMergeResultLists(t *testing.T) {
 		t.Error("Adding a one-elemented list to the initial list gave an unexpected result")
 	}
 
-
 	// Merge already present result
 
 	initList = []model.BuildResult{{Id: "1"}}
@@ -244,67 +240,67 @@ func TestMergeDiff(t *testing.T) {
 
 	// Merge 2 non-empty objects
 
-	initData = model.CollectedData {
-		MAC: "co:mp:ut:er",
+	initData = model.CollectedData{
+		MAC:      "co:mp:ut:er",
 		Username: "uname",
 		Images: []model.Image{{
-			Id: "1",
-			Name: "Image1",
-			ImageId: "1",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "1",
+			Name:           "Image1",
+			ImageId:        "1",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		}, {
-			Id: "2",
-			Name: "Image2",
-			ImageId: "2",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "2",
+			Name:           "Image2",
+			ImageId:        "2",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		}},
 		Projects: []model.Project{{
-			Id: "1",
-			Name: "Project1",
+			Id:           "1",
+			Name:         "Project1",
 			CreationTime: "2002",
-			Status: "new",
-			Images: []model.Image{},
-			Tests: []model.Test{},
+			Status:       "new",
+			Images:       []model.Image{},
+			Tests:        []model.Test{},
 		},
 			{
-				Id: "2",
-				Name: "Project2",
+				Id:           "2",
+				Name:         "Project2",
 				CreationTime: "2002",
-				Status: "new",
-				Images: []model.Image{},
-				Tests: []model.Test{},
+				Status:       "new",
+				Images:       []model.Image{},
+				Tests:        []model.Test{},
 			}},
 		Builds: []model.Build{{
-			Id: "1",
+			Id:        "1",
 			ProjectId: "1",
-			TestId: "1",
+			TestId:    "1",
 			StartTime: "2002",
-			Status: model.Status{Status:"new"},
+			Status:    model.Status{Status: "new"},
 		},
 			{
-				Id: "2",
+				Id:        "2",
 				ProjectId: "2",
-				TestId: "2",
+				TestId:    "2",
 				StartTime: "2002",
-				Status: model.Status{Status:"new"},
+				Status:    model.Status{Status: "new"},
 			}},
 		Registries: []model.Registry{{
-			Id: "1",
+			Id:   "1",
 			Name: "Private1",
 			Addr: "localhost:5000",
 		},
 			{
-				Id: "2",
+				Id:   "2",
 				Name: "Private2",
 				Addr: "localhost:5002",
 			}},
@@ -321,83 +317,83 @@ func TestMergeDiff(t *testing.T) {
 				},
 			}},
 		Results: []model.BuildResult{{
-			Id: "1",
-			BuildId: "1",
-			ResultEntries: []string{"1","2"},
-			},
+			Id:            "1",
+			BuildId:       "1",
+			ResultEntries: []string{"1", "2"},
+		},
 			{
-				Id: "2",
-				BuildId: "2",
-				ResultEntries: []string{"1","2"},
+				Id:            "2",
+				BuildId:       "2",
+				ResultEntries: []string{"1", "2"},
 			}},
 		Day: time.Now(),
 	}
 
-	finalData = model.CollectedDataDiff {
-		MAC: "co:mp:ut:er",
+	finalData = model.CollectedDataDiff{
+		MAC:         "co:mp:ut:er",
 		NewUserName: "uname",
 		AddedImages: []model.Image{},
 		DeletedImages: []model.Image{{
-			Id: "1",
-			Name: "Image1",
-			ImageId: "1",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "1",
+			Name:           "Image1",
+			ImageId:        "1",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		}, {
-			Id: "2",
-			Name: "Image2",
-			ImageId: "2",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "2",
+			Name:           "Image2",
+			ImageId:        "2",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		}},
 		AddedProjects: []model.Project{},
 		DeletedProjects: []model.Project{{
-			Id: "1",
-			Name: "Project1",
+			Id:           "1",
+			Name:         "Project1",
 			CreationTime: "2002",
-			Status: "new",
-			Images: []model.Image{},
-			Tests: []model.Test{},
+			Status:       "new",
+			Images:       []model.Image{},
+			Tests:        []model.Test{},
 		},
 			{
-				Id: "2",
-				Name: "Project2",
+				Id:           "2",
+				Name:         "Project2",
 				CreationTime: "2002",
-				Status: "new",
-				Images: []model.Image{},
-				Tests: []model.Test{},
-			},},
+				Status:       "new",
+				Images:       []model.Image{},
+				Tests:        []model.Test{},
+			}},
 		AddedBuilds: []model.Build{},
 		DeletedBuilds: []model.Build{{
-			Id: "1",
+			Id:        "1",
 			ProjectId: "1",
-			TestId: "1",
+			TestId:    "1",
 			StartTime: "2002",
-			Status: model.Status{Status:"new"},
+			Status:    model.Status{Status: "new"},
 		},
 			{
-				Id: "2",
+				Id:        "2",
 				ProjectId: "2",
-				TestId: "2",
+				TestId:    "2",
 				StartTime: "2002",
-				Status: model.Status{Status:"new"},
+				Status:    model.Status{Status: "new"},
 			}},
 		AddedRegistries: []model.Registry{},
 		DeletedRegistries: []model.Registry{{
-			Id: "1",
+			Id:   "1",
 			Name: "Private1",
 			Addr: "localhost:5000",
 		},
 			{
-				Id: "2",
+				Id:   "2",
 				Name: "Private2",
 				Addr: "localhost:5002",
 			}},
@@ -416,18 +412,17 @@ func TestMergeDiff(t *testing.T) {
 			}},
 		AddedResults: []model.BuildResult{},
 		DeletedResults: []model.BuildResult{{
-			Id: "1",
-			BuildId: "1",
-			ResultEntries: []string{"1","2"},
+			Id:            "1",
+			BuildId:       "1",
+			ResultEntries: []string{"1", "2"},
 		},
 			{
-				Id: "2",
-				BuildId: "2",
-				ResultEntries: []string{"1","2"},
+				Id:            "2",
+				BuildId:       "2",
+				ResultEntries: []string{"1", "2"},
 			}},
 		NewDay: time.Now(),
 	}
-
 
 	dataDiff = MergeDiff(initData, finalData)
 

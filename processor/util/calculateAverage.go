@@ -1,14 +1,14 @@
 package util
 
 import (
-	"math"
-	"strings"
-	"time"
-	"strconv"
-	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"log"
+	"math"
 	"regexp"
 	"sort"
+	"strconv"
+	"strings"
+	"time"
 )
 
 const (
@@ -62,7 +62,7 @@ func ConstructStatistics(dataList []model.CollectedData) model.Statistic {
 
 func mapIdToProject(dataList []model.CollectedData) map[string]model.Project {
 	idToProject := map[string]model.Project{}
-	for _, data := range dataList{
+	for _, data := range dataList {
 		for _, project := range data.Projects {
 			idToProject[project.Id] = project
 		}
@@ -72,7 +72,7 @@ func mapIdToProject(dataList []model.CollectedData) map[string]model.Project {
 
 func mapIdToTest(dataList []model.CollectedData) map[string]model.Test {
 	idToTest := map[string]model.Test{}
-	for _, data := range dataList{
+	for _, data := range dataList {
 		for _, test := range data.Tests {
 			idToTest[test.Id] = test
 		}
@@ -110,7 +110,6 @@ func mapIdToRegistry(dataList []model.CollectedData) map[string]model.Registry {
 	return idToRegistry
 }
 
-
 func CalculateNumberOfImages(nameToImage map[string]model.Image) int {
 	return len(nameToImage)
 }
@@ -124,11 +123,11 @@ func CalculateNumberOfProjects(idToProject map[string]model.Project) int {
 }
 
 func CalculateAverageImagePerProject(nameToImage map[string]model.Image, idToProject map[string]model.Project) float64 {
-	return float64(CalculateNumberOfImages(nameToImage))/float64(CalculateNumberOfProjects(idToProject))
+	return float64(CalculateNumberOfImages(nameToImage)) / float64(CalculateNumberOfProjects(idToProject))
 }
 
 func CalculateAverageTestPerProject(idToTest map[string]model.Test, idToProject map[string]model.Project) float64 {
-	return float64(CalculateNumberOfTests(idToTest))/float64(CalculateNumberOfProjects(idToProject))
+	return float64(CalculateNumberOfTests(idToTest)) / float64(CalculateNumberOfProjects(idToProject))
 }
 
 func CalculateAllProjectsOutcomeRates(idToSuccess map[string]float64, idToFailure map[string]float64) (float64, float64) {
@@ -145,15 +144,15 @@ func CalculateAllProjectsOutcomeRates(idToSuccess map[string]float64, idToFailur
 		return 0, 0
 	}
 
-	return float64(projectsSuccess * 100)/float64(projectsSuccess+projectsFailure), float64(projectsFailure * 100)/float64(projectsSuccess+projectsFailure)
+	return float64(projectsSuccess*100) / float64(projectsSuccess+projectsFailure), float64(projectsFailure*100) / float64(projectsSuccess+projectsFailure)
 }
 
-func CalculatePerProjectOutcomeRates(idToBuild map[string]model.Build, idToProject map[string]model.Project) (map[string]float64, map[string]float64){
+func CalculatePerProjectOutcomeRates(idToBuild map[string]model.Build, idToProject map[string]model.Project) (map[string]float64, map[string]float64) {
 	projectsSuccess := map[string]float64{}
 	projectsFailure := map[string]float64{}
 
 	for _, build := range idToBuild {
-		if !CmpProjects(idToProject[build.ProjectId], model.Project{}) && build.Status.Status == SUCCESS{
+		if !CmpProjects(idToProject[build.ProjectId], model.Project{}) && build.Status.Status == SUCCESS {
 			projectsSuccess[build.ProjectId]++
 		} else if !CmpProjects(idToProject[build.ProjectId], model.Project{}) && build.Status.Status == FAILURE {
 			projectsFailure[build.ProjectId]++
@@ -166,8 +165,8 @@ func CalculatePerProjectOutcomeRates(idToBuild map[string]model.Build, idToProje
 			projectsFailure[id] = 0
 		} else {
 			denominator := float64(projectsSuccess[id] + projectsFailure[id])
-			projectsSuccess[id] = float64(projectsSuccess[id] * 100) / denominator
-			projectsFailure[id] = float64(projectsFailure[id] * 100) / denominator
+			projectsSuccess[id] = float64(projectsSuccess[id]*100) / denominator
+			projectsFailure[id] = float64(projectsFailure[id]*100) / denominator
 		}
 	}
 
@@ -183,7 +182,7 @@ func CalculateMostExecutedProjects(idToBuild map[string]model.Build, idToProject
 
 	max := 0
 	projects := []model.Project{}
-	for id, occurrence := range mostExecutedProjects{
+	for id, occurrence := range mostExecutedProjects {
 		if occurrence > max {
 			projects = []model.Project{idToProject[id]}
 			max = occurrence
@@ -195,7 +194,7 @@ func CalculateMostExecutedProjects(idToBuild map[string]model.Build, idToProject
 	return projects, max
 }
 
-func CalculateMostUsedImages(idToProject map[string]model.Project) model.PairList{
+func CalculateMostUsedImages(idToProject map[string]model.Project) model.PairList {
 	mostUsedImages := map[string]int{}
 
 	for _, project := range idToProject {
@@ -210,7 +209,7 @@ func CalculateMostUsedImages(idToProject map[string]model.Project) model.PairLis
 func ShowImagesInProjects(idToProject map[string]model.Project) map[string][]model.Project {
 	imagesInProjects := map[string][]model.Project{}
 
-	for _, project := range idToProject{
+	for _, project := range idToProject {
 		for _, image := range project.Images {
 			imagesInProjects[image.Name+":"+image.Tag] = append(imagesInProjects[image.Name+":"+image.Tag], project)
 		}
@@ -219,7 +218,7 @@ func ShowImagesInProjects(idToProject map[string]model.Project) map[string][]mod
 	return imagesInProjects
 }
 
-func CalculateMostExecutedTests(idToBuild map[string]model.Build, idToTest map[string]model.Test) ([]model.Test, int){
+func CalculateMostExecutedTests(idToBuild map[string]model.Build, idToTest map[string]model.Test) ([]model.Test, int) {
 	buildsToTest := map[string][]model.Build{}
 	mostExecutedTestsNr := 0
 	mostExecutedTests := []model.Test{}
@@ -241,7 +240,7 @@ func CalculateMostExecutedTests(idToBuild map[string]model.Build, idToTest map[s
 	return mostExecutedTests, mostExecutedTestsNr
 }
 
-func CalculateLeastExecutedTests(idToBuild map[string]model.Build, idToTest map[string]model.Test) ([]model.Test, int){
+func CalculateLeastExecutedTests(idToBuild map[string]model.Build, idToTest map[string]model.Test) ([]model.Test, int) {
 	buildsToTest := map[string][]model.Build{}
 	leastExecutedTestsNr := math.MaxInt32
 	leastExecutedTests := []model.Test{}
@@ -292,14 +291,14 @@ func CalculateNumberOfTestsInEachHour(idToBuild map[string]model.Build, idToTest
 
 		t := strings.Split(datetime[1], ":")
 		hour := t[0]
-		hr, err := strconv.Atoi(hour);
+		hr, err := strconv.Atoi(hour)
 		if err != nil {
 			log.Println(err)
 		} else {
 			//Number today's hourly activities
-			if (year == now.Year() && time.Month(month) == now.Month() && day == now.Day()) {
-				for id := range idToTest{
-					if (build.TestId == id) {
+			if year == now.Year() && time.Month(month) == now.Month() && day == now.Day() {
+				for id := range idToTest {
+					if build.TestId == id {
 						hourlyActivities[hr]++
 					}
 				}
@@ -366,7 +365,7 @@ func CalculateNoOfVulnerabilitiesFound(dataList []model.CollectedData, idToBuild
 
 //As seen in http://stackoverflow.com/questions/18695346/how-to-sort-a-mapstringint-by-its-values
 
-func rankByValue(stringToInt map[string]int) model.PairList{
+func rankByValue(stringToInt map[string]int) model.PairList {
 	pl := make(model.PairList, len(stringToInt))
 	i := 0
 	for k, v := range stringToInt {
@@ -381,7 +380,7 @@ func ShowImagesInRegistries(nameToImage map[string]model.Image, idToRegistry map
 	imagesInRegistries := map[string][]string{}
 
 	for name, image := range nameToImage {
-		if (image.Location == "Public Registry") {
+		if image.Location == "Public Registry" {
 			imagesInRegistries["Public Registry"] = append(imagesInRegistries["Public Registry"], name)
 		} else if CmpRegistries(idToRegistry[image.RegistryId], model.Registry{}) {
 			imagesInRegistries["Unidentifiable Registry"] = append(imagesInRegistries[image.RegistryId], name)
@@ -393,7 +392,7 @@ func ShowImagesInRegistries(nameToImage map[string]model.Image, idToRegistry map
 	return imagesInRegistries
 }
 
-func SeparateByIp(dataList []model.CollectedData) map[string][]model.CollectedData{
+func SeparateByIp(dataList []model.CollectedData) map[string][]model.CollectedData {
 	separatedByIp := map[string][]model.CollectedData{}
 	for _, data := range dataList {
 		separatedByIp[data.Ip] = appendIfMissingCollectedData(separatedByIp[data.Ip], data)
