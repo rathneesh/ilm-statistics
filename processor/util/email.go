@@ -2,71 +2,71 @@ package util
 
 import (
 	"bytes"
-	"html/template"
-	"net/smtp"
-	"log"
-	"strconv"
 	"github.com/ilm-statistics/ilm-statistics/model"
-	"path/filepath"
-	"io/ioutil"
-	"gopkg.in/yaml.v2"
 	"github.com/scorredoira/email"
+	"gopkg.in/yaml.v2"
+	"html/template"
+	"io/ioutil"
+	"log"
 	"net/mail"
+	"net/smtp"
+	"path/filepath"
+	"strconv"
 )
 
 const (
 	EMAILCONFIGFILE = "./emailConfig.yml"
-	TEMPLATEPATH = "./processor/util/emailTemplate.html"
-	ATTACHMENTPATH = "./processor/util/attachmentTemplate.html"
-	ATTACHMENTNAME = "statisticsForAll.html"
+	TEMPLATEPATH    = "./processor/util/emailTemplate.html"
+	ATTACHMENTPATH  = "./processor/util/attachmentTemplate.html"
+	ATTACHMENTNAME  = "statisticsForAll.html"
 )
 
 type EmailConfig struct {
-	Subject string
+	Subject    string
 	SmtpServer string
-	SmtpPort string
-	From string
-	Password string
-	To []string
+	SmtpPort   string
+	From       string
+	Password   string
+	To         []string
 }
 
 type StatsToSend struct {
-	Ip string
-	Users int
-	Accounts int
-	AverageAccountsPerUser string
-	IsActivity bool
-	Hours map[int]int
-	BusiestHours []int
-	Tests int
-	Projects int
-	AverageTestsPerProject string
-	Images int
-	AverageImagesPerProject string
-	SuccessRate string
-	FailureRate string
-	MostPopularProjects []model.Project
-	MaxProjectPopularity int
-	ImagesInProjects map[string][]model.Project
-	ProjectsList map[string]model.Project
-	ProjectsSuccess map[string]string
-	ProjectsFailure map[string]string
-	MostUsedImages model.PairList
-	LeastUsedImages []string
+	Ip                       string
+	Users                    int
+	Accounts                 int
+	AverageAccountsPerUser   string
+	IsActivity               bool
+	Hours                    map[int]int
+	BusiestHours             []int
+	Tests                    int
+	Projects                 int
+	AverageTestsPerProject   string
+	Images                   int
+	AverageImagesPerProject  string
+	SuccessRate              string
+	FailureRate              string
+	MostPopularProjects      []model.Project
+	MaxProjectPopularity     int
+	ImagesInProjects         map[string][]model.Project
+	ProjectsList             map[string]model.Project
+	ProjectsSuccess          map[string]string
+	ProjectsFailure          map[string]string
+	MostUsedImages           model.PairList
+	LeastUsedImages          []string
 	LeastUsedImageOccurrence int
-	MostExecutedTests []model.Test
-	MostExecutedTestsNr int
-	LeastExecutedTests []model.Test
-	LeastExecutedTestsNr int
-	Vulnerabilities model.NoOfVulnerabilitiesWithLinksList
-	ImagesInRegistries map[string][]string
+	MostExecutedTests        []model.Test
+	MostExecutedTestsNr      int
+	LeastExecutedTests       []model.Test
+	LeastExecutedTestsNr     int
+	Vulnerabilities          model.NoOfVulnerabilitiesWithLinksList
+	ImagesInRegistries       map[string][]string
 }
 
 type StatsToSendList []StatsToSend
 
 var emailConfig EmailConfig
 
-func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statistic) ([]byte, error){
+func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statistic) ([]byte, error) {
 	log.Println("Start initializing the e-mail")
 
 	log.Println("Loading e-mail configurations from file")
@@ -75,7 +75,6 @@ func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statisti
 	statForIp[""] = stat
 
 	templateData := ConvertStatToTemplate(statForIp)
-
 
 	statforIpEmail := map[string]model.Statistic{}
 	statforIpEmail[""] = stat
@@ -103,18 +102,18 @@ func SendEmailTemplate(stat model.Statistic, statForIp map[string]model.Statisti
 
 //Request struct
 type Request struct {
-	from    string
-	to      []string
-	subject string
-	body    string
+	from       string
+	to         []string
+	subject    string
+	body       string
 	attachment []byte
 }
 
 func NewRequest(to []string, subject, body string, attachment []byte) *Request {
 	return &Request{
-		to:      to,
-		subject: subject,
-		body:    body,
+		to:         to,
+		subject:    subject,
+		body:       body,
 		attachment: attachment,
 	}
 }
@@ -131,7 +130,6 @@ func (r *Request) SendEmail() (bool, error) {
 		log.Println(err)
 		return false, err
 	}
-
 
 	auth := smtp.PlainAuth("", emailConfig.From, emailConfig.Password, emailConfig.SmtpServer)
 	if err := email.Send(addr, auth, m); err != nil {
@@ -200,31 +198,31 @@ func ConvertStatToTemplate(stats map[string]model.Statistic) StatsToSendList {
 
 	for ip, stat := range stats {
 		templateData := StatsToSend{
-			Ip: ip,
-			Users: stat.Users,
-			Accounts: stat.Accounts,
-			AverageAccountsPerUser: strconv.FormatFloat(stat.AvgAccountPerUser, 'f', 2, 64),
-			IsActivity: false,
-			Hours: stat.HourlyActivities,
-			BusiestHours: stat.BusiestHours,
-			Tests: stat.Tests.Total,
-			Projects: stat.Projects.Total,
-			AverageTestsPerProject: strconv.FormatFloat(stat.Projects.AvgTestsInProjects, 'f', 2, 64),
-			Images: stat.Projects.ImagesInProjects,
+			Ip:                      ip,
+			Users:                   stat.Users,
+			Accounts:                stat.Accounts,
+			AverageAccountsPerUser:  strconv.FormatFloat(stat.AvgAccountPerUser, 'f', 2, 64),
+			IsActivity:              false,
+			Hours:                   stat.HourlyActivities,
+			BusiestHours:            stat.BusiestHours,
+			Tests:                   stat.Tests.Total,
+			Projects:                stat.Projects.Total,
+			AverageTestsPerProject:  strconv.FormatFloat(stat.Projects.AvgTestsInProjects, 'f', 2, 64),
+			Images:                  stat.Projects.ImagesInProjects,
 			AverageImagesPerProject: strconv.FormatFloat(stat.Projects.AvgImagesInProjects, 'f', 2, 64),
-			SuccessRate: strconv.FormatFloat(stat.Projects.SuccessRate, 'f', 2, 64),
-			FailureRate: strconv.FormatFloat(stat.Projects.FailureRate, 'f', 2, 64),
-			MostPopularProjects: stat.MostPopularProjects,
-			MaxProjectPopularity: stat.MaxProjectPopularity,
-			ImagesInProjects: stat.ImagesInProjects,
-			ProjectsList: stat.Projects.IdToProject,
-			MostUsedImages: stat.MostUsedImages,
-			MostExecutedTests: stat.MostExecutedTests,
-			MostExecutedTestsNr: stat.MostExecutedTestsNr,
-			LeastExecutedTests: stat.LeastExecutedTests,
-			LeastExecutedTestsNr: stat.LeastExecutedTestsNr,
-			Vulnerabilities: stat.Vulnerabilities,
-			ImagesInRegistries: stat.RegistriesAndImages,
+			SuccessRate:             strconv.FormatFloat(stat.Projects.SuccessRate, 'f', 2, 64),
+			FailureRate:             strconv.FormatFloat(stat.Projects.FailureRate, 'f', 2, 64),
+			MostPopularProjects:     stat.MostPopularProjects,
+			MaxProjectPopularity:    stat.MaxProjectPopularity,
+			ImagesInProjects:        stat.ImagesInProjects,
+			ProjectsList:            stat.Projects.IdToProject,
+			MostUsedImages:          stat.MostUsedImages,
+			MostExecutedTests:       stat.MostExecutedTests,
+			MostExecutedTestsNr:     stat.MostExecutedTestsNr,
+			LeastExecutedTests:      stat.LeastExecutedTests,
+			LeastExecutedTestsNr:    stat.LeastExecutedTestsNr,
+			Vulnerabilities:         stat.Vulnerabilities,
+			ImagesInRegistries:      stat.RegistriesAndImages,
 		}
 
 		if len(templateData.Hours) != 0 {

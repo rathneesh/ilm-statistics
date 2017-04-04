@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/ilm-statistics/ilm-statistics/processor/resource"
+	"github.com/robfig/cron"
 	"log"
 	"net/http"
-	"github.com/robfig/cron"
-	"github.com/ilm-statistics/ilm-statistics/processor/resource"
 )
 
 func main() {

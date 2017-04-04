@@ -1,8 +1,8 @@
 package util
 
 import (
-	"testing"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"testing"
 	"time"
 )
 
@@ -11,46 +11,46 @@ func TestDiffImageList(t *testing.T) {
 
 	// Test if two lists of images are equal
 	imgs1 := []model.Image{{
-		Id: "1",
-		Name: "Image1",
-		ImageId: "1",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "1",
+		Name:           "Image1",
+		ImageId:        "1",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}, {
-		Id: "2",
-		Name: "Image2",
-		ImageId: "2",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "2",
+		Name:           "Image2",
+		ImageId:        "2",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}}
 
 	imgs2 := []model.Image{{
-		Id: "1",
-		Name: "Image1",
-		ImageId: "1",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "1",
+		Name:           "Image1",
+		ImageId:        "1",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}, {
-		Id: "2",
-		Name: "Image2",
-		ImageId: "2",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "2",
+		Name:           "Image2",
+		ImageId:        "2",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}}
 
@@ -61,21 +61,21 @@ func TestDiffImageList(t *testing.T) {
 
 	// Test for adding image
 	img := model.Image{
-		Id: "3",
-		Name: "Image3",
-		ImageId: "3",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "3",
+		Name:           "Image3",
+		ImageId:        "3",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}
 	imgs2 = append(imgs2, img)
 
 	addedImgs, deletedImgs = DiffImageList(imgs1, imgs2)
 
-	if len(addedImgs) != 1 || len(deletedImgs) != 0 || !CmpImages(addedImgs[0], img){
+	if len(addedImgs) != 1 || len(deletedImgs) != 0 || !CmpImages(addedImgs[0], img) {
 		t.Error("Added image not recognized")
 	}
 
@@ -83,21 +83,21 @@ func TestDiffImageList(t *testing.T) {
 	imgs1 = append(imgs1, img)
 
 	img = model.Image{
-		Id: "4",
-		Name: "Image4",
-		ImageId: "4",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "4",
+		Name:           "Image4",
+		ImageId:        "4",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}
 	imgs1 = append(imgs1, img)
 
 	addedImgs, deletedImgs = DiffImageList(imgs1, imgs2)
 
-	if len(addedImgs) != 0 || len(deletedImgs) != 1 || !CmpImages(deletedImgs[0], img){
+	if len(addedImgs) != 0 || len(deletedImgs) != 1 || !CmpImages(deletedImgs[0], img) {
 		t.Error("Deleted image not recognized")
 	}
 
@@ -107,40 +107,40 @@ func TestDiffProjectList(t *testing.T) {
 	t.Parallel()
 
 	// Test for two similar lists
-	projs1 := []model.Project {
+	projs1 := []model.Project{
 		{
-			Id: "1",
-			Name: "Project1",
+			Id:           "1",
+			Name:         "Project1",
 			CreationTime: "2002",
-			Status: "new",
-			Images: []model.Image{},
-			Tests: []model.Test{},
+			Status:       "new",
+			Images:       []model.Image{},
+			Tests:        []model.Test{},
 		},
 		{
-			Id: "2",
-			Name: "Project2",
+			Id:           "2",
+			Name:         "Project2",
 			CreationTime: "2002",
-			Status: "new",
-			Images: []model.Image{},
-			Tests: []model.Test{},
+			Status:       "new",
+			Images:       []model.Image{},
+			Tests:        []model.Test{},
 		},
 	}
-	projs2 := []model.Project {
+	projs2 := []model.Project{
 		{
-			Id: "1",
-			Name: "Project1",
+			Id:           "1",
+			Name:         "Project1",
 			CreationTime: "2002",
-			Status: "new",
-			Images: []model.Image{},
-			Tests: []model.Test{},
+			Status:       "new",
+			Images:       []model.Image{},
+			Tests:        []model.Test{},
 		},
 		{
-			Id: "2",
-			Name: "Project2",
+			Id:           "2",
+			Name:         "Project2",
 			CreationTime: "2002",
-			Status: "new",
-			Images: []model.Image{},
-			Tests: []model.Test{},
+			Status:       "new",
+			Images:       []model.Image{},
+			Tests:        []model.Test{},
 		},
 	}
 
@@ -153,11 +153,11 @@ func TestDiffProjectList(t *testing.T) {
 	// Test for adding project
 
 	proj := model.Project{Id: "3",
-		Name: "Project3",
+		Name:         "Project3",
 		CreationTime: "2002",
-		Status: "new",
-		Images: []model.Image{},
-		Tests: []model.Test{},
+		Status:       "new",
+		Images:       []model.Image{},
+		Tests:        []model.Test{},
 	}
 
 	projs2 = append(projs2, proj)
@@ -173,11 +173,11 @@ func TestDiffProjectList(t *testing.T) {
 	projs1 = append(projs1, proj)
 
 	proj = model.Project{Id: "4",
-		Name: "Project4",
+		Name:         "Project4",
 		CreationTime: "2002",
-		Status: "new",
-		Images: []model.Image{},
-		Tests: []model.Test{},
+		Status:       "new",
+		Images:       []model.Image{},
+		Tests:        []model.Test{},
 	}
 
 	projs1 = append(projs1, proj)
@@ -195,34 +195,34 @@ func TestDiffBuildList(t *testing.T) {
 	// Test for two similar lists
 
 	builds1 := []model.Build{{
-			Id: "1",
-			ProjectId: "1",
-			TestId: "1",
-			StartTime: "2002",
-			Status: model.Status{Status:"new"},
-		},
+		Id:        "1",
+		ProjectId: "1",
+		TestId:    "1",
+		StartTime: "2002",
+		Status:    model.Status{Status: "new"},
+	},
 		{
-			Id: "2",
+			Id:        "2",
 			ProjectId: "2",
-			TestId: "2",
+			TestId:    "2",
 			StartTime: "2002",
-			Status: model.Status{Status:"new"},
+			Status:    model.Status{Status: "new"},
 		},
 	}
 
 	builds2 := []model.Build{{
-			Id: "1",
-			ProjectId: "1",
-			TestId: "1",
-			StartTime: "2002",
-			Status: model.Status{Status:"new"},
-		},
+		Id:        "1",
+		ProjectId: "1",
+		TestId:    "1",
+		StartTime: "2002",
+		Status:    model.Status{Status: "new"},
+	},
 		{
-			Id: "2",
+			Id:        "2",
 			ProjectId: "2",
-			TestId: "2",
+			TestId:    "2",
 			StartTime: "2002",
-			Status: model.Status{Status:"new"},
+			Status:    model.Status{Status: "new"},
 		},
 	}
 
@@ -235,11 +235,11 @@ func TestDiffBuildList(t *testing.T) {
 	// Test for adding build
 
 	build := model.Build{
-		Id: "3",
+		Id:        "3",
 		ProjectId: "3",
-		TestId: "3",
+		TestId:    "3",
 		StartTime: "2002",
-		Status: model.Status{Status:"new"},
+		Status:    model.Status{Status: "new"},
 	}
 
 	builds2 = append(builds2, build)
@@ -254,11 +254,11 @@ func TestDiffBuildList(t *testing.T) {
 	builds1 = append(builds1, build)
 
 	build = model.Build{
-		Id: "4",
+		Id:        "4",
 		ProjectId: "4",
-		TestId: "4",
+		TestId:    "4",
 		StartTime: "2002",
-		Status: model.Status{Status:"new"},
+		Status:    model.Status{Status: "new"},
 	}
 
 	builds1 = append(builds1, build)
@@ -277,12 +277,12 @@ func TestDiffRegistryList(t *testing.T) {
 
 	regs1 := []model.Registry{
 		{
-			Id: "1",
+			Id:   "1",
 			Name: "Private1",
 			Addr: "localhost:5000",
 		},
 		{
-			Id: "2",
+			Id:   "2",
 			Name: "Private2",
 			Addr: "localhost:5002",
 		},
@@ -290,18 +290,18 @@ func TestDiffRegistryList(t *testing.T) {
 
 	regs2 := []model.Registry{
 		{
-			Id: "1",
+			Id:   "1",
 			Name: "Private1",
 			Addr: "localhost:5000",
 		},
 		{
-			Id: "2",
+			Id:   "2",
 			Name: "Private2",
 			Addr: "localhost:5002",
 		},
 	}
 
-	addedRegistries, deletedRegistries := DiffRegistryList(regs1,regs2)
+	addedRegistries, deletedRegistries := DiffRegistryList(regs1, regs2)
 
 	if len(addedRegistries) != 0 || len(deletedRegistries) != 0 {
 		t.Error("Two similar lists evaluated as different")
@@ -310,7 +310,7 @@ func TestDiffRegistryList(t *testing.T) {
 	// Test for adding registry
 
 	reg := model.Registry{
-		Id : "3",
+		Id:   "3",
 		Name: "Private3",
 		Addr: "localhost:5000",
 	}
@@ -319,7 +319,7 @@ func TestDiffRegistryList(t *testing.T) {
 
 	addedRegistries, deletedRegistries = DiffRegistryList(regs1, regs2)
 
-	if len(addedRegistries) != 1 || len(deletedRegistries) != 0 || !CmpRegistries(addedRegistries[0], reg){
+	if len(addedRegistries) != 1 || len(deletedRegistries) != 0 || !CmpRegistries(addedRegistries[0], reg) {
 		t.Error("Added registry not recognized")
 	}
 
@@ -327,7 +327,7 @@ func TestDiffRegistryList(t *testing.T) {
 	regs1 = append(regs1, reg)
 
 	reg = model.Registry{
-		Id: "4",
+		Id:   "4",
 		Name: "Private4",
 		Addr: "localhost:5000",
 	}
@@ -424,27 +424,27 @@ func TestDiffResultList(t *testing.T) {
 
 	results1 := []model.BuildResult{
 		{
-			Id: "1",
-			BuildId: "1",
-			ResultEntries: []string{"1","2"},
+			Id:            "1",
+			BuildId:       "1",
+			ResultEntries: []string{"1", "2"},
 		},
 		{
-			Id: "2",
-			BuildId: "2",
-			ResultEntries: []string{"1","2"},
+			Id:            "2",
+			BuildId:       "2",
+			ResultEntries: []string{"1", "2"},
 		},
 	}
 
 	results2 := []model.BuildResult{
 		{
-			Id: "1",
-			BuildId: "1",
-			ResultEntries: []string{"1","2"},
+			Id:            "1",
+			BuildId:       "1",
+			ResultEntries: []string{"1", "2"},
 		},
 		{
-			Id: "2",
-			BuildId: "2",
-			ResultEntries: []string{"1","2"},
+			Id:            "2",
+			BuildId:       "2",
+			ResultEntries: []string{"1", "2"},
 		},
 	}
 
@@ -457,16 +457,16 @@ func TestDiffResultList(t *testing.T) {
 	// Test for adding result
 
 	result := model.BuildResult{
-		Id: "3",
-		BuildId: "3",
-		ResultEntries: []string{"1","2"},
+		Id:            "3",
+		BuildId:       "3",
+		ResultEntries: []string{"1", "2"},
 	}
 
 	results2 = append(results2, result)
 
 	addedResults, deletedResults = DiffResultList(results1, results2)
 
-	if len(addedResults) != 1 || len(deletedResults) != 0  || !CmpBuildResults(addedResults[0], result){
+	if len(addedResults) != 1 || len(deletedResults) != 0 || !CmpBuildResults(addedResults[0], result) {
 		t.Error("Added result not recognized")
 	}
 
@@ -475,8 +475,8 @@ func TestDiffResultList(t *testing.T) {
 	results1 = append(results1, result)
 
 	result = model.BuildResult{
-		Id: "4",
-		BuildId: "4",
+		Id:            "4",
+		BuildId:       "4",
 		ResultEntries: []string{"1", "2"},
 	}
 
@@ -496,46 +496,46 @@ func TestDiffRepositoryList(t *testing.T) {
 
 	repos1 := []model.Repository{
 		{
-			Name: "Repo1",
-			Tag: "private",
-			FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-			Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-			HasProblems: false,
-			Message: "msg",
-			RegistryUrl: "localhost:5000",
+			Name:         "Repo1",
+			Tag:          "private",
+			FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+			Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+			HasProblems:  false,
+			Message:      "msg",
+			RegistryUrl:  "localhost:5000",
 			RegistryName: "Reggy",
 		},
 		{
-			Name: "Repo2",
-			Tag: "public",
-			FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-			Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-			HasProblems: false,
-			Message: "msg",
-			RegistryUrl: "localhost:5000",
+			Name:         "Repo2",
+			Tag:          "public",
+			FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+			Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+			HasProblems:  false,
+			Message:      "msg",
+			RegistryUrl:  "localhost:5000",
 			RegistryName: "Repsy",
 		},
 	}
 
 	repos2 := []model.Repository{
 		{
-			Name: "Repo1",
-			Tag: "private",
-			FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-			Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-			HasProblems: false,
-			Message: "msg",
-			RegistryUrl: "localhost:5000",
+			Name:         "Repo1",
+			Tag:          "private",
+			FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+			Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+			HasProblems:  false,
+			Message:      "msg",
+			RegistryUrl:  "localhost:5000",
 			RegistryName: "Reggy",
 		},
 		{
-			Name: "Repo2",
-			Tag: "public",
-			FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-			Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-			HasProblems: false,
-			Message: "msg",
-			RegistryUrl: "localhost:5000",
+			Name:         "Repo2",
+			Tag:          "public",
+			FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+			Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+			HasProblems:  false,
+			Message:      "msg",
+			RegistryUrl:  "localhost:5000",
 			RegistryName: "Repsy",
 		},
 	}
@@ -549,13 +549,13 @@ func TestDiffRepositoryList(t *testing.T) {
 	// Test for adding repository
 
 	repo := model.Repository{
-		Name: "Repo3",
-		Tag: "private-ish",
-		FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-		Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-		HasProblems: false,
-		Message: "Another message",
-		RegistryUrl: "localhost:5000",
+		Name:         "Repo3",
+		Tag:          "private-ish",
+		FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+		Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+		HasProblems:  false,
+		Message:      "Another message",
+		RegistryUrl:  "localhost:5000",
 		RegistryName: "Randy",
 	}
 
@@ -563,7 +563,7 @@ func TestDiffRepositoryList(t *testing.T) {
 
 	addedRepositories, deletedRepositories = DiffRepositoryList(repos1, repos2)
 
-	if len(addedRepositories) != 1 || len(deletedRepositories) != 0 || !CmpRepositories(addedRepositories[0], repo){
+	if len(addedRepositories) != 1 || len(deletedRepositories) != 0 || !CmpRepositories(addedRepositories[0], repo) {
 		t.Error("Added repository not recognized")
 	}
 
@@ -572,13 +572,13 @@ func TestDiffRepositoryList(t *testing.T) {
 	repos1 = append(repos1, repo)
 
 	repo = model.Repository{
-		Name: "Repo4",
-		Tag: "public-ish",
-		FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-		Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-		HasProblems: false,
-		Message: "... and another message",
-		RegistryUrl: "localhost:5000",
+		Name:         "Repo4",
+		Tag:          "public-ish",
+		FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+		Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+		HasProblems:  false,
+		Message:      "... and another message",
+		RegistryUrl:  "localhost:5000",
 		RegistryName: "Robert",
 	}
 
@@ -586,7 +586,7 @@ func TestDiffRepositoryList(t *testing.T) {
 
 	addedRepositories, deletedRepositories = DiffRepositoryList(repos1, repos2)
 
-	if len(addedRepositories) != 0 || len(deletedRepositories) != 1 || !CmpRepositories(deletedRepositories[0], repo){
+	if len(addedRepositories) != 0 || len(deletedRepositories) != 1 || !CmpRepositories(deletedRepositories[0], repo) {
 		t.Error("Deleted repository not recognized")
 	}
 }
@@ -653,7 +653,6 @@ func TestDiffCollectedData(t *testing.T) {
 	if !diff.NewDay.IsZero() {
 		t.Error("Time difference found between to zero entities (New Day)")
 	}
-
 
 	newData.Username = "uname"
 	newData.Images = append(newData.Images, model.Image{Id: "1", Name: "image1"})

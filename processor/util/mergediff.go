@@ -9,7 +9,7 @@ func MergeDiff(oldData model.CollectedData, newData model.CollectedDataDiff) mod
 
 	data := model.CollectedData{}
 	if oldData.MAC != newData.MAC {
-		log.Panicln("Data from different machines, not possible to merge the differences")
+		log.Println("Data from different machines, not possible to merge the differences")
 		return model.CollectedData{}
 	}
 	data.MAC = newData.MAC
@@ -19,167 +19,116 @@ func MergeDiff(oldData model.CollectedData, newData model.CollectedDataDiff) mod
 	} else {
 		data.Username = oldData.Username
 	}
-	data.Images = MergeImageLists(oldData.Images, newData.AddedImages, newData.DeletedImages)
-	data.Projects = MergeProjectLists(oldData.Projects, newData.AddedProjects, newData.DeletedProjects)
-	data.Builds = MergeBuildLists(oldData.Builds, newData.AddedBuilds, newData.DeletedBuilds)
-	data.Registries = MergeRegistryLists(oldData.Registries, newData.AddedRegistries, newData.DeletedRegistries)
-	data.Tests = MergeTestLists(oldData.Tests, newData.AddedTests, newData.DeletedTests)
-	data.Results = MergeResultLists(oldData.Results, newData.AddedResults, newData.DeletedResults)
+	data.Images = MergeImageLists(oldData.Images, newData.AddedImages)
+	data.Projects = MergeProjectLists(oldData.Projects, newData.AddedProjects)
+	data.Builds = MergeBuildLists(oldData.Builds, newData.AddedBuilds)
+	data.Registries = MergeRegistryLists(oldData.Registries, newData.AddedRegistries)
+	data.Tests = MergeTestLists(oldData.Tests, newData.AddedTests)
+	data.Results = MergeResultLists(oldData.Results, newData.AddedResults)
 	data.Day = newData.NewDay
 
 	return data
 }
 
-func MergeImageLists(starterImages []model.Image, addedImages []model.Image, deletedImages []model.Image) []model.Image {
-	result := []model.Image{}
+func MergeImageLists(starterImages []model.Image, addedImages []model.Image) []model.Image {
 
-	isDeleted := map[string]model.Image{}
-
-	for _, img := range deletedImages {
-		isDeleted[img.Id] = img
+	for _, image := range addedImages {
+		starterImages = appendIfMissingImage(starterImages, image)
 	}
 
-	for _, img := range starterImages {
-		if !CmpImages(isDeleted[img.Id], img) {
-			result = append(result, img)
-		}
-	}
-
-	for _, img := range addedImages {
-		result = append(result, img)
-	}
-
-	return result
+	return starterImages
 }
 
-func MergeProjectLists(starterProjects []model.Project, addedProjects []model.Project, deletedProjects []model.Project) []model.Project {
-	result := []model.Project{}
-
-	isDeleted := map[string]model.Project{}
-
-	for _, proj := range deletedProjects {
-		isDeleted[proj.Id] = proj
-	}
-
-	for _, proj := range starterProjects {
-		if !CmpProjects(isDeleted[proj.Id], proj) {
-			result = append(result, proj)
+func appendIfMissingImage(imageList []model.Image, image model.Image) []model.Image {
+	for _, e := range imageList {
+		if CmpImages(e, image) {
+			return imageList
 		}
 	}
+	return append(imageList, image)
+}
 
+func MergeProjectLists(starterProjects []model.Project, addedProjects []model.Project) []model.Project {
 	for _, proj := range addedProjects {
-		result = append(result, proj)
+		starterProjects = appendIfMissingProject(starterProjects, proj)
 	}
 
-	return result
+	return starterProjects
 }
 
-func MergeBuildLists(starterBuilds []model.Build, addedBuilds []model.Build, deletedBuilds []model.Build) []model.Build {
-	result := []model.Build{}
-
-	isDeleted := map[string]model.Build{}
-
-	for _, bld := range deletedBuilds {
-		isDeleted[bld.Id] = bld
-	}
-
-	for _, bld := range starterBuilds {
-		if !CmpBuilds(isDeleted[bld.Id], bld) {
-			result = append(result, bld)
+func appendIfMissingProject(projectList []model.Project, project model.Project) []model.Project {
+	for _, e := range projectList {
+		if CmpProjects(e, project) {
+			return projectList
 		}
 	}
+	return append(projectList, project)
+}
 
+func MergeBuildLists(starterBuilds []model.Build, addedBuilds []model.Build) []model.Build {
 	for _, bld := range addedBuilds {
-		result = append(result, bld)
+		starterBuilds = appendIfMissingBuild(starterBuilds, bld)
 	}
 
-	return result
+	return starterBuilds
 }
 
-func MergeRegistryLists(starterRegistries []model.Registry, addedRegistries []model.Registry, deletedRegistries []model.Registry) []model.Registry {
-	result := []model.Registry{}
-
-	isDeleted := map[string]model.Registry{}
-
-	for _, reg := range deletedRegistries {
-		isDeleted[reg.Id] = reg
-	}
-
-	for _, reg := range starterRegistries{
-		if !CmpRegistries(isDeleted[reg.Id],reg) {
-			result = append(result, reg)
+func appendIfMissingBuild(buildList []model.Build, build model.Build) []model.Build {
+	for _, e := range buildList {
+		if CmpBuilds(e, build) {
+			return buildList
 		}
 	}
+	return append(buildList, build)
+}
 
+func MergeRegistryLists(starterRegistries []model.Registry, addedRegistries []model.Registry) []model.Registry {
 	for _, reg := range addedRegistries {
-		result = append(result, reg)
+		starterRegistries = appendIfMissingRegistry(starterRegistries, reg)
 	}
 
-	return result
+	return starterRegistries
 }
 
-func MergeTestLists(starterTests []model.Test, addedTests []model.Test, deletedTests []model.Test) []model.Test {
-	result := []model.Test{}
-
-	isDeleted := map[string]model.Test{}
-
-	for _, test := range deletedTests {
-		isDeleted[test.Id] = test
-	}
-
-	for _, test := range starterTests {
-		if !CmpTests(isDeleted[test.Id], test) {
-			result = append(result, test)
+func appendIfMissingRegistry(registryList []model.Registry, registry model.Registry) []model.Registry {
+	for _, e := range registryList {
+		if CmpRegistries(e, registry) {
+			return registryList
 		}
 	}
+	return append(registryList, registry)
+}
 
+func MergeTestLists(starterTests []model.Test, addedTests []model.Test) []model.Test {
 	for _, test := range addedTests {
-		result = append(result, test)
+		starterTests = appendIfMissingTest(starterTests, test)
 	}
 
-	return result
+	return starterTests
 }
 
-func MergeResultLists(starterResults []model.BuildResult, addedResults []model.BuildResult, deletedResults []model.BuildResult) []model.BuildResult {
-	result := []model.BuildResult{}
-
-	isDeleted := map[string]model.BuildResult{}
-
-	for _, res := range deletedResults {
-		isDeleted[res.Id] = res
-	}
-
-	for _, res := range starterResults {
-		if !CmpBuildResults(isDeleted[res.Id], res) {
-			result = append(result, res)
+func appendIfMissingTest(testList []model.Test, test model.Test) []model.Test {
+	for _, e := range testList {
+		if CmpTests(e, test) {
+			return testList
 		}
 	}
+	return append(testList, test)
+}
 
+func MergeResultLists(starterResults []model.BuildResult, addedResults []model.BuildResult) []model.BuildResult {
 	for _, res := range addedResults {
-		result = append(result, res)
+		starterResults = appendIfMissingResult(starterResults, res)
 	}
 
-	return result
+	return starterResults
 }
 
-func MergeRepositoryLists(starterRepositories []model.Repository, addedRepositories []model.Repository, deletedRepositories []model.Repository) []model.Repository {
-	result := []model.Repository{}
-
-	isDeleted := map[string]model.Repository{}
-
-	for _, repo := range deletedRepositories {
-		isDeleted[repo.Name] = repo
-	}
-
-	for _, repo := range starterRepositories {
-		if !CmpRepositories(isDeleted[repo.Name], repo) {
-			result = append(result, repo)
+func appendIfMissingResult(resultList []model.BuildResult, result model.BuildResult) []model.BuildResult {
+	for _, e := range resultList {
+		if CmpBuildResults(e, result) {
+			return resultList
 		}
 	}
-
-	for _, repo := range addedRepositories {
-		result = append(result, repo)
-	}
-
-	return result
+	return append(resultList, result)
 }

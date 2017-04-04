@@ -1,24 +1,20 @@
 package service
 
 import (
-	"log"
-	"github.com/ilm-statistics/ilm-statistics/processor/util"
-	"time"
-	"github.com/ilm-statistics/ilm-statistics/processor/repository"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"github.com/ilm-statistics/ilm-statistics/processor/repository"
+	"github.com/ilm-statistics/ilm-statistics/processor/util"
+	"log"
+	"time"
 )
 
 func SendStatistics() {
 
-	if !repository.IsDataForToday() {
-		log.Println("There is no data for today")
-		return
-	}
-
 	// Read statistics
-	stats := repository.GetTodaysData()
+	stats := repository.GetDataForEmail()
 
 	// Calculate the average
+	log.Println("Calculating the average...")
 	s, sforIps := util.StatisticsCalculateAverages(stats)
 
 	// Add the day
@@ -35,13 +31,12 @@ func SendStatistics() {
 		}
 	}()
 
-
 }
 
-func CreateStatistic(stat model.CollectedData) model.CollectedData{
+func CreateStatistic(stat model.CollectedData) model.CollectedData {
 	return repository.CreateStatistic(stat)
 }
 
-func GetTodaysData() []model.CollectedData {
-	return repository.GetTodaysData()
+func GetYesterdaysData() []byte {
+	return repository.GetYesterdaysData()
 }

@@ -1,16 +1,16 @@
 package resource
 
 import (
-	"io/ioutil"
-	"io"
 	"encoding/json"
-	"net/http"
-	"time"
-	"log"
 	"github.com/ilm-statistics/ilm-statistics/model"
 	"github.com/ilm-statistics/ilm-statistics/processor/service"
+	"io"
+	"io/ioutil"
+	"log"
 	"math"
+	"net/http"
 	"strings"
+	"time"
 )
 
 func CreateNewStatistic(w http.ResponseWriter, r *http.Request) {
@@ -53,10 +53,8 @@ func GetStatistics(w http.ResponseWriter, r *http.Request) {
 		r.RequestURI,
 		time.Since(start),
 	)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if err := json.NewEncoder(w).Encode(service.GetTodaysData()); err != nil {
-		panic(err)
-	}
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+	w.Write(service.GetYesterdaysData())
 }
 
 func GetIp(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +68,7 @@ func GetIp(w http.ResponseWriter, r *http.Request) {
 	log.Printf("IP of sender: %s", r.RemoteAddr)
 }
 
-func SendStatistics(){
+func SendStatistics() {
 	service.SendStatistics()
 }
 

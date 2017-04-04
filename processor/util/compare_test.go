@@ -1,46 +1,46 @@
 package util
 
 import (
-	"testing"
 	"github.com/ilm-statistics/ilm-statistics/model"
+	"testing"
 	"time"
 )
 
-func TestCmpImages(t *testing.T){
+func TestCmpImages(t *testing.T) {
 	t.Parallel()
 
 	// Two equal images
 	img1 := model.Image{
-		Id: "1",
-		Name: "Image1",
-		ImageId: "1",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "1",
+		Name:           "Image1",
+		ImageId:        "1",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}
 	img2 := model.Image{
-		Id: "1",
-		Name: "Image1",
-		ImageId: "1",
-		Description: "A cool new image with all that fancy stuff",
-		RegistryId: "42",
-		Tag: "awesome",
-		IlmTags: []string{"yay", "hooray"},
-		Location: "public registry",
+		Id:             "1",
+		Name:           "Image1",
+		ImageId:        "1",
+		Description:    "A cool new image with all that fancy stuff",
+		RegistryId:     "42",
+		Tag:            "awesome",
+		IlmTags:        []string{"yay", "hooray"},
+		Location:       "public registry",
 		SkipImageBuild: false,
 	}
 
-	if !CmpImages(img1,img2) {
+	if !CmpImages(img1, img2) {
 		t.Error("Two equal images evaluated as non-equal")
 	}
 
 	// One image is different from the other in one field (Name)
 	img2.Name = "Image2"
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different Name)")
 	}
 
@@ -48,7 +48,7 @@ func TestCmpImages(t *testing.T){
 	img2.Name = "Image1"
 	img2.ImageId = "2"
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different ImageId)")
 	}
 
@@ -62,11 +62,11 @@ func TestCmpImages(t *testing.T){
 
 	// One image is different from the other in one field (Status)
 	img2.Description = "A cool new image with all that fancy stuff"
-	
+
 	// One image is different from the other in one field (RegistryId)
 	img2.RegistryId = "45"
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different RegistryId)")
 	}
 
@@ -74,7 +74,7 @@ func TestCmpImages(t *testing.T){
 	img2.RegistryId = "42"
 	img2.Tag = "awful"
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different Tag)")
 	}
 
@@ -82,7 +82,7 @@ func TestCmpImages(t *testing.T){
 	img2.Tag = "awesome"
 	img2.IlmTags = []string{"boo"}
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different IlmTags)")
 	}
 
@@ -90,7 +90,7 @@ func TestCmpImages(t *testing.T){
 	img2.IlmTags = []string{"yay", "hooray"}
 	img2.Location = "private registry"
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different Location)")
 	}
 
@@ -98,7 +98,7 @@ func TestCmpImages(t *testing.T){
 	img2.Location = "public registry"
 	img2.SkipImageBuild = true
 
-	if CmpImages(img1,img2) {
+	if CmpImages(img1, img2) {
 		t.Error("Two non-equal images evaluated as equal (different SkipImageBuild)")
 	}
 }
@@ -110,7 +110,7 @@ func TestCmpProviders(t *testing.T) {
 	prov1 := model.Provider{
 		ProviderType: "clair",
 	}
-	prov2 := model.Provider {
+	prov2 := model.Provider{
 		ProviderType: "clair",
 	}
 
@@ -143,24 +143,23 @@ func TestCmpTests(t *testing.T) {
 		},
 	}
 
-	if !CmpTests(test1, test2){
+	if !CmpTests(test1, test2) {
 		t.Error("Two equal tests evaluated as non-equal")
 	}
 
 	// One test is different from the other in one field (Id)
 	test2.Id = "2"
 
-	if CmpTests(test1,test2){
+	if CmpTests(test1, test2) {
 		t.Error("Two non-equal tests evaluated as equal (different Id)")
 	}
-
 
 	test2.Id = "1"
 
 	// One test is different from the other in one field (Provider)
 	test2.Provider.ProviderType = "not clair"
 
-	if CmpTests(test1,test2){
+	if CmpTests(test1, test2) {
 		t.Error("Two non-equal tests evaluated as equal (different Provider)")
 	}
 }
@@ -170,20 +169,20 @@ func TestCmpProjects(t *testing.T) {
 
 	//Two equal projects
 	proj1 := model.Project{
-		Id: "1",
-		Name: "Project1",
+		Id:           "1",
+		Name:         "Project1",
 		CreationTime: "2002",
-		Status: "new",
-		Images: []model.Image{},
-		Tests: []model.Test{},
+		Status:       "new",
+		Images:       []model.Image{},
+		Tests:        []model.Test{},
 	}
 	proj2 := model.Project{
-		Id: "1",
-		Name: "Project1",
+		Id:           "1",
+		Name:         "Project1",
 		CreationTime: "2002",
-		Status: "new",
-		Images: []model.Image{},
-		Tests: []model.Test{},
+		Status:       "new",
+		Images:       []model.Image{},
+		Tests:        []model.Test{},
 	}
 
 	if !CmpProjects(proj1, proj2) {
@@ -193,7 +192,7 @@ func TestCmpProjects(t *testing.T) {
 	// One project is different from the other in one field (Id)
 	proj2.Id = "2"
 
-	if CmpProjects(proj1, proj2){
+	if CmpProjects(proj1, proj2) {
 		t.Error("Two non-equal projects evaluated as equal (different Id)")
 	}
 
@@ -201,7 +200,7 @@ func TestCmpProjects(t *testing.T) {
 	proj2.Id = "1"
 	proj2.Name = "Project2"
 
-	if CmpProjects(proj1,proj2){
+	if CmpProjects(proj1, proj2) {
 		t.Error("Two non-equal projects evaluated as equal (different Name)")
 	}
 	proj2.Name = "Project1"
@@ -209,7 +208,7 @@ func TestCmpProjects(t *testing.T) {
 	// One project is different from the other in one field (CreationTime)
 	proj2.CreationTime = "2003"
 
-	if CmpProjects(proj1, proj2){
+	if CmpProjects(proj1, proj2) {
 		t.Error("Two non-equal projects evaluated as equal (different CreationTime)")
 	}
 
@@ -218,7 +217,7 @@ func TestCmpProjects(t *testing.T) {
 	// One project is different from the other in one field (Status)
 	proj2.Status = "old"
 
-	if CmpProjects(proj1, proj2){
+	if CmpProjects(proj1, proj2) {
 		t.Error("Two non-equal projects evaluated as equal (different Status)")
 	}
 
@@ -226,60 +225,60 @@ func TestCmpProjects(t *testing.T) {
 	proj2.Status = "new"
 	proj2.Images = []model.Image{
 		{
-			Id: "1",
-			Name: "Image1",
-			ImageId: "1",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "1",
+			Name:           "Image1",
+			ImageId:        "1",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		},
 		{
-			Id: "12",
-			Name: "Image1",
-			ImageId: "12",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "12",
+			Name:           "Image1",
+			ImageId:        "12",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		},
 	}
 
-	if CmpProjects(proj1, proj2){
+	if CmpProjects(proj1, proj2) {
 		t.Error("Two non-equal projects evaluated as equal (different Images)")
 	}
 
 	// One project is different from the other in one field (different order in Images) -> they should evaluate as equal
 	proj1.Images = []model.Image{
 		{
-			Id: "12",
-			Name: "Image1",
-			ImageId: "12",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "12",
+			Name:           "Image1",
+			ImageId:        "12",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		},
 		{
-			Id: "1",
-			Name: "Image1",
-			ImageId: "1",
-			Description: "A cool new image with all that fancy stuff",
-			RegistryId: "42",
-			Tag: "awesome",
-			IlmTags: []string{"yay", "hooray"},
-			Location: "public registry",
+			Id:             "1",
+			Name:           "Image1",
+			ImageId:        "1",
+			Description:    "A cool new image with all that fancy stuff",
+			RegistryId:     "42",
+			Tag:            "awesome",
+			IlmTags:        []string{"yay", "hooray"},
+			Location:       "public registry",
 			SkipImageBuild: false,
 		},
 	}
 
-	if !CmpProjects(proj1, proj2){
+	if !CmpProjects(proj1, proj2) {
 		t.Error("Two equal projects evaluated as non-equal (different order in Images)")
 	}
 
@@ -299,7 +298,7 @@ func TestCmpProjects(t *testing.T) {
 		},
 	}
 
-	if CmpProjects(proj1, proj2){
+	if CmpProjects(proj1, proj2) {
 		t.Error("Two non-equal projects evaluated as equal (different Tests)")
 	}
 }
@@ -309,21 +308,21 @@ func TestCmpBuilds(t *testing.T) {
 
 	// Two equal builds
 	build1 := model.Build{
-		Id: "1",
+		Id:        "1",
 		ProjectId: "1",
-		TestId: "1",
+		TestId:    "1",
 		StartTime: "2002",
-		Status: model.Status{Status:"new"},
+		Status:    model.Status{Status: "new"},
 	}
 	build2 := model.Build{
-		Id: "1",
+		Id:        "1",
 		ProjectId: "1",
-		TestId: "1",
+		TestId:    "1",
 		StartTime: "2002",
-		Status: model.Status{Status:"new",},
+		Status:    model.Status{Status: "new"},
 	}
 
-	if !CmpBuilds(build1, build2){
+	if !CmpBuilds(build1, build2) {
 		t.Error("Two equal projects evaluated as non-equal")
 	}
 
@@ -373,24 +372,24 @@ func TestCmpRegistries(t *testing.T) {
 
 	// Two equal registries
 	reg1 := model.Registry{
-		Id: "1",
+		Id:   "1",
 		Name: "Private1",
 		Addr: "localhost:5000",
 	}
 	reg2 := model.Registry{
-		Id: "1",
+		Id:   "1",
 		Name: "Private1",
 		Addr: "localhost:5000",
 	}
 
-	if !CmpRegistries(reg1,reg2){
+	if !CmpRegistries(reg1, reg2) {
 		t.Error("Two equal registries evaluated as non-equal")
 	}
 
 	// One of the registries is different from the other in one field (Id)
 	reg2.Id = "2"
 
-	if CmpRegistries(reg1,reg2){
+	if CmpRegistries(reg1, reg2) {
 		t.Error("Two non-equal registries evaluated as equal (different Id)")
 	}
 
@@ -398,7 +397,7 @@ func TestCmpRegistries(t *testing.T) {
 	reg2.Id = "1"
 	reg2.Name = "Private2"
 
-	if CmpRegistries(reg1,reg2){
+	if CmpRegistries(reg1, reg2) {
 		t.Error("Two non-equal registries evaluated as equal (different Name)")
 	}
 
@@ -406,7 +405,7 @@ func TestCmpRegistries(t *testing.T) {
 	reg2.Name = "Private1"
 	reg2.Addr = "localhost:5001"
 
-	if CmpRegistries(reg1,reg2){
+	if CmpRegistries(reg1, reg2) {
 		t.Error("Two non-equal registries evaluated as equal (different Addr)")
 	}
 
@@ -417,25 +416,25 @@ func TestCmpBuildResults(t *testing.T) {
 
 	// Two equal buildResults
 	res1 := model.BuildResult{
-		Id: "1",
-		BuildId: "1",
-		ResultEntries: []string{"1","2"},
+		Id:            "1",
+		BuildId:       "1",
+		ResultEntries: []string{"1", "2"},
 	}
 
 	res2 := model.BuildResult{
-		Id: "1",
-		BuildId: "1",
-		ResultEntries: []string{"1","2"},
+		Id:            "1",
+		BuildId:       "1",
+		ResultEntries: []string{"1", "2"},
 	}
 
-	if !CmpBuildResults(res1,res2){
+	if !CmpBuildResults(res1, res2) {
 		t.Error("Two equal build results evaluated as non-equal")
 	}
 
 	// One of the build results is different from the other in one field (ID)
 	res2.Id = "2"
 
-	if CmpBuildResults(res1,res2){
+	if CmpBuildResults(res1, res2) {
 		t.Error("Two non-equal build results evaluated as equal (different ID)")
 	}
 
@@ -443,7 +442,7 @@ func TestCmpBuildResults(t *testing.T) {
 	res2.Id = "1"
 	res2.BuildId = "2"
 
-	if CmpBuildResults(res1,res2){
+	if CmpBuildResults(res1, res2) {
 		t.Error("Two non-equal build results evaluated as equal (different BuildId)")
 	}
 
@@ -451,14 +450,14 @@ func TestCmpBuildResults(t *testing.T) {
 	res2.BuildId = "1"
 	res2.ResultEntries = []string{}
 
-	if CmpBuildResults(res1,res2){
+	if CmpBuildResults(res1, res2) {
 		t.Error("Two non-equal build results evaluated as equal (different ResultEntries)")
 	}
 
 	// One build result is different from the other in one field (different order in ResultEntries) -> they should evaluate as equal
-	res2.ResultEntries = []string{"2","1"}
+	res2.ResultEntries = []string{"2", "1"}
 
-	if !CmpBuildResults(res1,res2){
+	if !CmpBuildResults(res1, res2) {
 		t.Error("Two equal build results evaluated as non-equal (different order in ResultEntries)")
 	}
 }
@@ -468,34 +467,34 @@ func TestCmpRepositories(t *testing.T) {
 
 	// Two equal repositories
 	repo1 := model.Repository{
-		Name: "Repo1",
-		Tag: "private",
-		FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-		Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-		HasProblems: false,
-		Message: "msg",
-		RegistryUrl: "localhost:5000",
+		Name:         "Repo1",
+		Tag:          "private",
+		FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+		Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+		HasProblems:  false,
+		Message:      "msg",
+		RegistryUrl:  "localhost:5000",
 		RegistryName: "Reggy",
 	}
 	repo2 := model.Repository{
-		Name: "Repo1",
-		Tag: "private",
-		FsLayers: []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}},
-		Signatures: []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, },
-		HasProblems: false,
-		Message: "msg",
-		RegistryUrl: "localhost:5000",
+		Name:         "Repo1",
+		Tag:          "private",
+		FsLayers:     []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}},
+		Signatures:   []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}},
+		HasProblems:  false,
+		Message:      "msg",
+		RegistryUrl:  "localhost:5000",
 		RegistryName: "Reggy",
 	}
 
-	if !CmpRepositories(repo1,repo2){
+	if !CmpRepositories(repo1, repo2) {
 		t.Error("Two equal repositories evaluates as non-equal")
 	}
 
 	// One repository is different from the other in one field (Name)
 	repo2.Name = "Repo2"
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different Name)")
 	}
 
@@ -503,30 +502,30 @@ func TestCmpRepositories(t *testing.T) {
 	repo2.Name = "Repo1"
 	repo2.Tag = "public"
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different Tag)")
 	}
 
 	// One repository is different from the other in one field (FsLayers)
 	repo2.Tag = "private"
-	repo2.FsLayers = []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "500"}}
-	if CmpRepositories(repo1,repo2){
+	repo2.FsLayers = []model.FsLayer{{BlobSum: "50"}, {BlobSum: "500"}}
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different FsLayers)")
 	}
 
 	// One repository is different from the other in one field (Signatures)
-	repo2.FsLayers = []model.FsLayer{ {BlobSum: "50",}, {BlobSum: "100"}}
-	repo2.Signatures = []model.Signature{ {Header: model.Header{Algorithm:"algs12"}, Signature: "signed", Protected: "yes" }, }
+	repo2.FsLayers = []model.FsLayer{{BlobSum: "50"}, {BlobSum: "100"}}
+	repo2.Signatures = []model.Signature{{Header: model.Header{Algorithm: "algs12"}, Signature: "signed", Protected: "yes"}}
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different Signatures)")
 	}
 
 	// One repository is different from the other in one field (HasProblems)
-	repo2.Signatures = []model.Signature{ {Header: model.Header{Algorithm:"algs"}, Signature: "signed", Protected: "yes" }, }
+	repo2.Signatures = []model.Signature{{Header: model.Header{Algorithm: "algs"}, Signature: "signed", Protected: "yes"}}
 	repo2.HasProblems = true
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different HasProblems)")
 	}
 
@@ -534,7 +533,7 @@ func TestCmpRepositories(t *testing.T) {
 	repo2.HasProblems = false
 	repo2.Message = "Hello World!"
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different Message)")
 	}
 
@@ -542,7 +541,7 @@ func TestCmpRepositories(t *testing.T) {
 	repo2.Message = "msg"
 	repo2.RegistryUrl = "localhost:8080"
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different RegistryUrl)")
 	}
 
@@ -550,7 +549,7 @@ func TestCmpRepositories(t *testing.T) {
 	repo2.RegistryUrl = "localhost:5000"
 	repo2.RegistryName = "Registry"
 
-	if CmpRepositories(repo1,repo2){
+	if CmpRepositories(repo1, repo2) {
 		t.Error("Two non-equal repositories evaluated as equal (different RegistryName)")
 	}
 }
@@ -562,7 +561,7 @@ func TestCmpCollectedData(t *testing.T) {
 	data2 := model.CollectedData{}
 
 	// Test two empty data struncts
-	if !CmpCollectedData(data1, data2){
+	if !CmpCollectedData(data1, data2) {
 		t.Error("Two empty structs evaluated as non-equal")
 	}
 
